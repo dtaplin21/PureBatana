@@ -35,7 +35,7 @@ export default function Header() {
           <div className="hidden lg:flex space-x-8 order-2">
             <div className="relative group">
               <Link href="/">
-                <a className={`font-medium hover:text-[#588157] transition-colors py-2 ${currentLocation === '/' ? 'text-[#588157]' : ''}`}>Shop</a>
+                <a className={`font-medium hover:text-[#588157] transition-colors py-2 text-lg ${currentLocation === '/' ? 'text-[#588157]' : ''}`}>Our Products</a>
               </Link>
               {/* Dropdown menu */}
               <div className="absolute left-0 mt-2 w-48 bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
@@ -56,19 +56,16 @@ export default function Header() {
               </div>
             </div>
             <Link href="/benefits">
-              <a className={`font-medium hover:text-[#588157] transition-colors py-2 ${currentLocation === '/benefits' ? 'text-[#588157]' : ''}`}>Benefits</a>
-            </Link>
-            <Link href="/story">
-              <a className={`font-medium hover:text-[#588157] transition-colors py-2 ${currentLocation === '/story' ? 'text-[#588157]' : ''}`}>Our Story</a>
+              <a className={`font-medium hover:text-[#588157] transition-colors py-2 text-lg ${currentLocation === '/benefits' ? 'text-[#588157]' : ''}`}>Benefits of Batana Oil</a>
             </Link>
             <Link href="/how-to-use">
-              <a className={`font-medium hover:text-[#588157] transition-colors py-2 ${currentLocation === '/how-to-use' ? 'text-[#588157]' : ''}`}>How to Use</a>
+              <a className={`font-medium hover:text-[#588157] transition-colors py-2 text-lg ${currentLocation === '/how-to-use' ? 'text-[#588157]' : ''}`}>How to Use Batana Oil</a>
             </Link>
-            <Link href="/#reviews">
-              <a className={`font-medium hover:text-[#588157] transition-colors py-2 ${currentLocation.includes('reviews') ? 'text-[#588157]' : ''}`}>Reviews</a>
+            <Link href="/story">
+              <a className={`font-medium hover:text-[#588157] transition-colors py-2 text-lg ${currentLocation === '/story' ? 'text-[#588157]' : ''}`}>Our Story</a>
             </Link>
             <Link href="/contact">
-              <a className={`font-medium hover:text-[#588157] transition-colors py-2 ${currentLocation === '/contact' ? 'text-[#588157]' : ''}`}>Contact</a>
+              <a className={`font-medium hover:text-[#588157] transition-colors py-2 text-lg ${currentLocation === '/contact' ? 'text-[#588157]' : ''}`}>Contact</a>
             </Link>
           </div>
           
@@ -98,22 +95,19 @@ export default function Header() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col space-y-3">
             <Link href="/">
-              <a className="font-medium py-2 border-b border-neutral-100" onClick={() => setIsMobileMenuOpen(false)}>Shop</a>
+              <a className="font-medium py-2 border-b border-neutral-100 text-base" onClick={() => setIsMobileMenuOpen(false)}>Our Products</a>
             </Link>
             <Link href="/benefits">
-              <a className="font-medium py-2 border-b border-neutral-100" onClick={() => setIsMobileMenuOpen(false)}>Benefits</a>
-            </Link>
-            <Link href="/story">
-              <a className="font-medium py-2 border-b border-neutral-100" onClick={() => setIsMobileMenuOpen(false)}>Our Story</a>
+              <a className="font-medium py-2 border-b border-neutral-100 text-base" onClick={() => setIsMobileMenuOpen(false)}>Benefits of Batana Oil</a>
             </Link>
             <Link href="/how-to-use">
-              <a className="font-medium py-2 border-b border-neutral-100" onClick={() => setIsMobileMenuOpen(false)}>How to Use</a>
+              <a className="font-medium py-2 border-b border-neutral-100 text-base" onClick={() => setIsMobileMenuOpen(false)}>How to Use Batana Oil</a>
             </Link>
-            <Link href="/#reviews">
-              <a className="font-medium py-2 border-b border-neutral-100" onClick={() => setIsMobileMenuOpen(false)}>Reviews</a>
+            <Link href="/story">
+              <a className="font-medium py-2 border-b border-neutral-100 text-base" onClick={() => setIsMobileMenuOpen(false)}>Our Story</a>
             </Link>
             <Link href="/contact">
-              <a className="font-medium py-2" onClick={() => setIsMobileMenuOpen(false)}>Contact</a>
+              <a className="font-medium py-2 text-base" onClick={() => setIsMobileMenuOpen(false)}>Contact</a>
             </Link>
           </div>
         </div>
