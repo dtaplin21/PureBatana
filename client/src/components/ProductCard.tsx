@@ -28,7 +28,10 @@ export default function ProductCard({ product }: ProductCardProps) {
       <Link href={`/product/${product.slug}`}>
         <div className="relative cursor-pointer">
           <img 
-            src={product.images[0]} 
+            src={product.slug === "pure-batana-oil" 
+              ? `/images/IMG_5441.jpg` 
+              : product.images[0]
+            } 
             alt={product.name} 
             className="w-full h-64 object-cover"
             onError={(e) => {

@@ -78,7 +78,11 @@ export default function ProductPage() {
           <div className="flex flex-col lg:flex-row gap-12">
             {/* Product Gallery */}
             <div className="lg:w-1/2">
-              <ProductGallery images={product.images} />
+              {product.slug === "pure-batana-oil" ? (
+                <ProductGallery images={["/images/IMG_5441.jpg", "/images/IMG_5442.jpg", "/images/IMG_5443.jpg"]} />
+              ) : (
+                <ProductGallery images={product.images} />
+              )}
             </div>
             
             {/* Product Details */}

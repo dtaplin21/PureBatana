@@ -39,7 +39,7 @@ export default function Hero() {
           </div>
           <div className="md:w-1/2">
             <img 
-              src="https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+              src="/images/IMG_5441.jpg" 
               alt="Batana Oil Bottle" 
               className="w-full max-w-md mx-auto rounded-lg shadow-xl" 
               loading="eager"
