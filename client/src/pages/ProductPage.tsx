@@ -79,7 +79,7 @@ export default function ProductPage() {
             {/* Product Gallery */}
             <div className="lg:w-1/2">
               {product.slug === "pure-batana-oil" ? (
-                <ProductGallery images={["/images/IMG_5441.jpg", "/images/IMG_5442.jpg", "/images/IMG_5443.jpg"]} />
+                <ProductGallery images={["/images/batana-front.jpg", "/images/batana-instructions.jpg", "/images/batana-benefits.jpg"]} />
               ) : (
                 <ProductGallery images={product.images} />
               )}

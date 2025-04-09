@@ -1,0 +1,55 @@
+Uploaded Files:
+/mnt/data/IMG_5441.jpg – front of jar (label)
+
+/mnt/data/IMG_5442.jpg – usage instructions
+
+/mnt/data/IMG_5443.jpg – benefits/ingredients
+
+📁 Step-by-Step Instructions to Replace the Old Image
+✅ Step 1: Create a Folder for Product Images
+Inside your project, go to:
+
+swift
+Copy
+Edit
+WebsiteValidator/WebsiteValidator/client/public/images/
+If images/ does not exist under public/, create it. This is where static assets like images should go in a React + Vite project.
+
+✅ Step 2: Move the Uploaded Images into That Folder
+Rename them for clarity:
+
+Old Path (uploaded)	New Path (in project)
+/mnt/data/IMG_5441.jpg	client/public/images/batana-front.jpg
+/mnt/data/IMG_5442.jpg	client/public/images/batana-instructions.jpg
+/mnt/data/IMG_5443.jpg	client/public/images/batana-benefits.jpg
+You can rename and move them using your file explorer or terminal.
+
+✅ Step 3: Reference the Images in Your Code
+Wherever you want to display them (e.g., inside ProductCard.tsx or a new section), reference them like this:
+
+tsx
+Copy
+Edit
+<img src="/images/batana-front.jpg" alt="Batana Oil Front" className="rounded-lg w-full max-w-md" />
+<img src="/images/batana-instructions.jpg" alt="Batana Oil Instructions" className="rounded-lg w-full max-w-md" />
+<img src="/images/batana-benefits.jpg" alt="Batana Oil Benefits" className="rounded-lg w-full max-w-md" />
+✅ Optional: Add IDs for Smooth Scroll
+You can now link directly to these sections from the header (as discussed before) by adding id tags like:
+
+tsx
+Copy
+Edit
+<section id="products" className="py-12">
+  <h2 className="text-2xl font-bold mb-4">Our Products</h2>
+  <img src="/images/batana-front.jpg" alt="Batana Product" />
+</section>
+
+<section id="benefits" className="py-12">
+  <h2 className="text-2xl font-bold mb-4">Benefits of Batana Oil</h2>
+  <img src="/images/batana-benefits.jpg" alt="Benefits" />
+</section>
+
+<section id="howtouse" className="py-12">
+  <h2 className="text-2xl font-bold mb-4">How to Use Batana Oil</h2>
+  <img src="/images/batana-instructions.jpg" alt="How to Use" />
+</section>

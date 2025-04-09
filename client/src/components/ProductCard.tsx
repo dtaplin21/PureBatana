@@ -29,7 +29,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="relative cursor-pointer">
           <img 
             src={product.slug === "pure-batana-oil" 
-              ? `/images/IMG_5441.jpg` 
+              ? `/images/batana-front.jpg` 
               : product.images[0]
             } 
             alt={product.name} 

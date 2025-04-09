@@ -1,3 +1,7 @@
 {
-  "batana_oil": ["/images/IMG_5441.jpg", "/images/IMG_5442.jpg", "/images/IMG_5443.jpg"]
+  "batana_oil": [
+    "/images/batana-front.jpg", 
+    "/images/batana-instructions.jpg", 
+    "/images/batana-benefits.jpg"
+  ]
 }
