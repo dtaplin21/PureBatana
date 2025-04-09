@@ -1,10 +1,18 @@
 export default function HowToUse() {
   return (
-    <section id="how-to-use" className="py-16 md:py-24 bg-neutral-50">
+    <section id="howtouse" className="py-16 md:py-24 bg-neutral-50">
       <div className="container mx-auto px-4">
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-8">
           <h2 className="font-display font-bold text-3xl md:text-4xl text-[#3a5a40] mb-4">How to Use Batana Oil</h2>
           <p className="text-neutral-800">Simple ways to incorporate this versatile oil into your daily routine</p>
+        </div>
+        
+        <div className="max-w-2xl mx-auto mb-16">
+          <img 
+            src="/images/batana-instructions.jpg" 
+            alt="Batana Oil Usage Instructions" 
+            className="w-full rounded-lg mx-auto shadow-md"
+          />
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

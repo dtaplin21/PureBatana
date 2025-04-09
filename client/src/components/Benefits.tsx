@@ -4,9 +4,17 @@ export default function Benefits() {
   return (
     <section id="benefits" className="py-16 md:py-24 bg-[#dad7cd]">
       <div className="container mx-auto px-4">
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-8">
           <h2 className="font-display font-bold text-3xl md:text-4xl text-[#3a5a40] mb-4">Benefits of Batana Oil</h2>
           <p className="text-neutral-800">Discover why this ancient beauty secret has been treasured for centuries</p>
+        </div>
+        
+        <div className="max-w-2xl mx-auto mb-16">
+          <img 
+            src="/images/batana-benefits.jpg" 
+            alt="Batana Oil Benefits" 
+            className="w-full rounded-lg mx-auto shadow-md"
+          />
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -37,10 +45,10 @@ export default function Benefits() {
         
         <div className="mt-16 text-center">
           <Link href="/">
-            <a className="inline-flex items-center text-[#3a5a40] hover:text-[#588157] font-medium transition-colors">
+            <span className="inline-flex items-center text-[#3a5a40] hover:text-[#588157] font-medium transition-colors cursor-pointer">
               <span>Explore Our Products</span>
               <i className="fas fa-arrow-right ml-2"></i>
-            </a>
+            </span>
           </Link>
         </div>
       </div>
