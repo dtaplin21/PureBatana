@@ -55,11 +55,14 @@ export default function Header() {
                 </div>
               </div>
             </div>
-            <Link href="/#benefits">
-              <a className={`font-medium hover:text-[#588157] transition-colors py-2 ${currentLocation.includes('benefits') ? 'text-[#588157]' : ''}`}>Benefits</a>
+            <Link href="/benefits">
+              <a className={`font-medium hover:text-[#588157] transition-colors py-2 ${currentLocation === '/benefits' ? 'text-[#588157]' : ''}`}>Benefits</a>
             </Link>
-            <Link href="/#story">
-              <a className={`font-medium hover:text-[#588157] transition-colors py-2 ${currentLocation.includes('story') ? 'text-[#588157]' : ''}`}>Our Story</a>
+            <Link href="/story">
+              <a className={`font-medium hover:text-[#588157] transition-colors py-2 ${currentLocation === '/story' ? 'text-[#588157]' : ''}`}>Our Story</a>
+            </Link>
+            <Link href="/how-to-use">
+              <a className={`font-medium hover:text-[#588157] transition-colors py-2 ${currentLocation === '/how-to-use' ? 'text-[#588157]' : ''}`}>How to Use</a>
             </Link>
             <Link href="/#reviews">
               <a className={`font-medium hover:text-[#588157] transition-colors py-2 ${currentLocation.includes('reviews') ? 'text-[#588157]' : ''}`}>Reviews</a>
@@ -97,11 +100,14 @@ export default function Header() {
             <Link href="/">
               <a className="font-medium py-2 border-b border-neutral-100" onClick={() => setIsMobileMenuOpen(false)}>Shop</a>
             </Link>
-            <Link href="/#benefits">
+            <Link href="/benefits">
               <a className="font-medium py-2 border-b border-neutral-100" onClick={() => setIsMobileMenuOpen(false)}>Benefits</a>
             </Link>
-            <Link href="/#story">
+            <Link href="/story">
               <a className="font-medium py-2 border-b border-neutral-100" onClick={() => setIsMobileMenuOpen(false)}>Our Story</a>
+            </Link>
+            <Link href="/how-to-use">
+              <a className="font-medium py-2 border-b border-neutral-100" onClick={() => setIsMobileMenuOpen(false)}>How to Use</a>
             </Link>
             <Link href="/#reviews">
               <a className="font-medium py-2 border-b border-neutral-100" onClick={() => setIsMobileMenuOpen(false)}>Reviews</a>
