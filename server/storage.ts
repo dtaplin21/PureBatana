@@ -8,6 +8,8 @@ import {
   subscribers, Subscriber, InsertSubscriber,
   contactMessages, ContactMessage, InsertContactMessage
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, and, count } from "drizzle-orm";
 
 export interface IStorage {
   // Products
@@ -437,4 +439,359 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DatabaseStorage implements IStorage {
+  // Products
+  async getProducts(): Promise<Product[]> {
+    return db.select().from(products);
+  }
+
+  async getProduct(id: number): Promise<Product | undefined> {
+    const [product] = await db.select().from(products).where(eq(products.id, id));
+    return product;
+  }
+
+  async getProductBySlug(slug: string): Promise<Product | undefined> {
+    const [product] = await db.select().from(products).where(eq(products.slug, slug));
+    return product;
+  }
+
+  async createProduct(product: InsertProduct): Promise<Product> {
+    const [newProduct] = await db.insert(products).values(product).returning();
+    return newProduct;
+  }
+
+  async updateProduct(id: number, product: Partial<InsertProduct>): Promise<Product | undefined> {
+    const [updatedProduct] = await db
+      .update(products)
+      .set(product)
+      .where(eq(products.id, id))
+      .returning();
+    return updatedProduct;
+  }
+
+  async deleteProduct(id: number): Promise<boolean> {
+    const result = await db.delete(products).where(eq(products.id, id));
+    return result.count > 0;
+  }
+
+  // Users
+  async getUsers(): Promise<User[]> {
+    return db.select().from(users);
+  }
+
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async createUser(user: InsertUser): Promise<User> {
+    const [newUser] = await db.insert(users).values(user).returning();
+    return newUser;
+  }
+
+  async updateUser(id: number, user: Partial<InsertUser>): Promise<User | undefined> {
+    const [updatedUser] = await db
+      .update(users)
+      .set(user)
+      .where(eq(users.id, id))
+      .returning();
+    return updatedUser;
+  }
+
+  // Orders
+  async getOrders(): Promise<Order[]> {
+    return db.select().from(orders);
+  }
+
+  async getOrder(id: number): Promise<Order | undefined> {
+    const [order] = await db.select().from(orders).where(eq(orders.id, id));
+    return order;
+  }
+
+  async getUserOrders(userId: number): Promise<Order[]> {
+    return db.select().from(orders).where(eq(orders.userId, userId));
+  }
+
+  async createOrder(order: InsertOrder): Promise<Order> {
+    const [newOrder] = await db.insert(orders).values(order).returning();
+    return newOrder;
+  }
+
+  async updateOrderStatus(id: number, status: string): Promise<Order | undefined> {
+    const now = new Date();
+    const [updatedOrder] = await db
+      .update(orders)
+      .set({ status, updatedAt: now })
+      .where(eq(orders.id, id))
+      .returning();
+    return updatedOrder;
+  }
+
+  // Order Items
+  async getOrderItems(orderId: number): Promise<OrderItem[]> {
+    return db.select().from(orderItems).where(eq(orderItems.orderId, orderId));
+  }
+
+  async createOrderItem(item: InsertOrderItem): Promise<OrderItem> {
+    const [newItem] = await db.insert(orderItems).values(item).returning();
+    return newItem;
+  }
+
+  // Cart Items
+  async getCartItems(userId: number): Promise<CartItem[]> {
+    return db.select().from(cartItems).where(eq(cartItems.userId, userId));
+  }
+
+  async getCartItemByUserAndProduct(userId: number, productId: number): Promise<CartItem | undefined> {
+    const [cartItem] = await db
+      .select()
+      .from(cartItems)
+      .where(
+        and(
+          eq(cartItems.userId, userId),
+          eq(cartItems.productId, productId)
+        )
+      );
+    return cartItem;
+  }
+
+  async createCartItem(item: InsertCartItem): Promise<CartItem> {
+    try {
+      const [newItem] = await db.insert(cartItems).values(item).returning();
+      return newItem;
+    } catch (error) {
+      // Handle unique constraint violation by updating the quantity instead
+      if (error instanceof Error && error.message.includes('unique constraint')) {
+        const existingItem = await this.getCartItemByUserAndProduct(item.userId, item.productId);
+        if (existingItem) {
+          const updatedItem = await this.updateCartItemQuantity(
+            existingItem.id,
+            existingItem.quantity + item.quantity
+          );
+          if (updatedItem) return updatedItem;
+        }
+      }
+      throw error;
+    }
+  }
+
+  async updateCartItemQuantity(id: number, quantity: number): Promise<CartItem | undefined> {
+    const [updatedItem] = await db
+      .update(cartItems)
+      .set({ quantity })
+      .where(eq(cartItems.id, id))
+      .returning();
+    return updatedItem;
+  }
+
+  async deleteCartItem(id: number): Promise<boolean> {
+    const result = await db.delete(cartItems).where(eq(cartItems.id, id));
+    return result.count > 0;
+  }
+
+  async clearCart(userId: number): Promise<boolean> {
+    const result = await db.delete(cartItems).where(eq(cartItems.userId, userId));
+    return result.count > 0;
+  }
+
+  // Reviews
+  async getProductReviews(productId: number): Promise<Review[]> {
+    return db.select().from(reviews).where(eq(reviews.productId, productId));
+  }
+
+  async createReview(review: InsertReview): Promise<Review> {
+    const [newReview] = await db.insert(reviews).values(review).returning();
+    return newReview;
+  }
+
+  // Newsletter subscribers
+  async createSubscriber(subscriber: InsertSubscriber): Promise<Subscriber> {
+    const [newSubscriber] = await db.insert(subscribers).values(subscriber).returning();
+    return newSubscriber;
+  }
+
+  async getSubscriberByEmail(email: string): Promise<Subscriber | undefined> {
+    const [subscriber] = await db.select().from(subscribers).where(eq(subscribers.email, email));
+    return subscriber;
+  }
+
+  // Contact messages
+  async createContactMessage(message: InsertContactMessage): Promise<ContactMessage> {
+    const [newMessage] = await db.insert(contactMessages).values(message).returning();
+    return newMessage;
+  }
+}
+
+// Initialize storage
+export const storage = new DatabaseStorage();
+
+// Define a function to seed the database with initial data if needed
+export async function seedDatabase() {
+  const productCount = await db.select({ count: count() }).from(products);
+  
+  if (productCount[0].count === 0) {
+    console.log("Seeding database with initial data...");
+    
+    // Seed products
+    const demoProducts: InsertProduct[] = [
+      {
+        name: "Pure Batana Oil",
+        slug: "pure-batana-oil",
+        description: "Our 100% pure, cold-pressed Batana Oil is a traditional beauty elixir handcrafted by indigenous Miskito women in Honduras. This nutrient-rich oil has been used for centuries to nourish hair and skin with its exceptional moisturizing properties. Each bottle contains 2 oz (60ml) of premium Batana Oil in a protective amber glass bottle with a precision dropper for easy application.",
+        shortDescription: "100% pure, cold-pressed batana oil in a protective amber glass bottle with precision dropper.",
+        price: 29.95,
+        images: ["/images/pure-batana-oil-1.jpg", "/images/pure-batana-oil-2.jpg", "/images/pure-batana-oil-3.jpg", "/images/pure-batana-oil-4.jpg"],
+        category: "oils",
+        stock: 100,
+        featured: true,
+        benefits: [
+          "Strengthens hair follicles and prevents breakage",
+          "Deeply moisturizes skin without clogging pores",
+          "Rich in omega-3, 6, and 9 fatty acids",
+          "Improves skin elasticity and natural radiance",
+          "Supports traditional indigenous knowledge and fair trade"
+        ],
+        usage: "For Hair: Apply a small amount to palms and work through damp hair, focusing on ends. Can be used as a deep conditioning treatment by leaving on for 30 minutes before washing. For Face: Warm 2-3 drops between fingertips and gently press into clean, slightly damp skin. Perfect as the final step in your evening skincare routine. For Body: Massage a generous amount into skin after bathing while still damp. Focus on dry areas like elbows, knees, and heels.",
+        isBestseller: true,
+        isNew: false
+      },
+      {
+        name: "Batana Hair Mask",
+        slug: "batana-hair-mask",
+        description: "Our intensive Batana Hair Mask combines our signature cold-pressed Batana Oil with botanical extracts to create a deep conditioning treatment that repairs damaged hair, restores moisture, and adds natural shine. Perfect for all hair types, especially dry, damaged, or color-treated hair.",
+        shortDescription: "Intensive treatment mask with Batana Oil and nourishing botanical extracts for damaged hair.",
+        price: 34.95,
+        images: ["/images/batana-hair-mask-1.jpg", "/images/batana-hair-mask-2.jpg"],
+        category: "hair",
+        stock: 75,
+        featured: true,
+        benefits: [
+          "Deeply conditions dry, damaged hair",
+          "Restores natural moisture balance",
+          "Enhances natural shine and softness",
+          "Strengthens hair to prevent breakage",
+          "Made with 100% natural ingredients"
+        ],
+        usage: "Apply generously to clean, damp hair from mid-lengths to ends. Comb through for even distribution. Leave on for 15-30 minutes, then rinse thoroughly. Use weekly for best results.",
+        isBestseller: false,
+        isNew: true
+      },
+      {
+        name: "Batana Gift Set",
+        slug: "batana-gift-set",
+        description: "Our luxurious Batana Gift Set includes our best-selling Pure Batana Oil, Batana Hair Mask, and Batana Body Butter packaged in a beautiful gift box made from sustainable materials. The perfect introduction to the transformative benefits of Batana or a thoughtful gift for someone special.",
+        shortDescription: "Complete set including Pure Batana Oil, Hair Mask, and Body Butter in an elegant gift box.",
+        price: 79.95,
+        images: ["/images/batana-gift-set-1.jpg", "/images/batana-gift-set-2.jpg"],
+        category: "gift-sets",
+        stock: 50,
+        featured: true,
+        benefits: [
+          "Complete Batana skincare collection",
+          "Nourishing treatment for hair and body",
+          "Elegant, eco-friendly packaging",
+          "Perfect for gifting or self-care",
+          "Includes our three bestselling products"
+        ],
+        usage: "See individual product instructions for detailed usage information.",
+        isBestseller: false,
+        isNew: false
+      }
+    ];
+    
+    await db.insert(products).values(demoProducts);
+    console.log("Added demo products");
+    
+    // Create demo users
+    const demoUsers: InsertUser[] = [
+      {
+        username: "sarah_k",
+        password: "password123", // In a real app, this would be hashed
+        email: "sarah_k@example.com",
+        firstName: "Sarah",
+        lastName: "K",
+        address: "123 Main St",
+        city: "Portland",
+        state: "OR",
+        zip: "97205",
+        country: "USA",
+        phone: "555-123-4567"
+      },
+      {
+        username: "michael_t",
+        password: "password123",
+        email: "michael_t@example.com",
+        firstName: "Michael",
+        lastName: "T",
+        address: "456 Oak Ave",
+        city: "Seattle",
+        state: "WA",
+        zip: "98101",
+        country: "USA",
+        phone: "555-987-6543"
+      },
+      {
+        username: "jennifer_l",
+        password: "password123",
+        email: "jennifer_l@example.com",
+        firstName: "Jennifer",
+        lastName: "L",
+        address: "789 Pine St",
+        city: "San Francisco",
+        state: "CA",
+        zip: "94105",
+        country: "USA",
+        phone: "555-567-8901"
+      }
+    ];
+    
+    await db.insert(users).values(demoUsers);
+    console.log("Added demo users");
+    
+    // Add reviews for the first product
+    const allProducts = await db.select().from(products);
+    const allUsers = await db.select().from(users);
+    
+    if (allProducts.length > 0 && allUsers.length >= 3) {
+      const productId = allProducts[0].id;
+      
+      const demoReviews: InsertReview[] = [
+        {
+          userId: allUsers[0].id,
+          productId: productId,
+          rating: 5,
+          comment: "After just two weeks of using Batana Oil on my dry, damaged hair, I noticed incredible improvement in texture and shine. It's become the only hair product I'll ever need."
+        },
+        {
+          userId: allUsers[1].id,
+          productId: productId,
+          rating: 5,
+          comment: "I've struggled with sensitive skin my entire life. Pure Batana is the first oil that moisturizes deeply without causing breakouts. It's truly miraculous."
+        },
+        {
+          userId: allUsers[2].id,
+          productId: productId,
+          rating: 4, // Changed from 4.5 to 4 since rating is an integer
+          comment: "The scent is subtle and natural, and the oil absorbs beautifully into my skin without feeling greasy. I love that it's ethically sourced too!"
+        }
+      ];
+      
+      await db.insert(reviews).values(demoReviews);
+      console.log("Added demo reviews");
+    }
+    
+    console.log("Database seeding complete");
+  } else {
+    console.log("Database already contains data, skipping seed");
+  }
+}

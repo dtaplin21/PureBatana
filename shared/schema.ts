@@ -1,5 +1,6 @@
-import { pgTable, text, serial, integer, boolean, timestamp, doublePrecision } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, doublePrecision, foreignKey, uniqueIndex } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
+import { relations } from "drizzle-orm";
 import { z } from "zod";
 
 // Products table
@@ -47,7 +48,7 @@ export const insertUserSchema = createInsertSchema(users).omit({
 // Orders table
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   status: text("status").notNull().default("pending"),
   total: doublePrecision("total").notNull(),
   shippingAddress: text("shipping_address"),
@@ -65,8 +66,8 @@ export const insertOrderSchema = createInsertSchema(orders).omit({
 // Order Items table
 export const orderItems = pgTable("order_items", {
   id: serial("id").primaryKey(),
-  orderId: integer("order_id").notNull(),
-  productId: integer("product_id").notNull(),
+  orderId: integer("order_id").notNull().references(() => orders.id, { onDelete: "cascade" }),
+  productId: integer("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
   quantity: integer("quantity").notNull(),
   price: doublePrecision("price").notNull(),
 });
@@ -78,9 +79,14 @@ export const insertOrderItemSchema = createInsertSchema(orderItems).omit({
 // Cart Items table
 export const cartItems = pgTable("cart_items", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
-  productId: integer("product_id").notNull(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  productId: integer("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
   quantity: integer("quantity").notNull(),
+}, (table) => {
+  return {
+    // Add a unique constraint to prevent duplicate cart items
+    userProductUnique: uniqueIndex("cart_user_product_idx").on(table.userId, table.productId),
+  };
 });
 
 export const insertCartItemSchema = createInsertSchema(cartItems).omit({
@@ -90,11 +96,16 @@ export const insertCartItemSchema = createInsertSchema(cartItems).omit({
 // Reviews table
 export const reviews = pgTable("reviews", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
-  productId: integer("product_id").notNull(),
-  rating: integer("rating").notNull(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  productId: integer("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  rating: integer("rating").notNull(), // Integer rating from 1-5
   comment: text("comment"),
   createdAt: timestamp("created_at").defaultNow(),
+}, (table) => {
+  return {
+    // Add a unique constraint so a user can only review a product once
+    userProductUnique: uniqueIndex("review_user_product_idx").on(table.userId, table.productId),
+  };
 });
 
 export const insertReviewSchema = createInsertSchema(reviews).omit({
@@ -153,3 +164,36 @@ export type InsertSubscriber = z.infer<typeof insertSubscriberSchema>;
 
 export type ContactMessage = typeof contactMessages.$inferSelect;
 export type InsertContactMessage = z.infer<typeof insertContactMessageSchema>;
+
+// Define relations
+export const productsRelations = relations(products, ({ many }) => ({
+  orderItems: many(orderItems),
+  cartItems: many(cartItems),
+  reviews: many(reviews),
+}));
+
+export const usersRelations = relations(users, ({ many }) => ({
+  orders: many(orders),
+  cartItems: many(cartItems),
+  reviews: many(reviews),
+}));
+
+export const ordersRelations = relations(orders, ({ one, many }) => ({
+  user: one(users, { fields: [orders.userId], references: [users.id] }),
+  items: many(orderItems),
+}));
+
+export const orderItemsRelations = relations(orderItems, ({ one }) => ({
+  order: one(orders, { fields: [orderItems.orderId], references: [orders.id] }),
+  product: one(products, { fields: [orderItems.productId], references: [products.id] }),
+}));
+
+export const cartItemsRelations = relations(cartItems, ({ one }) => ({
+  user: one(users, { fields: [cartItems.userId], references: [users.id] }),
+  product: one(products, { fields: [cartItems.productId], references: [products.id] }),
+}));
+
+export const reviewsRelations = relations(reviews, ({ one }) => ({
+  user: one(users, { fields: [reviews.userId], references: [users.id] }),
+  product: one(products, { fields: [reviews.productId], references: [products.id] }),
+}));
