@@ -36,9 +36,9 @@ const Header = () => {
         {/* Cart icon */}
         <Link href="/cart">
           <span className="hover:text-black transition cursor-pointer relative">
-            <i className="fas fa-shopping-bag"></i>
+            <i className="fas fa-shopping-bag text-xl"></i>
             {cartCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-[#3a5a40] text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+              <span className="absolute -top-2 -right-2 bg-[#3a5a40] text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-bold">
                 {cartCount}
               </span>
             )}
@@ -50,9 +50,9 @@ const Header = () => {
       <div className="md:hidden flex items-center">
         <Link href="/cart" className="mr-4">
           <span className="hover:text-black transition cursor-pointer relative">
-            <i className="fas fa-shopping-bag"></i>
+            <i className="fas fa-shopping-bag text-xl"></i>
             {cartCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-[#3a5a40] text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+              <span className="absolute -top-2 -right-2 bg-[#3a5a40] text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-bold">
                 {cartCount}
               </span>
             )}

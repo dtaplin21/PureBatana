@@ -25,8 +25,8 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <div className="bg-white rounded-lg overflow-hidden shadow-sm transition-all hover:shadow-md">
-      <Link href={`/product/${product.slug}`}>
-        <div className="relative cursor-pointer">
+      <div className="relative cursor-pointer">
+        <Link href={`/product/${product.slug}`} className="block">
           <img 
             src={product.slug === "pure-batana-oil" 
               ? `/images/batana-front.jpg` 
@@ -48,21 +48,23 @@ export default function ProductCard({ product }: ProductCardProps) {
               New
             </div>
           )}
-        </div>
-        <div className="p-6">
+        </Link>
+      </div>
+      <div className="p-6">
+        <Link href={`/product/${product.slug}`} className="block">
           <h3 className="font-display font-semibold text-xl mb-2">{product.name}</h3>
           <p className="text-neutral-600 mb-4">{product.shortDescription}</p>
-          <div className="flex justify-between items-center">
-            <p className="font-display font-bold text-lg">${product.price.toFixed(2)}</p>
-            <button 
-              className="bg-[#3a5a40] hover:bg-[#588157] text-white py-2 px-4 rounded-full transition-colors text-sm"
-              onClick={handleAddToCart}
-            >
-              Add to Cart
-            </button>
-          </div>
+        </Link>
+        <div className="flex justify-between items-center">
+          <p className="font-display font-bold text-lg">${product.price.toFixed(2)}</p>
+          <button 
+            className="bg-[#3a5a40] hover:bg-[#588157] text-white py-2 px-4 rounded-full transition-colors text-sm"
+            onClick={handleAddToCart}
+          >
+            Add to Cart
+          </button>
         </div>
-      </Link>
+      </div>
     </div>
   );
 }
