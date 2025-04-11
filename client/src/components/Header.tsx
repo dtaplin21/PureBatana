@@ -21,7 +21,7 @@ const Header = () => {
         </Link>
       </div>
 
-      {/* Navigation links on the right */}
+      {/* Navigation links in the middle */}
       <nav className="hidden md:flex space-x-6 text-gray-700 font-medium">
         <Link href="/">
           <span className="hover:text-black transition cursor-pointer">Our Products</span>
@@ -32,31 +32,34 @@ const Header = () => {
         <Link href="/how-to-use">
           <span className="hover:text-black transition cursor-pointer">How to Use Batana Oil</span>
         </Link>
-        
-        {/* Cart icon */}
+      </nav>
+      
+      {/* Cart button on the right */}
+      <div className="hidden md:block">
         <Link href="/cart">
-          <span className="hover:text-black transition cursor-pointer relative ml-2 px-2 py-1">
-            <i className="fas fa-shopping-cart text-2xl text-[#3a5a40]"></i>
+          <button className="flex items-center bg-[#3a5a40] hover:bg-[#588157] text-white px-4 py-2 rounded-full transition-colors">
+            <i className="fas fa-shopping-cart mr-2"></i>
+            <span>Cart</span>
             {cartCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-[#3a5a40] text-white text-xs w-6 h-6 flex items-center justify-center rounded-full font-bold">
+              <span className="ml-2 bg-white text-[#3a5a40] w-6 h-6 flex items-center justify-center rounded-full font-bold text-sm">
                 {cartCount}
               </span>
             )}
-          </span>
+          </button>
         </Link>
-      </nav>
+      </div>
 
       {/* Mobile menu */}
       <div className="md:hidden flex items-center">
         <Link href="/cart" className="mr-4">
-          <span className="hover:text-black transition cursor-pointer relative px-2 py-1">
-            <i className="fas fa-shopping-cart text-2xl text-[#3a5a40]"></i>
+          <button className="flex items-center bg-[#3a5a40] hover:bg-[#588157] text-white px-3 py-1 rounded-full transition-colors">
+            <i className="fas fa-shopping-cart mr-1"></i>
             {cartCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-[#3a5a40] text-white text-xs w-6 h-6 flex items-center justify-center rounded-full font-bold">
+              <span className="ml-1 bg-white text-[#3a5a40] w-5 h-5 flex items-center justify-center rounded-full font-bold text-xs">
                 {cartCount}
               </span>
             )}
-          </span>
+          </button>
         </Link>
         <button 
           className="text-gray-700" 
