@@ -5,8 +5,23 @@ import { Link } from "wouter";
 import { Separator } from "@/components/ui/separator";
 
 export default function CartPage() {
-  const { cart, removeItem, updateQuantity, clearCart, cartTotal } = useCart();
+  const { cart, removeItem, updateQuantity, clearCart, cartTotal, isLoading } = useCart();
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-16 text-center">
+        <h1 className="font-display font-bold text-3xl text-[#3a5a40] mb-6">Your Cart</h1>
+        <div className="animate-pulse">
+          <div className="h-16 bg-gray-200 rounded mb-4"></div>
+          <div className="h-64 bg-gray-200 rounded mb-4"></div>
+          <div className="h-12 bg-gray-200 rounded mb-4 max-w-xs mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Empty cart state
   if (cart.length === 0) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">

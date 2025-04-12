@@ -4,9 +4,7 @@ import { useCart } from "@/context/CartContext";
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { cart } = useCart();
-  
-  const cartCount = cart.reduce((count, item) => count + item.quantity, 0);
+  const { cartCount } = useCart();
   
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -41,7 +39,7 @@ const Header = () => {
             <i className="fas fa-shopping-cart mr-2"></i>
             <span>Cart</span>
             {cartCount > 0 && (
-              <span className="ml-2 bg-white text-[#3a5a40] w-6 h-6 flex items-center justify-center rounded-full font-bold text-sm">
+              <span className="ml-2 bg-red-600 text-white w-6 h-6 flex items-center justify-center rounded-full font-bold text-sm">
                 {cartCount}
               </span>
             )}
@@ -55,7 +53,7 @@ const Header = () => {
           <button className="flex items-center bg-[#3a5a40] hover:bg-[#588157] text-white px-3 py-1 rounded-full transition-colors">
             <i className="fas fa-shopping-cart mr-1"></i>
             {cartCount > 0 && (
-              <span className="ml-1 bg-white text-[#3a5a40] w-5 h-5 flex items-center justify-center rounded-full font-bold text-xs">
+              <span className="ml-1 bg-red-600 text-white w-5 h-5 flex items-center justify-center rounded-full font-bold text-xs">
                 {cartCount}
               </span>
             )}
