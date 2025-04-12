@@ -66,8 +66,8 @@ function CheckoutForm({
       const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          // Make sure to change this to your payment completion page
-          return_url: window.location.origin + "/checkout/success",
+          // Redirect to the success page
+          return_url: `${window.location.origin}/checkout/success`,
           receipt_email: contactInfo.email,
           payment_method_data: {
             billing_details: {
@@ -210,7 +210,7 @@ export default function CheckoutPage() {
     
     // Redirect to success page
     setTimeout(() => {
-      setLocation("/");
+      setLocation("/checkout/success");
     }, 2000);
   };
   
