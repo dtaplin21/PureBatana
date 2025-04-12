@@ -36,28 +36,26 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   
   // Load cart from localStorage on initial load
   useEffect(() => {
-    const loadCart = () => {
-      try {
-        if (typeof window !== "undefined") {
-          const savedCart = localStorage.getItem("cart");
-          const parsedCart = savedCart ? JSON.parse(savedCart) : [];
-          setCart(parsedCart);
-        }
-      } catch (error) {
-        console.error("Error loading cart from localStorage", error);
-        setCart([]);
-      } finally {
-        setIsLoading(false);
+    try {
+      const savedCart = localStorage.getItem("cart");
+      if (savedCart) {
+        setCart(JSON.parse(savedCart));
       }
-    };
-    
-    loadCart();
+    } catch (error) {
+      console.error("Error loading cart from localStorage", error);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
     if (!isLoading) {
-      localStorage.setItem("cart", JSON.stringify(cart));
+      try {
+        localStorage.setItem("cart", JSON.stringify(cart));
+      } catch (error) {
+        console.error("Error saving cart to localStorage", error);
+      }
     }
   }, [cart, isLoading]);
 
