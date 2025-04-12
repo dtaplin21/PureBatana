@@ -15,11 +15,116 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 
+// Make sure to call loadStripe outside of a component's render to avoid
+// recreating the Stripe object on every render
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+
+// Payment form component using Stripe Elements
+function CheckoutForm({ 
+  orderTotal, 
+  shippingInfo, 
+  contactInfo,
+  onSuccess,
+  onError
+}: { 
+  orderTotal: number, 
+  shippingInfo: any,
+  contactInfo: any,
+  onSuccess: () => void,
+  onError: (error: string) => void
+}) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!stripe || !elements) {
+      // Stripe.js hasn't yet loaded
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Create the order in your database
+      const orderData = {
+        order: {
+          userId: 1, // Use actual user ID if available
+          status: "pending",
+          total: orderTotal,
+          shippingAddress: `${shippingInfo.address}, ${shippingInfo.city}, ${shippingInfo.state} ${shippingInfo.zip}, ${shippingInfo.country}`,
+          billingAddress: `${shippingInfo.address}, ${shippingInfo.city}, ${shippingInfo.state} ${shippingInfo.zip}, ${shippingInfo.country}`,
+          email: contactInfo.email,
+          name: `${contactInfo.firstName} ${contactInfo.lastName}`,
+          createdAt: new Date()
+        }
+      };
+      
+      // Confirm the payment with Stripe
+      const { error } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          // Make sure to change this to your payment completion page
+          return_url: window.location.origin + "/checkout/success",
+          receipt_email: contactInfo.email,
+          payment_method_data: {
+            billing_details: {
+              name: `${contactInfo.firstName} ${contactInfo.lastName}`,
+              email: contactInfo.email,
+              address: {
+                line1: shippingInfo.address,
+                city: shippingInfo.city,
+                state: shippingInfo.state,
+                postal_code: shippingInfo.zip,
+                country: shippingInfo.country
+              }
+            }
+          }
+        },
+        redirect: "if_required"
+      });
+
+      if (error) {
+        if (error.type === "card_error" || error.type === "validation_error") {
+          onError(error.message || "An error occurred with your payment");
+        } else {
+          onError("An unexpected error occurred");
+        }
+      } else {
+        // Payment successful
+        onSuccess();
+      }
+    } catch (error) {
+      onError("Failed to process payment");
+      console.error("Payment error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <PaymentElement />
+      <Button 
+        type="submit"
+        className="w-full bg-[#3a5a40] hover:bg-[#588157] text-lg h-12 mt-4"
+        disabled={!stripe || isLoading}
+      >
+        {isLoading ? "Processing..." : `Complete Purchase • $${orderTotal.toFixed(2)}`}
+      </Button>
+    </form>
+  );
+}
+
 export default function CheckoutPage() {
   const [location, setLocation] = useLocation();
   const { cart, cartTotal, clearCart } = useCart();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [showStripeForm, setShowStripeForm] = useState(false);
   
   // User info state
   const [firstName, setFirstName] = useState("");
@@ -34,15 +139,89 @@ export default function CheckoutPage() {
   const [zip, setZip] = useState("");
   const [country, setCountry] = useState("United States");
   
-  // Payment info state (in a real app, would use a payment processor)
-  const [cardNumber, setCardNumber] = useState("");
-  const [cardName, setCardName] = useState("");
-  const [expiry, setExpiry] = useState("");
-  const [cvv, setCvv] = useState("");
-  
   // Determine shipping
   const shippingFee = cartTotal >= 50 ? 0 : 5.95;
   const orderTotal = cartTotal + shippingFee;
+  
+  // Contact and shipping info objects
+  const contactInfo = {
+    firstName,
+    lastName,
+    email,
+    phone
+  };
+  
+  const shippingInfo = {
+    address,
+    city,
+    state,
+    zip,
+    country
+  };
+  
+  // Load the payment intent when necessary
+  useEffect(() => {
+    // Only create a payment intent once we have contact and shipping info
+    if (showStripeForm && !clientSecret) {
+      const createPaymentIntent = async () => {
+        try {
+          setIsSubmitting(true);
+          
+          // Create a payment intent by calling your server
+          const orderItems = cart.map(item => ({
+            productId: item.product.id,
+            quantity: item.quantity,
+            price: item.product.price
+          }));
+          
+          const response = await apiRequest("POST", "/api/create-payment-intent", {
+            amount: orderTotal,
+            orderItems
+          });
+          
+          const data = await response.json();
+          setClientSecret(data.clientSecret);
+        } catch (error) {
+          console.error("Error creating payment intent:", error);
+          toast({
+            title: "Payment error",
+            description: "Could not initialize payment. Please try again.",
+            variant: "destructive"
+          });
+          setShowStripeForm(false);
+        } finally {
+          setIsSubmitting(false);
+        }
+      };
+      
+      createPaymentIntent();
+    }
+  }, [showStripeForm, clientSecret, cart, orderTotal, toast]);
+  
+  // Handle successful payment
+  const handlePaymentSuccess = () => {
+    toast({
+      title: "Payment successful!",
+      description: "Your order has been placed.",
+    });
+    
+    // Clear cart
+    clearCart();
+    
+    // Redirect to success page
+    setTimeout(() => {
+      setLocation("/");
+    }, 2000);
+  };
+  
+  // Handle payment errors
+  const handlePaymentError = (errorMessage: string) => {
+    toast({
+      title: "Payment failed",
+      description: errorMessage,
+      variant: "destructive",
+    });
+  };
   
   if (cart.length === 0) {
     return (
@@ -60,10 +239,11 @@ export default function CheckoutPage() {
     );
   }
   
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Show Stripe form after validating user info
+  const handleContinueToPayment = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validation (basic example)
+    // Validation of contact and shipping info
     if (!firstName || !lastName || !email || !address || !city || !state || !zip || !country) {
       toast({
         title: "Missing information",
@@ -73,64 +253,27 @@ export default function CheckoutPage() {
       return;
     }
     
-    if (!cardNumber || !cardName || !expiry || !cvv) {
-      toast({
-        title: "Payment information required",
-        description: "Please enter your payment details",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    try {
-      setIsSubmitting(true);
-      
-      // In a real app, you'd process payment through a payment processor
-      
-      // Hard-coded user ID for demo (in a real app, this would be the logged-in user)
-      const userId = 1;
-      
-      // Create order with order items
-      const orderData = {
-        order: {
-          userId,
-          status: "pending",
-          total: orderTotal,
-          shippingAddress: `${address}, ${city}, ${state} ${zip}, ${country}`,
-          billingAddress: `${address}, ${city}, ${state} ${zip}, ${country}`,
-        },
-        orderItems: cart.map(item => ({
-          productId: item.product.id,
-          quantity: item.quantity,
-          price: item.product.price,
-        })),
-      };
-      
-      // Submit order to backend
-      await apiRequest("POST", "/api/orders", orderData);
-      
-      // Clear cart
-      clearCart();
-      
-      toast({
-        title: "Order placed successfully!",
-        description: "Thank you for your purchase.",
-      });
-      
-      // Redirect to confirmation page (in a real app)
-      setTimeout(() => {
-        setLocation("/");
-      }, 2000);
-      
-    } catch (error) {
-      toast({
-        title: "Error placing order",
-        description: "Please try again later.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    // If validation passes, move to payment step
+    setShowStripeForm(true);
+  };
+
+  // Appearance options for Stripe Elements
+  const appearance = {
+    theme: 'stripe',
+    variables: {
+      colorPrimary: '#3a5a40',
+      colorBackground: '#ffffff',
+      colorText: '#30313d',
+      colorDanger: '#df1b41',
+      fontFamily: 'system-ui, sans-serif',
+      spacingUnit: '4px',
+      borderRadius: '4px',
+    },
+  };
+  
+  const options = {
+    clientSecret,
+    appearance,
   };
   
   return (
@@ -139,162 +282,136 @@ export default function CheckoutPage() {
       
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="lg:w-2/3">
-          <form onSubmit={handleSubmit}>
-            <div className="bg-white rounded-lg shadow-sm border border-neutral-100 p-6 mb-6">
-              <h2 className="font-display font-semibold text-xl mb-4">Contact Information</h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div>
-                  <Label htmlFor="firstName">First Name *</Label>
-                  <Input 
-                    id="firstName" 
-                    value={firstName} 
-                    onChange={(e) => setFirstName(e.target.value)} 
-                    required 
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="lastName">Last Name *</Label>
-                  <Input 
-                    id="lastName" 
-                    value={lastName} 
-                    onChange={(e) => setLastName(e.target.value)} 
-                    required 
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="email">Email Address *</Label>
-                  <Input 
-                    id="email" 
-                    type="email" 
-                    value={email} 
-                    onChange={(e) => setEmail(e.target.value)} 
-                    required 
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <Input 
-                    id="phone" 
-                    value={phone} 
-                    onChange={(e) => setPhone(e.target.value)} 
-                  />
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-lg shadow-sm border border-neutral-100 p-6 mb-6">
-              <h2 className="font-display font-semibold text-xl mb-4">Shipping Address</h2>
-              
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="address">Street Address *</Label>
-                  <Input 
-                    id="address" 
-                    value={address} 
-                    onChange={(e) => setAddress(e.target.value)} 
-                    required 
-                  />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="city">City *</Label>
-                    <Input 
-                      id="city" 
-                      value={city} 
-                      onChange={(e) => setCity(e.target.value)} 
-                      required 
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="state">State/Province *</Label>
-                    <Input 
-                      id="state" 
-                      value={state} 
-                      onChange={(e) => setState(e.target.value)} 
-                      required 
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="zip">ZIP/Postal Code *</Label>
-                    <Input 
-                      id="zip" 
-                      value={zip} 
-                      onChange={(e) => setZip(e.target.value)} 
-                      required 
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="country">Country *</Label>
-                    <Input 
-                      id="country" 
-                      value={country} 
-                      onChange={(e) => setCountry(e.target.value)} 
-                      required 
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-            
+          {showStripeForm && clientSecret ? (
             <div className="bg-white rounded-lg shadow-sm border border-neutral-100 p-6 mb-6">
               <h2 className="font-display font-semibold text-xl mb-4">Payment Information</h2>
-              
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="cardNumber">Card Number *</Label>
-                  <Input 
-                    id="cardNumber" 
-                    placeholder="•••• •••• •••• ••••" 
-                    value={cardNumber} 
-                    onChange={(e) => setCardNumber(e.target.value)} 
-                    required 
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="cardName">Name on Card *</Label>
-                  <Input 
-                    id="cardName" 
-                    value={cardName} 
-                    onChange={(e) => setCardName(e.target.value)} 
-                    required 
-                  />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Elements stripe={stripePromise} options={options as any}>
+                <CheckoutForm 
+                  orderTotal={orderTotal} 
+                  shippingInfo={shippingInfo}
+                  contactInfo={contactInfo}
+                  onSuccess={handlePaymentSuccess}
+                  onError={handlePaymentError}
+                />
+              </Elements>
+              <Button 
+                className="mt-4 w-full"
+                variant="outline"
+                onClick={() => setShowStripeForm(false)}
+              >
+                Back to Shipping Information
+              </Button>
+            </div>
+          ) : (
+            <form onSubmit={handleContinueToPayment}>
+              <div className="bg-white rounded-lg shadow-sm border border-neutral-100 p-6 mb-6">
+                <h2 className="font-display font-semibold text-xl mb-4">Contact Information</h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                   <div>
-                    <Label htmlFor="expiry">Expiration Date (MM/YY) *</Label>
+                    <Label htmlFor="firstName">First Name *</Label>
                     <Input 
-                      id="expiry" 
-                      placeholder="MM/YY" 
-                      value={expiry} 
-                      onChange={(e) => setExpiry(e.target.value)} 
+                      id="firstName" 
+                      value={firstName} 
+                      onChange={(e) => setFirstName(e.target.value)} 
                       required 
                     />
                   </div>
                   <div>
-                    <Label htmlFor="cvv">CVV *</Label>
+                    <Label htmlFor="lastName">Last Name *</Label>
                     <Input 
-                      id="cvv" 
-                      placeholder="123" 
-                      value={cvv} 
-                      onChange={(e) => setCvv(e.target.value)} 
+                      id="lastName" 
+                      value={lastName} 
+                      onChange={(e) => setLastName(e.target.value)} 
                       required 
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="email">Email Address *</Label>
+                    <Input 
+                      id="email" 
+                      type="email" 
+                      value={email} 
+                      onChange={(e) => setEmail(e.target.value)} 
+                      required 
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="phone">Phone Number</Label>
+                    <Input 
+                      id="phone" 
+                      value={phone} 
+                      onChange={(e) => setPhone(e.target.value)} 
                     />
                   </div>
                 </div>
               </div>
-            </div>
-            
-            <Button 
-              type="submit" 
-              className="w-full bg-[#3a5a40] hover:bg-[#588157] text-lg h-12"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Processing..." : `Complete Purchase • $${orderTotal.toFixed(2)}`}
-            </Button>
-          </form>
+              
+              <div className="bg-white rounded-lg shadow-sm border border-neutral-100 p-6 mb-6">
+                <h2 className="font-display font-semibold text-xl mb-4">Shipping Address</h2>
+                
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="address">Street Address *</Label>
+                    <Input 
+                      id="address" 
+                      value={address} 
+                      onChange={(e) => setAddress(e.target.value)} 
+                      required 
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="city">City *</Label>
+                      <Input 
+                        id="city" 
+                        value={city} 
+                        onChange={(e) => setCity(e.target.value)} 
+                        required 
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="state">State/Province *</Label>
+                      <Input 
+                        id="state" 
+                        value={state} 
+                        onChange={(e) => setState(e.target.value)} 
+                        required 
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="zip">ZIP/Postal Code *</Label>
+                      <Input 
+                        id="zip" 
+                        value={zip} 
+                        onChange={(e) => setZip(e.target.value)} 
+                        required 
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="country">Country *</Label>
+                      <Input 
+                        id="country" 
+                        value={country} 
+                        onChange={(e) => setCountry(e.target.value)} 
+                        required 
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <Button 
+                type="submit" 
+                className="w-full bg-[#3a5a40] hover:bg-[#588157] text-lg h-12"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Processing..." : `Continue to Payment • $${orderTotal.toFixed(2)}`}
+              </Button>
+            </form>
+          )}
         </div>
         
         <div className="lg:w-1/3">
