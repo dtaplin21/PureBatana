@@ -21,9 +21,6 @@ const Header = () => {
 
       {/* Navigation links in the middle */}
       <nav className="hidden md:flex space-x-6 text-gray-700 font-medium">
-        <Link href="/">
-          <span className="hover:text-black transition cursor-pointer">Our Products</span>
-        </Link>
         <Link href="/benefits">
           <span className="hover:text-black transition cursor-pointer">Benefits</span>
         </Link>
@@ -72,11 +69,6 @@ const Header = () => {
       {isMobileMenuOpen && (
         <div className="absolute top-full left-0 right-0 bg-white shadow-md z-50 md:hidden">
           <div className="px-6 py-4 flex flex-col space-y-4">
-            <Link href="/">
-              <span className="block text-gray-700 hover:text-black cursor-pointer" onClick={() => setIsMobileMenuOpen(false)}>
-                Our Products
-              </span>
-            </Link>
             <Link href="/benefits">
               <span className="block text-gray-700 hover:text-black cursor-pointer" onClick={() => setIsMobileMenuOpen(false)}>
                 Benefits of Batana Oil

@@ -13,6 +13,7 @@ import AccountPage from "@/pages/AccountPage";
 import OrdersPage from "@/pages/OrdersPage";
 import ContactPage from "@/pages/ContactPage";
 import SimpleContactPage from "@/pages/SimpleContactPage";
+import AdminPage from "@/pages/AdminPage";
 
 import BenefitsPage from "@/pages/BenefitsPage";
 import StoryPage from "@/pages/StoryPage";
@@ -41,6 +42,7 @@ function Router() {
           <Route path="/story" component={StoryPage} />
           <Route path="/how-to-use" component={HowToUsePage} />
           <Route path="/reviews" component={ReviewsPage} />
+          <Route path="/admin" component={AdminPage} />
           <Route component={NotFound} />
         </Switch>
       </main>
