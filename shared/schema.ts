@@ -53,6 +53,8 @@ export const orders = pgTable("orders", {
   total: doublePrecision("total").notNull(),
   shippingAddress: text("shipping_address"),
   billingAddress: text("billing_address"),
+  email: text("email").notNull(),  // Customer email for order communications
+  name: text("name").notNull(),    // Customer name for order communications
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

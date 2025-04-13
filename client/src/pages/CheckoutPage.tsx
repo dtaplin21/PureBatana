@@ -57,8 +57,7 @@ function CheckoutForm({
           shippingAddress: `${shippingInfo.address}, ${shippingInfo.city}, ${shippingInfo.state} ${shippingInfo.zip}, ${shippingInfo.country}`,
           billingAddress: `${shippingInfo.address}, ${shippingInfo.city}, ${shippingInfo.state} ${shippingInfo.zip}, ${shippingInfo.country}`,
           email: contactInfo.email,
-          name: `${contactInfo.firstName} ${contactInfo.lastName}`,
-          createdAt: new Date()
+          name: `${contactInfo.firstName} ${contactInfo.lastName}`
         }
       };
       

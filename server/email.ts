@@ -56,9 +56,15 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
 }
 
 export async function sendOrderConfirmationEmail(orderData: OrderEmailData): Promise<boolean> {
+  if (!orderData.shippingAddress) {
+    orderData.shippingAddress = "No shipping address provided";
+  }
   try {
     // Format the date
-    const date = new Date(orderData.dateCreated);
+    const date = orderData.dateCreated instanceof Date 
+      ? orderData.dateCreated 
+      : orderData.dateCreated ? new Date(orderData.dateCreated) : new Date();
+      
     const formattedDate = date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
