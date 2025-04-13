@@ -202,7 +202,7 @@ export default function CheckoutPage() {
   const handlePaymentSuccess = () => {
     toast({
       title: "Payment successful!",
-      description: "Your order has been placed.",
+      description: "Your order has been placed. We've sent a confirmation email with your receipt.",
     });
     
     // Clear cart

@@ -15,6 +15,24 @@ interface EmailParams {
   replyTo?: string;
 }
 
+interface OrderItem {
+  name: string;
+  quantity: number;
+  price: number;
+}
+
+interface OrderEmailData {
+  orderNumber: string;
+  customerName: string;
+  customerEmail: string;
+  items: OrderItem[];
+  subtotal: number;
+  shipping: number;
+  total: number;
+  shippingAddress: string;
+  dateCreated: Date | string;
+}
+
 export async function sendEmail(params: EmailParams): Promise<boolean> {
   try {
     const emailData: any = {
@@ -33,6 +51,214 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
     return true;
   } catch (error) {
     console.error('SendGrid email error:', error);
+    return false;
+  }
+}
+
+export async function sendOrderConfirmationEmail(orderData: OrderEmailData): Promise<boolean> {
+  try {
+    // Format the date
+    const date = new Date(orderData.dateCreated);
+    const formattedDate = date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    
+    // Generate the receipt in text format
+    const textReceipt = `
+PURE BATANA - ORDER CONFIRMATION
+    
+Dear ${orderData.customerName},
+
+Thank you for your order! We're excited to confirm that your Pure Batana order has been received and is being processed.
+
+ORDER DETAILS:
+Order Number: ${orderData.orderNumber}
+Order Date: ${formattedDate}
+
+ITEMS ORDERED:
+${orderData.items.map(item => `${item.name} x ${item.quantity} - $${(item.price * item.quantity).toFixed(2)}`).join('\n')}
+
+SHIPPING ADDRESS:
+${orderData.shippingAddress}
+
+ORDER SUMMARY:
+Subtotal: $${orderData.subtotal.toFixed(2)}
+Shipping: ${orderData.shipping === 0 ? 'FREE' : '$' + orderData.shipping.toFixed(2)}
+Total: $${orderData.total.toFixed(2)}
+
+Your Pure Batana products will be carefully packaged and shipped to you shortly. You will receive a shipping notification once your order is on its way.
+
+If you have any questions about your order, please contact us at Dtaplin21@gmail.com.
+
+Thank you for choosing Pure Batana!
+
+Sincerely,
+The Pure Batana Team
+    `;
+    
+    // Generate the receipt in HTML format
+    const htmlReceipt = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .receipt {
+      padding: 20px;
+      border: 1px solid #eee;
+      border-radius: 5px;
+    }
+    .header {
+      text-align: center;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #3a5a40;
+      margin-bottom: 20px;
+    }
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #3a5a40;
+      margin: 0;
+    }
+    .order-info {
+      background-color: #f8f8f8;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+    .order-items {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    .order-items th, .order-items td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    .order-items th {
+      color: #3a5a40;
+    }
+    .totals {
+      margin-top: 15px;
+    }
+    .totals div {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+    .total-row {
+      font-weight: bold;
+      color: #3a5a40;
+      font-size: 18px;
+      padding-top: 5px;
+      border-top: 1px solid #eee;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+      color: #777;
+      font-size: 14px;
+    }
+    .free-shipping {
+      color: #3a5a40;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="receipt">
+    <div class="header">
+      <h1 class="logo">PURE BATANA</h1>
+      <p>Order Confirmation</p>
+    </div>
+    
+    <p>Dear ${orderData.customerName},</p>
+    
+    <p>Thank you for your order! We're excited to confirm that your Pure Batana order has been received and is being processed.</p>
+    
+    <div class="order-info">
+      <h3>Order Details:</h3>
+      <p><strong>Order Number:</strong> ${orderData.orderNumber}</p>
+      <p><strong>Order Date:</strong> ${formattedDate}</p>
+      <p><strong>Shipping Address:</strong><br>${orderData.shippingAddress.replace(/,/g, ',<br>')}</p>
+    </div>
+    
+    <h3>Items Ordered:</h3>
+    <table class="order-items">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Qty</th>
+          <th>Price</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${orderData.items.map(item => `
+          <tr>
+            <td>${item.name}</td>
+            <td>${item.quantity}</td>
+            <td>$${item.price.toFixed(2)}</td>
+            <td>$${(item.price * item.quantity).toFixed(2)}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+    
+    <div class="totals">
+      <div>
+        <span>Subtotal:</span>
+        <span>$${orderData.subtotal.toFixed(2)}</span>
+      </div>
+      <div>
+        <span>Shipping:</span>
+        <span>${orderData.shipping === 0 ? '<span class="free-shipping">FREE</span>' : '$' + orderData.shipping.toFixed(2)}</span>
+      </div>
+      <div class="total-row">
+        <span>Total:</span>
+        <span>$${orderData.total.toFixed(2)}</span>
+      </div>
+    </div>
+    
+    <p>Your Pure Batana products will be carefully packaged and shipped to you shortly. You will receive a shipping notification once your order is on its way.</p>
+    
+    <p>If you have any questions about your order, please contact us at <a href="mailto:Dtaplin21@gmail.com">Dtaplin21@gmail.com</a>.</p>
+    
+    <p>Thank you for choosing Pure Batana!</p>
+    
+    <p>Sincerely,<br>The Pure Batana Team</p>
+    
+    <div class="footer">
+      <p>© ${new Date().getFullYear()} Pure Batana. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>
+    `;
+    
+    // Send the email
+    return await sendEmail({
+      to: orderData.customerEmail,
+      from: 'noreply@replit.com', // Using Replit's domain which should be pre-verified
+      subject: `Pure Batana - Order Confirmation #${orderData.orderNumber}`,
+      text: textReceipt,
+      html: htmlReceipt
+    });
+    
+  } catch (error) {
+    console.error('Order confirmation email error:', error);
     return false;
   }
 }
