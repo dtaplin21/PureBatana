@@ -5,6 +5,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { Star, StarHalf, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
+import ReviewForm from "@/components/ReviewForm";
 
 interface Review {
   id: number;
@@ -177,9 +178,14 @@ export default function ReviewsPage() {
             Continue Shopping
           </Button>
         </Link>
-        <Button className="bg-[#3a5a40] hover:bg-[#588157]">
-          Write a Review
-        </Button>
+        {products && <ReviewForm 
+          products={products} 
+          buttonClassName="bg-[#3a5a40] hover:bg-[#588157]"
+          onSuccess={() => {
+            // Refresh the page data after a successful review submission
+            window.scrollTo(0, 0);
+          }}
+        />}
       </div>
     </div>
   );
