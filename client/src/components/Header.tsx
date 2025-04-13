@@ -25,10 +25,10 @@ const Header = () => {
           <span className="hover:text-black transition cursor-pointer">Our Products</span>
         </Link>
         <Link href="/benefits">
-          <span className="hover:text-black transition cursor-pointer">Benefits of Batana Oil</span>
+          <span className="hover:text-black transition cursor-pointer">Benefits</span>
         </Link>
         <Link href="/how-to-use">
-          <span className="hover:text-black transition cursor-pointer">How to Use Batana Oil</span>
+          <span className="hover:text-black transition cursor-pointer">How to Use</span>
         </Link>
       </nav>
       
