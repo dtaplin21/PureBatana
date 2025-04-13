@@ -14,7 +14,7 @@ export default function Footer() {
             <h4 className="font-medium text-lg mb-6">Customer Care</h4>
             <ul className="space-y-3">
               <li>
-                <Link className="text-neutral-200 hover:text-white transition-colors" href="/contact">
+                <Link className="text-neutral-200 hover:text-white transition-colors" href="/contact-simple">
                   Contact Us
                 </Link>
               </li>
