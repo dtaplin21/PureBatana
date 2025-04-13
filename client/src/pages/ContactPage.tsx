@@ -105,8 +105,6 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
-      
-      <Newsletter />
     </>
   );
 }

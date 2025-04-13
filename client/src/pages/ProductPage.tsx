@@ -6,7 +6,6 @@ import { useCart } from "@/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import ProductGallery from "@/components/ProductGallery";
 import QuantitySelector from "@/components/QuantitySelector";
-import Newsletter from "@/components/Newsletter";
 import { Badge } from "@/components/ui/badge";
 
 export default function ProductPage() {
@@ -191,8 +190,6 @@ export default function ProductPage() {
           </div>
         </div>
       </section>
-      
-      <Newsletter />
     </>
   );
 }
