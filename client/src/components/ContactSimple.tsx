@@ -56,7 +56,7 @@ export default function ContactSimple() {
           service to our customers.
         </p>
         <ul>
-          <li>dtaplin21@gmail.com</li>
+          <li>Dtaplin21@gmail.com</li>
         </ul>
       </div>
       <div className="contact-col">
