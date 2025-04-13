@@ -38,35 +38,41 @@ const Header = () => {
           : 'shadow-sm py-5'
       }`}
     >
-      <div className="container mx-auto flex justify-between items-center">
-        {/* Logo on the left */}
-        <div className="text-2xl font-bold tracking-tight">
-          <Link href="/">
-            <span className="cursor-pointer text-[#3a5a40] hover:text-[#588157] transition-colors">PURE BATANA</span>
-          </Link>
-        </div>
+      <div className="container mx-auto flex items-center">
+        {/* Logo and navigation grouped together */}
+        <div className="flex items-center">
+          {/* Logo */}
+          <div className="text-2xl font-bold tracking-tight mr-10">
+            <Link href="/">
+              <span className="cursor-pointer text-[#3a5a40] hover:text-[#588157] transition-colors">PURE BATANA</span>
+            </Link>
+          </div>
 
-        {/* Navigation links in the middle */}
-        <nav className="hidden md:flex space-x-8 text-gray-700 font-medium">
-          <Link href="/benefits">
-            <span className={`transition-colors cursor-pointer border-b-2 py-1 ${
-              location === '/benefits' 
-                ? 'border-[#588157] text-[#3a5a40] font-semibold' 
-                : 'border-transparent hover:border-gray-300 hover:text-[#3a5a40]'
-            }`}>
-              Benefits
-            </span>
-          </Link>
-          <Link href="/how-to-use">
-            <span className={`transition-colors cursor-pointer border-b-2 py-1 ${
-              location === '/how-to-use' 
-                ? 'border-[#588157] text-[#3a5a40] font-semibold' 
-                : 'border-transparent hover:border-gray-300 hover:text-[#3a5a40]'
-            }`}>
-              How to Use
-            </span>
-          </Link>
-        </nav>
+          {/* Navigation links next to logo */}
+          <nav className="hidden md:flex space-x-6 text-gray-700 font-medium">
+            <Link href="/benefits">
+              <span className={`transition-colors cursor-pointer border-b-2 py-1 ${
+                location === '/benefits' 
+                  ? 'border-[#588157] text-[#3a5a40] font-semibold' 
+                  : 'border-transparent hover:border-gray-300 hover:text-[#3a5a40]'
+              }`}>
+                Benefits
+              </span>
+            </Link>
+            <Link href="/how-to-use">
+              <span className={`transition-colors cursor-pointer border-b-2 py-1 ${
+                location === '/how-to-use' 
+                  ? 'border-[#588157] text-[#3a5a40] font-semibold' 
+                  : 'border-transparent hover:border-gray-300 hover:text-[#3a5a40]'
+              }`}>
+                How to Use
+              </span>
+            </Link>
+          </nav>
+        </div>
+        
+        {/* Spacer to push cart button to the right */}
+        <div className="flex-grow"></div>
         
         {/* Cart button on the right */}
         <div className="hidden md:block">
@@ -84,7 +90,7 @@ const Header = () => {
         </div>
 
         {/* Mobile menu */}
-        <div className="md:hidden flex items-center">
+        <div className="md:hidden ml-auto flex items-center">
           <Link href="/cart" className="mr-4">
             <button className="flex items-center bg-[#3a5a40] hover:bg-[#588157] text-white px-3 py-1 rounded-full transition-colors shadow-sm">
               <i className="fas fa-shopping-cart mr-1"></i>
