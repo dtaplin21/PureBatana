@@ -56,9 +56,7 @@ export default function ContactSimple() {
           service to our customers.
         </p>
         <ul>
-          <li>hello@purebatana.com</li>
-          <li>(555) 123-4567</li>
-          <li>123 Botanical Way, Portland, OR 97205</li>
+          <li>dtaplin21@gmail.com</li>
         </ul>
       </div>
       <div className="contact-col">

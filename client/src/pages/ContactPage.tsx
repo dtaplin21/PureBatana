@@ -27,7 +27,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h4 className="font-medium mb-1">Email Us</h4>
-                    <p className="text-neutral-600">hello@purebatana.com</p>
+                    <p className="text-neutral-600">dtaplin21@gmail.com</p>
                   </div>
                 </div>
                 
@@ -36,8 +36,7 @@ export default function ContactPage() {
                     <i className="fas fa-phone-alt"></i>
                   </div>
                   <div>
-                    <h4 className="font-medium mb-1">Call Us</h4>
-                    <p className="text-neutral-600">(555) 123-4567</p>
+       
                   </div>
                 </div>
                 
