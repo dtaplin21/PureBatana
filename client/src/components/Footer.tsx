@@ -19,23 +19,8 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link className="text-neutral-200 hover:text-white transition-colors" href="/contact">
-                  FAQs
-                </Link>
-              </li>
-              <li>
-                <Link className="text-neutral-200 hover:text-white transition-colors" href="/">
-                  Shipping & Returns
-                </Link>
-              </li>
-              <li>
-                <Link className="text-neutral-200 hover:text-white transition-colors" href="/orders">
+                <Link className="text-neutral-200 hover:text-white transition-colors" href="/track-order">
                   Track Your Order
-                </Link>
-              </li>
-              <li>
-                <Link className="text-neutral-200 hover:text-white transition-colors" href="/account">
-                  My Account
                 </Link>
               </li>
             </ul>

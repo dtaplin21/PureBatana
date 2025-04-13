@@ -13,6 +13,7 @@ import AccountPage from "@/pages/AccountPage";
 import OrdersPage from "@/pages/OrdersPage";
 import ContactPage from "@/pages/ContactPage";
 import SimpleContactPage from "@/pages/SimpleContactPage";
+import TrackOrderPage from "@/pages/TrackOrderPage";
 import BenefitsPage from "@/pages/BenefitsPage";
 import StoryPage from "@/pages/StoryPage";
 import HowToUsePage from "@/pages/HowToUsePage";
@@ -36,6 +37,7 @@ function Router() {
           <Route path="/orders" component={OrdersPage} />
           <Route path="/contact" component={ContactPage} />
           <Route path="/contact-simple" component={SimpleContactPage} />
+          <Route path="/track-order" component={TrackOrderPage} />
           <Route path="/benefits" component={BenefitsPage} />
           <Route path="/story" component={StoryPage} />
           <Route path="/how-to-use" component={HowToUsePage} />
