@@ -8,7 +8,6 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { InsertContactMessage } from "@shared/schema";
 import ContactForm from "@/components/ContactForm";
-import Newsletter from "@/components/Newsletter";
 
 export default function ContactPage() {
   return (

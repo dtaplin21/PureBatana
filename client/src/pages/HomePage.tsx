@@ -4,7 +4,6 @@ import Benefits from "@/components/Benefits";
 import Story from "@/components/Story";
 import HowToUse from "@/components/HowToUse";
 import Testimonials from "@/components/Testimonials";
-import Newsletter from "@/components/Newsletter";
 import { useQuery } from "@tanstack/react-query";
 import { Product } from "@shared/schema";
 import ProductCard from "@/components/ProductCard";
@@ -60,7 +59,6 @@ export default function HomePage() {
       <Story />
       <HowToUse />
       <Testimonials />
-      <Newsletter />
     </>
   );
 }
