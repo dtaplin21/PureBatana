@@ -37,7 +37,8 @@ interface Product {
 }
 
 export default function ReviewsPage() {
-  const [filteredProductId, setFilteredProductId] = useState<number | null>(null);
+  // Setting filteredProductId to null to show all reviews
+  const filteredProductId = null;
   
   // Fetch all reviews
   const { data: reviews, isLoading, isError } = useQuery({
@@ -121,30 +122,7 @@ export default function ReviewsPage() {
     <div className="container mx-auto px-4 py-16">
       <h1 className="font-display font-bold text-3xl text-[#3a5a40] mb-8 text-center">Customer Reviews</h1>
       
-      {products && products.length > 1 && (
-        <div className="mb-8 flex justify-center">
-          <div className="inline-flex flex-wrap gap-2 justify-center">
-            <Button 
-              variant={filteredProductId === null ? "default" : "outline"}
-              className={filteredProductId === null ? "bg-[#3a5a40]" : ""}
-              onClick={() => setFilteredProductId(null)}
-            >
-              All Products
-            </Button>
-            
-            {products.map((product: Product) => (
-              <Button 
-                key={product.id}
-                variant={filteredProductId === product.id ? "default" : "outline"}
-                className={filteredProductId === product.id ? "bg-[#3a5a40]" : ""}
-                onClick={() => setFilteredProductId(product.id)}
-              >
-                {product.name}
-              </Button>
-            ))}
-          </div>
-        </div>
-      )}
+    
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
         {displayedReviews && displayedReviews.length > 0 ? (
