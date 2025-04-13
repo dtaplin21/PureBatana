@@ -15,6 +15,7 @@ import ContactPage from "@/pages/ContactPage";
 import BenefitsPage from "@/pages/BenefitsPage";
 import StoryPage from "@/pages/StoryPage";
 import HowToUsePage from "@/pages/HowToUsePage";
+import ReviewsPage from "@/pages/ReviewsPage";
 import NotFound from "@/pages/not-found";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -36,6 +37,7 @@ function Router() {
           <Route path="/benefits" component={BenefitsPage} />
           <Route path="/story" component={StoryPage} />
           <Route path="/how-to-use" component={HowToUsePage} />
+          <Route path="/reviews" component={ReviewsPage} />
           <Route component={NotFound} />
         </Switch>
       </main>

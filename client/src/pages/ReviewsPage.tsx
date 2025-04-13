@@ -132,7 +132,7 @@ export default function ReviewsPage() {
               All Products
             </Button>
             
-            {products.map(product => (
+            {products.map((product: Product) => (
               <Button 
                 key={product.id}
                 variant={filteredProductId === product.id ? "default" : "outline"}
@@ -156,7 +156,7 @@ export default function ReviewsPage() {
                 </div>
                 <div>
                   <h3 className="font-medium">
-                    {review.user ? `${review.user.firstName} ${review.user.lastName.charAt(0)}.` : 'Anonymous User'}
+                    {review.user ? `${review.user.firstName || ''} ${review.user.lastName ? review.user.lastName.charAt(0) + '.' : ''}`.trim() || 'Anonymous User' : 'Anonymous User'}
                   </h3>
                   <p className="text-sm text-neutral-500">Verified Buyer</p>
                 </div>
@@ -174,9 +174,9 @@ export default function ReviewsPage() {
               {/* Show product info if in "All Products" view */}
               {filteredProductId === null && products && (
                 <div className="mt-4 pt-4 border-t border-neutral-100">
-                  <Link href={`/product/${products.find(p => p.id === review.productId)?.slug || ''}`}>
+                  <Link href={`/product/${products.find((p: Product) => p.id === review.productId)?.slug || ''}`}>
                     <span className="text-sm font-medium text-[#3a5a40] hover:underline">
-                      {products.find(p => p.id === review.productId)?.name || 'Unknown Product'}
+                      {products.find((p: Product) => p.id === review.productId)?.name || 'Unknown Product'}
                     </span>
                   </Link>
                 </div>

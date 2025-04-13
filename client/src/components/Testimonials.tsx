@@ -1,3 +1,6 @@
+import { Link } from "wouter";
+import { Button } from "@/components/ui/button";
+
 export default function Testimonials() {
   const testimonials = [
     {
@@ -53,10 +56,12 @@ export default function Testimonials() {
         </div>
         
         <div className="mt-12 text-center">
-          <a href="#" className="bg-white hover:bg-neutral-50 text-[#3a5a40] font-medium py-3 px-8 rounded-full transition-colors inline-flex items-center border border-neutral-200">
-            Read All Reviews
-            <i className="fas fa-arrow-right ml-2"></i>
-          </a>
+          <Link href="/reviews">
+            <Button variant="outline" className="text-[#3a5a40] border-neutral-200 font-medium py-3 px-8 rounded-full inline-flex items-center">
+              Read All Reviews
+              <i className="fas fa-arrow-right ml-2"></i>
+            </Button>
+          </Link>
         </div>
       </div>
     </section>
