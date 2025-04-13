@@ -138,8 +138,8 @@ export default function CheckoutPage() {
   const [zip, setZip] = useState("");
   const [country, setCountry] = useState("United States");
   
-  // Determine shipping
-  const shippingFee = cartTotal >= 50 ? 0 : 5.95;
+  // Fixed shipping fee
+  const shippingFee = 5.95;
   const orderTotal = cartTotal + shippingFee;
   
   // Contact and shipping info objects
@@ -438,9 +438,7 @@ export default function CheckoutPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-neutral-600">Shipping</span>
-                <span className="font-medium">
-                  {shippingFee === 0 ? "Free" : `$${shippingFee.toFixed(2)}`}
-                </span>
+                <span className="font-medium">${shippingFee.toFixed(2)}</span>
               </div>
               
               <Separator />

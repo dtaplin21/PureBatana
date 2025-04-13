@@ -91,7 +91,7 @@ ${orderData.shippingAddress}
 
 ORDER SUMMARY:
 Subtotal: $${orderData.subtotal.toFixed(2)}
-Shipping: ${orderData.shipping === 0 ? 'FREE' : '$' + orderData.shipping.toFixed(2)}
+Shipping: $${orderData.shipping.toFixed(2)}
 Total: $${orderData.total.toFixed(2)}
 
 Your Pure Batana products will be carefully packaged and shipped to you shortly. You will receive a shipping notification once your order is on its way.
@@ -177,10 +177,6 @@ The Pure Batana Team
       color: #777;
       font-size: 14px;
     }
-    .free-shipping {
-      color: #3a5a40;
-      font-weight: bold;
-    }
   </style>
 </head>
 <body>
@@ -230,7 +226,7 @@ The Pure Batana Team
       </div>
       <div>
         <span>Shipping:</span>
-        <span>${orderData.shipping === 0 ? '<span class="free-shipping">FREE</span>' : '$' + orderData.shipping.toFixed(2)}</span>
+        <span>$${orderData.shipping.toFixed(2)}</span>
       </div>
       <div class="total-row">
         <span>Total:</span>
