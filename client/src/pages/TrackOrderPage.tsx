@@ -2,11 +2,30 @@ import { useState } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
+// Function to generate a formatted order number
+function generateOrderNumberFormat(id: number): string {
+  // Add leading zeros to make it at least 5 digits and prefix with PB
+  return `PB${id.toString().padStart(5, '0')}`;
+}
+
+// Function to extract the numeric ID from a formatted order number
+function extractOrderId(formattedNumber: string): number | null {
+  // If the input starts with PB, remove it
+  const numericPart = formattedNumber.startsWith('PB') 
+    ? formattedNumber.substring(2) 
+    : formattedNumber;
+    
+  // Try to parse as integer
+  const id = parseInt(numericPart, 10);
+  return isNaN(id) ? null : id;
+}
+
 export default function TrackOrderPage() {
   const [orderNumber, setOrderNumber] = useState("");
   const [email, setEmail] = useState("");
   const [orderStatus, setOrderStatus] = useState<null | {
     id: number;
+    orderNumber: string;
     status: string;
     createdAt: string;
     items: Array<{
@@ -29,26 +48,37 @@ export default function TrackOrderPage() {
     try {
       // Simulate API call to track order
       // In a real implementation, we would call an actual API endpoint
-      // For now, we'll simulate the response
       
       if (!orderNumber || !email) {
-        throw new Error("Please provide both order number and email");
+        throw new Error("Please provide both order number and email address");
       }
 
-      // Convert to number for validation
-      const orderNumberInt = parseInt(orderNumber, 10);
-      if (isNaN(orderNumberInt)) {
-        throw new Error("Order number must be a valid number");
+      // Extract the numeric ID from the formatted order number
+      let orderId: number | null;
+      
+      // Handle both formats: with PB prefix or just numbers
+      if (orderNumber.startsWith('PB')) {
+        orderId = extractOrderId(orderNumber);
+      } else {
+        // Try to parse as a direct number
+        orderId = parseInt(orderNumber, 10);
+      }
+      
+      if (orderId === null || isNaN(orderId)) {
+        throw new Error("Please enter a valid order number (format: PB00000 or numerical ID)");
       }
       
       // Simulate a delay to mimic an API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Simulate order found or not found
-      if (orderNumberInt > 0 && orderNumberInt < 1000 && email.includes('@')) {
+      // For demo purposes, accept any number between 1-999 as valid
+      if (orderId > 0 && orderId < 1000 && email.includes('@')) {
+        const formattedOrderNumber = generateOrderNumberFormat(orderId);
+        
         // Simulate a found order with sample data
         setOrderStatus({
-          id: orderNumberInt,
+          id: orderId,
+          orderNumber: formattedOrderNumber,
           status: "Shipped",
           createdAt: new Date().toLocaleDateString(),
           items: [
@@ -59,7 +89,7 @@ export default function TrackOrderPage() {
         
         toast({
           title: "Order Found",
-          description: `We found your order #${orderNumber}`,
+          description: `We found your order ${formattedOrderNumber}`,
         });
       } else {
         throw new Error("No order found with the provided information");
@@ -109,9 +139,12 @@ export default function TrackOrderPage() {
               value={orderNumber}
               onChange={(e) => setOrderNumber(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#3a5a40] focus:outline-none"
-              placeholder="Enter your order number"
+              placeholder="e.g. PB00123 or 123"
               required
             />
+            <p className="text-xs text-gray-500 mt-1">
+              Your order number is in the format PB00000, found in your order confirmation email.
+            </p>
           </div>
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
@@ -155,7 +188,7 @@ export default function TrackOrderPage() {
       {orderStatus && (
         <div className="bg-white shadow-md rounded-lg p-6">
           <div className="border-b pb-4 mb-4">
-            <h2 className="text-xl font-semibold">Order #{orderStatus.id}</h2>
+            <h2 className="text-xl font-semibold">Order {orderStatus.orderNumber}</h2>
             <p className="text-gray-600">Placed on {orderStatus.createdAt}</p>
             <div className="mt-2">
               <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(orderStatus.status)}`}>
