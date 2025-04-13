@@ -48,6 +48,7 @@ export interface IStorage {
   clearCart(userId: number): Promise<boolean>;
   
   // Reviews
+  getAllReviews(): Promise<Review[]>;
   getProductReviews(productId: number): Promise<Review[]>;
   createReview(review: InsertReview): Promise<Review>;
   
@@ -395,6 +396,24 @@ export class MemStorage implements IStorage {
   }
 
   // Reviews
+  async getAllReviews(): Promise<Review[]> {
+    // Return all reviews with user information
+    const allReviews = Array.from(this.reviews.values());
+    return allReviews.map(review => {
+      const user = this.users.get(review.userId);
+      if (user) {
+        return {
+          ...review,
+          user: {
+            firstName: user.firstName,
+            lastName: user.lastName
+          }
+        };
+      }
+      return review;
+    });
+  }
+  
   async getProductReviews(productId: number): Promise<Review[]> {
     return Array.from(this.reviews.values()).filter(review => review.productId === productId);
   }
@@ -605,6 +624,25 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Reviews
+  async getAllReviews(): Promise<Review[]> {
+    // Join with users to get the user information for each review
+    const result = await db.select({
+      review: reviews,
+      user: {
+        firstName: users.firstName,
+        lastName: users.lastName
+      }
+    })
+    .from(reviews)
+    .leftJoin(users, eq(reviews.userId, users.id));
+    
+    // Transform the results to match the Review type with added user info
+    return result.map(({ review, user }) => ({
+      ...review,
+      user
+    }));
+  }
+  
   async getProductReviews(productId: number): Promise<Review[]> {
     return db.select().from(reviews).where(eq(reviews.productId, productId));
   }
