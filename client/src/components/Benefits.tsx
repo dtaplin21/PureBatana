@@ -43,14 +43,7 @@ export default function Benefits() {
           </div>
         </div>
         
-        <div className="mt-16 text-center">
-          <Link href="/">
-            <span className="inline-flex items-center text-[#3a5a40] hover:text-[#588157] font-medium transition-colors cursor-pointer">
-              <span>Explore Our Products</span>
-              <i className="fas fa-arrow-right ml-2"></i>
-            </span>
-          </Link>
-        </div>
+
       </div>
     </section>
   );
