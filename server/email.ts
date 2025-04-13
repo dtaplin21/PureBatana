@@ -12,17 +12,24 @@ interface EmailParams {
   subject: string;
   text: string;
   html: string;
+  replyTo?: string;
 }
 
 export async function sendEmail(params: EmailParams): Promise<boolean> {
   try {
-    await sgMail.send({
+    const emailData: any = {
       to: params.to,
       from: params.from,
       subject: params.subject,
       text: params.text,
       html: params.html,
-    });
+    };
+    
+    if (params.replyTo) {
+      emailData.replyTo = params.replyTo;
+    }
+    
+    await sgMail.send(emailData);
     return true;
   } catch (error) {
     console.error('SendGrid email error:', error);
