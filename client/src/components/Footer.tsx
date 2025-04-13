@@ -18,11 +18,6 @@ export default function Footer() {
                   Contact Us
                 </Link>
               </li>
-              <li>
-                <Link className="text-neutral-200 hover:text-white transition-colors" href="/track-order">
-                  Track Your Order
-                </Link>
-              </li>
             </ul>
           </div>
         </div>
