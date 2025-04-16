@@ -1,4 +1,5 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { API_BASE_URL } from "./config";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -7,12 +8,31 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
+/**
+ * Builds a complete URL by combining the base URL with the provided path
+ */
+export function buildApiUrl(path: string): string {
+  // If the path already includes http:// or https://, return it as is
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    return path;
+  }
+  
+  // Make sure the path starts with a slash
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  
+  // Combine with API base URL
+  return `${API_BASE_URL}${normalizedPath}`;
+}
+
 export async function apiRequest(
   method: string,
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  const res = await fetch(url, {
+  // Build the full URL
+  const fullUrl = buildApiUrl(url);
+  
+  const res = await fetch(fullUrl, {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
     body: data ? JSON.stringify(data) : undefined,
@@ -29,7 +49,15 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey[0] as string, {
+    // Make sure the queryKey is a string and convert it to a full URL
+    let url = '';
+    if (typeof queryKey[0] === 'string') {
+      url = buildApiUrl(queryKey[0]);
+    } else {
+      throw new Error('Query key must be a string');
+    }
+    
+    const res = await fetch(url, {
       credentials: "include",
     });
 

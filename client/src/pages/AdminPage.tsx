@@ -3,7 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, buildApiUrl } from "@/lib/queryClient";
 
 interface Product {
   id: number;
@@ -38,7 +38,8 @@ export default function AdminPage() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/products');
+      // Use the buildApiUrl function to create the full URL
+      const response = await fetch(buildApiUrl('/api/products'));
       const data = await response.json();
       setProducts(data);
       
