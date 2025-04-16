@@ -1,4 +1,5 @@
-import { Switch, Route } from "wouter";
+// Import our safe routing components instead of directly from wouter
+import { Switch, Route } from "./lib/routing";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
