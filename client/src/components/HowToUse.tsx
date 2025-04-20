@@ -9,8 +9,8 @@ export default function HowToUse() {
         
         <div className="max-w-2xl mx-auto mb-16">
           <img 
-            src="/images/batana-instructions.jpg" 
-            alt="Batana Oil Usage Instructions" 
+            src="/images/jar-usage.jpg" 
+            alt="Pure Batana Oil Usage Instructions" 
             className="w-full rounded-lg mx-auto shadow-md"
           />
         </div>

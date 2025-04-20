@@ -81,8 +81,8 @@ export default function Hero() {
           </div>
           <div className="md:w-1/2">
             <img 
-              src="/images/batana-front.jpg" 
-              alt="Batana Oil Bottle" 
+              src={isLoading ? "/images/jar-front.jpg" : product?.images[0]} 
+              alt="Pure Batana Oil" 
               className="w-full max-w-md mx-auto rounded-lg shadow-xl" 
               loading="eager"
             />

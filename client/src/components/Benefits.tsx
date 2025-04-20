@@ -11,8 +11,8 @@ export default function Benefits() {
         
         <div className="max-w-2xl mx-auto mb-16">
           <img 
-            src="/images/batana-benefits.jpg" 
-            alt="Batana Oil Benefits" 
+            src="/images/jar-benefits.jpg" 
+            alt="Pure Batana Oil Benefits" 
             className="w-full rounded-lg mx-auto shadow-md"
           />
         </div>
