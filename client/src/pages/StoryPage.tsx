@@ -36,8 +36,8 @@ export default function StoryPage() {
               
               <div className="my-8">
                 <img 
-                  src="https://images.unsplash.com/photo-1604404157820-e90f6ff383b6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
-                  alt="Tropical rainforest in Honduras" 
+                  src="/images/jar-benefits.jpg" 
+                  alt="Pure Batana Oil Benefits" 
                   className="w-full h-auto rounded-lg shadow-md"
                 />
                 <p className="text-sm text-neutral-600 italic mt-2">The lush rainforests of La Mosquitia where the American palm grows wild</p>
@@ -87,8 +87,8 @@ export default function StoryPage() {
               
               <div className="my-8">
                 <img 
-                  src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
-                  alt="Women working together in a cooperative" 
+                  src="/images/jar-usage.jpg" 
+                  alt="Pure Batana Oil Usage" 
                   className="w-full h-auto rounded-lg shadow-md"
                 />
                 <p className="text-sm text-neutral-600 italic mt-2">Our cooperative partners preparing Batana oil using traditional methods</p>

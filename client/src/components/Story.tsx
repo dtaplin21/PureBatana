@@ -5,8 +5,8 @@ export default function Story() {
         <div className="flex flex-col md:flex-row items-center gap-12">
           <div className="md:w-1/2">
             <img 
-              src="https://images.unsplash.com/photo-1591543620767-582b2e76369e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-              alt="Indigenous women harvesting palm fruit" 
+              src="/images/jar-front.jpg" 
+              alt="Pure Batana Oil Jar" 
               className="w-full h-auto rounded-lg shadow-md"
               loading="lazy"
             />

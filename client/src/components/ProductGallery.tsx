@@ -5,7 +5,7 @@ interface ProductGalleryProps {
 }
 
 export default function ProductGallery({ images }: ProductGalleryProps) {
-  const [mainImage, setMainImage] = useState(images[0] || "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80");
+  const [mainImage, setMainImage] = useState(images[0] || "/images/jar-front.jpg");
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const handleThumbnailClick = (image: string, index: number) => {
@@ -14,7 +14,7 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
   };
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    e.currentTarget.src = "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+    e.currentTarget.src = "/images/jar-front.jpg";
   };
 
   return (

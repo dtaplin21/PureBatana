@@ -29,13 +29,13 @@ export default function ProductCard({ product }: ProductCardProps) {
         <Link href={`/product/${product.slug}`} className="block">
           <img 
             src={product.slug === "pure-batana-oil" 
-              ? `/images/batana-front.jpg` 
+              ? `/images/jar-front.jpg` 
               : product.images[0]
             } 
             alt={product.name} 
             className="w-full h-64 object-cover"
             onError={(e) => {
-              (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80";
+              (e.target as HTMLImageElement).src = "/images/jar-front.jpg";
             }}
           />
           {product.isBestseller && (
