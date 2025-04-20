@@ -112,13 +112,13 @@ export default function ProductPage() {
                   <div className="flex items-center">
                     <div className="flex mr-3">
                       {product.reviewCount > 0 ? (
-                        <>
+                        <div className="flex">
                           <i className="fas fa-star text-yellow-500"></i>
                           <i className="fas fa-star text-yellow-500"></i>
                           <i className="fas fa-star text-yellow-500"></i>
                           <i className="fas fa-star text-yellow-500"></i>
                           <i className="fas fa-star-half-alt text-yellow-500"></i>
-                        </>
+                        </div>
                       ) : (
                         <span className="text-gray-400 text-sm mr-1">No ratings yet</span>
                       )}
