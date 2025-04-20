@@ -26,7 +26,7 @@ export default function Hero() {
               {!isLoading && (
                 <>
                   <div className="flex mr-3">
-                    {product?.reviewCount ? (
+                    {product?.reviewCount && product.reviewCount > 0 ? (
                       <>
                         <i className="fas fa-star text-yellow-500"></i>
                         <i className="fas fa-star text-yellow-500"></i>
@@ -35,15 +35,28 @@ export default function Hero() {
                         <i className="fas fa-star-half-alt text-yellow-500"></i>
                       </>
                     ) : (
-                      <span className="text-gray-500">No ratings yet</span>
+                      <>
+                        <i className="fas fa-star text-gray-300"></i>
+                        <i className="fas fa-star text-gray-300"></i>
+                        <i className="fas fa-star text-gray-300"></i>
+                        <i className="fas fa-star text-gray-300"></i>
+                        <i className="fas fa-star text-gray-300"></i>
+                      </>
                     )}
                   </div>
                   <span className="text-sm text-neutral-600">
-                    {product?.reviewCount ? 
-                      `${product.reviewCount} ${product.reviewCount === 1 ? 'review' : 'reviews'}` : 
-                      'Be the first to review'
+                    {product?.reviewCount && product.reviewCount > 0 
+                      ? `4.8/5 (${product.reviewCount} ${product.reviewCount === 1 ? 'review' : 'reviews'})`
+                      : 'No reviews yet'
                     }
                   </span>
+                  
+                  {product?.viewCount && product.viewCount > 0 && (
+                    <span className="ml-3 text-sm text-neutral-500 flex items-center">
+                      <i className="fas fa-eye mr-1"></i>
+                      {product.viewCount} views
+                    </span>
+                  )}
                 </>
               )}
             </div>
