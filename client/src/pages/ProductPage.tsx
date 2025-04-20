@@ -1,16 +1,25 @@
 import { useRoute } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { Product } from "@shared/schema";
+import { Product, Review } from "@shared/schema";
 import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import ProductGallery from "@/components/ProductGallery";
 import QuantitySelector from "@/components/QuantitySelector";
 import { Badge } from "@/components/ui/badge";
+import { format } from 'date-fns';
 
 // Extended type for product with review count
 type ProductWithMeta = Product & {
   reviewCount: number;
+};
+
+// Extended type for review with user info
+type ReviewWithUser = Review & {
+  user?: {
+    firstName: string | null;
+    lastName: string | null;
+  };
 };
 
 export default function ProductPage() {
@@ -20,11 +29,17 @@ export default function ProductPage() {
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
 
-  const { data: product, isLoading, isError } = useQuery<ProductWithMeta>({
+  const { data: product, isLoading: productLoading, isError: productError } = useQuery<ProductWithMeta>({
     queryKey: [`/api/products/${slug}`],
   });
+  
+  // Fetch reviews once we have the product ID
+  const { data: reviews, isLoading: reviewsLoading } = useQuery<ReviewWithUser[]>({
+    queryKey: [`/api/reviews/product/${product?.id}`],
+    enabled: !!product?.id, // Only run the query if we have a product ID
+  });
 
-  if (isLoading) {
+  if (productLoading) {
     return (
       <div className="container mx-auto px-4 py-16">
         <div className="flex flex-col lg:flex-row gap-12 animate-pulse">
@@ -50,7 +65,7 @@ export default function ProductPage() {
     );
   }
 
-  if (isError || !product) {
+  if (productError || !product) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <h2 className="text-2xl font-bold text-red-500 mb-4">Product Not Found</h2>
@@ -96,14 +111,24 @@ export default function ProductPage() {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center">
                     <div className="flex mr-3">
-                      <i className="fas fa-star text-yellow-500"></i>
-                      <i className="fas fa-star text-yellow-500"></i>
-                      <i className="fas fa-star text-yellow-500"></i>
-                      <i className="fas fa-star text-yellow-500"></i>
-                      <i className="fas fa-star-half-alt text-yellow-500"></i>
+                      {product.reviewCount > 0 ? (
+                        <>
+                          <i className="fas fa-star text-yellow-500"></i>
+                          <i className="fas fa-star text-yellow-500"></i>
+                          <i className="fas fa-star text-yellow-500"></i>
+                          <i className="fas fa-star text-yellow-500"></i>
+                          <i className="fas fa-star-half-alt text-yellow-500"></i>
+                        </>
+                      ) : (
+                        <span className="text-gray-400 text-sm mr-1">No ratings yet</span>
+                      )}
                     </div>
                     <a href="#reviews" className="text-sm text-[#588157] hover:underline">
-                      {product.reviewCount} {product.reviewCount === 1 ? 'review' : 'reviews'}
+                      {product.reviewCount > 0 ? (
+                        `${product.reviewCount} ${product.reviewCount === 1 ? 'review' : 'reviews'}`
+                      ) : (
+                        'Write the first review'
+                      )}
                     </a>
                   </div>
                   <div className="text-sm text-gray-500 flex items-center">
@@ -208,25 +233,57 @@ export default function ProductPage() {
             </div>
           ) : (
             <div className="max-w-4xl mx-auto">
-              {/* This would be replaced with actual review data when available */}
-              <div className="bg-white rounded-lg shadow-sm p-6 mb-4 border border-gray-100">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="font-display font-semibold text-lg">Sarah K.</h3>
-                    <div className="flex text-yellow-500 mt-1">
-                      <i className="fas fa-star"></i>
-                      <i className="fas fa-star"></i>
-                      <i className="fas fa-star"></i>
-                      <i className="fas fa-star"></i>
-                      <i className="fas fa-star"></i>
+              {reviewsLoading ? (
+                <div className="animate-pulse space-y-4">
+                  {[1, 2].map(i => (
+                    <div key={i} className="bg-white rounded-lg shadow-sm p-6 mb-4 border border-gray-100">
+                      <div className="flex justify-between items-start mb-4">
+                        <div>
+                          <div className="h-5 bg-gray-200 rounded w-28 mb-2"></div>
+                          <div className="flex space-x-1">
+                            {[1, 2, 3, 4, 5].map(s => (
+                              <div key={s} className="h-4 w-4 bg-gray-200 rounded-full"></div>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="h-4 bg-gray-200 rounded w-24"></div>
+                      </div>
+                      <div className="h-16 bg-gray-200 rounded w-full"></div>
                     </div>
-                  </div>
-                  <span className="text-gray-500 text-sm">March 15, 2023</span>
+                  ))}
                 </div>
-                <p className="text-gray-700">
-                  After just two weeks of using Batana Oil on my dry, damaged hair, I noticed incredible improvement in texture and shine. It's become the only hair product I'll ever need.
-                </p>
-              </div>
+              ) : reviews && reviews.length > 0 ? (
+                <>
+                  {reviews.map(review => (
+                    <div key={review.id} className="bg-white rounded-lg shadow-sm p-6 mb-4 border border-gray-100">
+                      <div className="flex justify-between items-start mb-4">
+                        <div>
+                          <h3 className="font-display font-semibold text-lg">
+                            {review.user ? 
+                              `${review.user.firstName || ''} ${review.user.lastName ? review.user.lastName.charAt(0) + '.' : ''}` : 
+                              'Anonymous User'}
+                          </h3>
+                          <div className="flex text-yellow-500 mt-1">
+                            {[1, 2, 3, 4, 5].map(star => (
+                              <i key={star} className={`fas fa-star${star > review.rating ? '-half-alt' : ''} ${star > Math.ceil(review.rating) ? 'text-gray-300' : 'text-yellow-500'}`}></i>
+                            ))}
+                          </div>
+                        </div>
+                        <span className="text-gray-500 text-sm">
+                          {review.createdAt ? format(new Date(review.createdAt), 'MMMM d, yyyy') : ''}
+                        </span>
+                      </div>
+                      <p className="text-gray-700">
+                        {review.comment}
+                      </p>
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">No reviews available at this moment.</p>
+                </div>
+              )}
               
               <div className="text-center mt-8">
                 <button className="bg-[#3a5a40] hover:bg-[#588157] text-white font-medium py-2 px-6 rounded-full transition-colors">
