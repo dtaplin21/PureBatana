@@ -272,6 +272,23 @@ export class MemStorage implements IStorage {
   async deleteProduct(id: number): Promise<boolean> {
     return this.products.delete(id);
   }
+  
+  async incrementProductViewCount(id: number): Promise<boolean> {
+    const product = this.products.get(id);
+    if (!product) return false;
+    
+    // Initialize viewCount if it doesn't exist yet
+    const currentViewCount = product.viewCount || 0;
+    
+    // Increment the view count
+    const updatedProduct = {
+      ...product,
+      viewCount: currentViewCount + 1
+    };
+    
+    this.products.set(id, updatedProduct);
+    return true;
+  }
 
   // Users
   async getUsers(): Promise<User[]> {
@@ -492,6 +509,27 @@ export class DatabaseStorage implements IStorage {
   async deleteProduct(id: number): Promise<boolean> {
     const result = await db.delete(products).where(eq(products.id, id));
     return result.count > 0;
+  }
+  
+  async incrementProductViewCount(id: number): Promise<boolean> {
+    try {
+      // First get the current product to see if it exists
+      const product = await this.getProduct(id);
+      if (!product) return false;
+      
+      // Update the view count by adding 1 to the current value
+      await db
+        .update(products)
+        .set({ 
+          viewCount: (product.viewCount || 0) + 1 
+        })
+        .where(eq(products.id, id));
+      
+      return true;
+    } catch (error) {
+      console.error("Error incrementing product view count:", error);
+      return false;
+    }
   }
 
   // Users

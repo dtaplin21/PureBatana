@@ -8,6 +8,11 @@ import ProductGallery from "@/components/ProductGallery";
 import QuantitySelector from "@/components/QuantitySelector";
 import { Badge } from "@/components/ui/badge";
 
+// Extended type for product with review count
+type ProductWithMeta = Product & {
+  reviewCount: number;
+};
+
 export default function ProductPage() {
   const [, params] = useRoute("/product/:slug");
   const slug = params?.slug || "";
@@ -15,7 +20,7 @@ export default function ProductPage() {
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
 
-  const { data: product, isLoading, isError } = useQuery<Product>({
+  const { data: product, isLoading, isError } = useQuery<ProductWithMeta>({
     queryKey: [`/api/products/${slug}`],
   });
 
@@ -88,18 +93,28 @@ export default function ProductPage() {
             <div className="lg:w-1/2">
               <div className="mb-8">
                 <h1 className="font-display font-bold text-3xl text-[#3a5a40] mb-2">{product.name}</h1>
-                <div className="flex items-center mb-4">
-                  <div className="flex mr-3">
-                    <i className="fas fa-star text-yellow-500"></i>
-                    <i className="fas fa-star text-yellow-500"></i>
-                    <i className="fas fa-star text-yellow-500"></i>
-                    <i className="fas fa-star text-yellow-500"></i>
-                    <i className="fas fa-star-half-alt text-yellow-500"></i>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center">
+                    <div className="flex mr-3">
+                      <i className="fas fa-star text-yellow-500"></i>
+                      <i className="fas fa-star text-yellow-500"></i>
+                      <i className="fas fa-star text-yellow-500"></i>
+                      <i className="fas fa-star text-yellow-500"></i>
+                      <i className="fas fa-star-half-alt text-yellow-500"></i>
+                    </div>
+                    <a href="#reviews" className="text-sm text-[#588157] hover:underline">
+                      {product.reviewCount} {product.reviewCount === 1 ? 'review' : 'reviews'}
+                    </a>
                   </div>
-                  <a href="#reviews" className="text-sm text-[#588157] hover:underline">124 reviews</a>
+                  <div className="text-sm text-gray-500 flex items-center">
+                    <i className="fas fa-eye mr-1"></i>
+                    <span>{product.viewCount} views</span>
+                  </div>
                 </div>
-                {product.isBestseller && <Badge className="bg-[#588157] mb-2">Bestseller</Badge>}
-                {product.isNew && <Badge className="bg-[#a3b18a] mb-2 ml-2">New</Badge>}
+                <div className="flex flex-wrap mb-2">
+                  {product.isBestseller && <Badge className="bg-[#588157] mb-2 mr-2">Bestseller</Badge>}
+                  {product.isNew && <Badge className="bg-[#a3b18a] mb-2">New</Badge>}
+                </div>
                 <p className="text-2xl font-display font-bold">${product.price.toFixed(2)}</p>
               </div>
               
@@ -179,15 +194,47 @@ export default function ProductPage() {
       
       <section id="reviews" className="py-16">
         <div className="container mx-auto px-4">
-          <h2 className="font-display font-bold text-2xl md:text-3xl text-[#3a5a40] mb-8 text-center">Customer Reviews</h2>
+          <h2 className="font-display font-bold text-2xl md:text-3xl text-[#3a5a40] mb-8 text-center">
+            Customer Reviews {product.reviewCount > 0 && `(${product.reviewCount})`}
+          </h2>
           
-          {/* Show reviews when we implement the reviews system */}
-          <div className="text-center py-8">
-            <p className="text-gray-500 mb-4">Be the first to review this product</p>
-            <button className="bg-[#3a5a40] hover:bg-[#588157] text-white font-medium py-2 px-6 rounded-full transition-colors">
-              Write a Review
-            </button>
-          </div>
+          {/* Show empty state or reviews */}
+          {product.reviewCount === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500 mb-4">Be the first to review this product</p>
+              <button className="bg-[#3a5a40] hover:bg-[#588157] text-white font-medium py-2 px-6 rounded-full transition-colors">
+                Write a Review
+              </button>
+            </div>
+          ) : (
+            <div className="max-w-4xl mx-auto">
+              {/* This would be replaced with actual review data when available */}
+              <div className="bg-white rounded-lg shadow-sm p-6 mb-4 border border-gray-100">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 className="font-display font-semibold text-lg">Sarah K.</h3>
+                    <div className="flex text-yellow-500 mt-1">
+                      <i className="fas fa-star"></i>
+                      <i className="fas fa-star"></i>
+                      <i className="fas fa-star"></i>
+                      <i className="fas fa-star"></i>
+                      <i className="fas fa-star"></i>
+                    </div>
+                  </div>
+                  <span className="text-gray-500 text-sm">March 15, 2023</span>
+                </div>
+                <p className="text-gray-700">
+                  After just two weeks of using Batana Oil on my dry, damaged hair, I noticed incredible improvement in texture and shine. It's become the only hair product I'll ever need.
+                </p>
+              </div>
+              
+              <div className="text-center mt-8">
+                <button className="bg-[#3a5a40] hover:bg-[#588157] text-white font-medium py-2 px-6 rounded-full transition-colors">
+                  Write a Review
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </section>
     </>
