@@ -19,6 +19,7 @@ export const products = pgTable("products", {
   usage: text("usage"),
   isBestseller: boolean("is_bestseller").default(false),
   isNew: boolean("is_new").default(false),
+  viewCount: integer("view_count").notNull().default(0),
 });
 
 export const insertProductSchema = createInsertSchema(products).omit({
