@@ -1,7 +1,19 @@
 import { Link } from "@/lib/routing";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { Product } from "@shared/schema";
+
+// Extended type for product with review count
+type ProductWithMeta = Product & {
+  reviewCount: number;
+};
 
 export default function Hero() {
+  // Fetch the product data for the hero 
+  const { data: product, isLoading } = useQuery<ProductWithMeta>({
+    queryKey: ['/api/products/pure-batana-oil'],
+  });
+
   return (
     <section className="py-16 md:py-24 bg-gradient-to-r from-[rgba(58,90,64,0.05)] to-[rgba(163,177,138,0.1)]">
       <div className="container mx-auto px-4">
@@ -11,17 +23,34 @@ export default function Hero() {
             <p className="text-[#588157] text-xl font-medium mb-6">Ancient Honduran beauty secret for hair & skin</p>
             <p className="text-neutral-800 mb-8 max-w-xl">Handcrafted by indigenous Miskito women in Honduras, our 100% pure, cold-pressed Batana Oil delivers transformative moisturizing and revitalizing benefits. This centuries-old beauty secret is now available to you in its purest form.</p>
             <div className="flex items-center mb-8">
-              <div className="flex mr-3">
-                <i className="fas fa-star text-yellow-500"></i>
-                <i className="fas fa-star text-yellow-500"></i>
-                <i className="fas fa-star text-yellow-500"></i>
-                <i className="fas fa-star text-yellow-500"></i>
-                <i className="fas fa-star-half-alt text-yellow-500"></i>
-              </div>
-              <span className="text-sm text-neutral-600">4.8/5 (124 reviews)</span>
+              {!isLoading && (
+                <>
+                  <div className="flex mr-3">
+                    {product?.reviewCount ? (
+                      <>
+                        <i className="fas fa-star text-yellow-500"></i>
+                        <i className="fas fa-star text-yellow-500"></i>
+                        <i className="fas fa-star text-yellow-500"></i>
+                        <i className="fas fa-star text-yellow-500"></i>
+                        <i className="fas fa-star-half-alt text-yellow-500"></i>
+                      </>
+                    ) : (
+                      <span className="text-gray-500">No ratings yet</span>
+                    )}
+                  </div>
+                  <span className="text-sm text-neutral-600">
+                    {product?.reviewCount ? 
+                      `${product.reviewCount} ${product.reviewCount === 1 ? 'review' : 'reviews'}` : 
+                      'Be the first to review'
+                    }
+                  </span>
+                </>
+              )}
             </div>
             <div className="flex items-center mb-8">
-              <p className="text-2xl font-display font-bold mr-4">$29.95</p>
+              <p className="text-2xl font-display font-bold mr-4">
+                ${isLoading ? '29.95' : product?.price.toFixed(2)}
+              </p>
               <span className="text-neutral-600">2 oz (60ml)</span>
             </div>
             <div className="flex flex-wrap gap-3">
