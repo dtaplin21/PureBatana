@@ -67,7 +67,7 @@ export default function Hero() {
               <span className="text-neutral-600">2 oz (60ml)</span>
             </div>
             <div className="flex flex-wrap gap-3">
-              <a href="https://buy.stripe.com/bIYaH15It3iq2yI6oo" target="_blank" rel="noopener noreferrer">
+              <a href="https://buy.stripe.com/bIYaH15It3iq2yI6oo?quantity=1" target="_blank" rel="noopener noreferrer">
                 <Button className="bg-[#3a5a40] hover:bg-[#588157] h-12 px-8">
                   <i className="fas fa-credit-card mr-2"></i> Buy Now
                 </Button>

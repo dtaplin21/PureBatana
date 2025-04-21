@@ -86,7 +86,8 @@ export default function ProductPage() {
   };
 
   const handleBuyNow = () => {
-    window.location.href = "https://buy.stripe.com/bIYaH15It3iq2yI6oo";
+    // Add quantity parameter to the Stripe URL
+    window.location.href = `https://buy.stripe.com/bIYaH15It3iq2yI6oo?quantity=${quantity}`;
   };
 
   return (

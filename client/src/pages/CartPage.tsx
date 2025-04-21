@@ -6,6 +6,9 @@ import { Separator } from "@/components/ui/separator";
 
 export default function CartPage() {
   const { cart, removeItem, updateQuantity, clearCart, cartTotal, isLoading } = useCart();
+  
+  // Calculate total quantity across all cart items
+  const totalQuantity = cart.reduce((total, item) => total + item.quantity, 0);
 
   // Loading state
   if (isLoading) {
@@ -118,7 +121,7 @@ export default function CartPage() {
             </div>
             
             <a 
-              href="https://buy.stripe.com/bIYaH15It3iq2yI6oo" 
+              href={`https://buy.stripe.com/bIYaH15It3iq2yI6oo?quantity=${totalQuantity}`}
               target="_blank"
               rel="noopener noreferrer"
               className="block w-full"
