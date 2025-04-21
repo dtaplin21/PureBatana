@@ -13,13 +13,11 @@ export default function Story() {
           </div>
           
           <div className="md:w-1/2">
-            <h2 className="font-display font-bold text-3xl md:text-4xl text-[#3a5a40] mb-6">Our Story</h2>
+            <h2 className="font-display font-bold text-3xl md:text-4xl text-[#3a5a40] mb-6">Our Mission</h2>
             
-            <p className="mb-4">For centuries, the indigenous Miskito women of Honduras have harvested and processed American palm fruit to create Batana Oil, a natural beauty elixir revered for its remarkable properties.</p>
+            <p className="mb-4">Jessica Jones Taplin knows firsthand the frustration of searching for truly natural hair care—time and again she ran into products that promised nourishment but left her hair dry, brittle, or irritated. Drawing on her sensitivity to harsh chemicals and her passion for holistic wellness, Jessica set out to create a line of hair products made purely from nature's finest ingredients—no sulfates, no parabens, no compromises. At Gaia Grow, we believe that what's good for your hair should also be good for the planet. That's why every bottle is crafted with sustainably sourced botanical extracts and packaged in eco‑friendly materials, helping us cultivate a healthier, more natural environment for everyone.</p>
             
-            <p className="mb-4">Our founder discovered this treasure while traveling through the La Mosquitia region, where she witnessed its transformative effects firsthand. Partnering directly with Miskito communities, we ensure fair compensation and sustainable harvesting practices.</p>
-            
-            <p className="mb-8">Each bottle of Pure Batana supports traditional knowledge, indigenous livelihoods, and rainforest conservation while delivering an authentic, potent beauty oil to your daily routine.</p>
+            <p className="mb-8">But our mission doesn't stop there. Jessica takes pride in building a better world, pledging a portion of every sale to support community‑driven projects in Liberia and beyond. From clean‑water initiatives to educational programs in rural villages, your purchase helps nourish people and places that have given so much to us. Together, we're not just growing healthy hair—we're growing hope.</p>
             
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex items-center p-4 bg-neutral-50 rounded-lg">

@@ -5,15 +5,15 @@ export default function StoryPage() {
   return (
     <div>
       <Helmet>
-        <title>Our Story | Pure Batana</title>
-        <meta name="description" content="Learn about the history and mission of Pure Batana. Discover how we work with indigenous Miskito communities to bring this traditional oil to the world." />
+        <title>Our Mission | Pure Batana</title>
+        <meta name="description" content="Learn about the mission of Pure Batana. Discover our commitment to natural hair care products and sustainable practices that benefit communities around the world." />
       </Helmet>
       
       <div className="py-12 bg-[#f8f9fa]">
         <div className="container mx-auto px-4">
-          <h1 className="font-display font-bold text-4xl md:text-5xl text-center text-[#3a5a40] mb-6">Our Story</h1>
+          <h1 className="font-display font-bold text-4xl md:text-5xl text-center text-[#3a5a40] mb-6">Our Mission</h1>
           <p className="text-center text-lg text-neutral-700 max-w-3xl mx-auto">
-            The journey of Pure Batana from the rainforests of Honduras to you.
+            Creating natural hair care products while making a positive impact on the world.
           </p>
         </div>
       </div>
@@ -26,63 +26,64 @@ export default function StoryPage() {
             <h2 className="font-display font-bold text-3xl md:text-4xl text-[#3a5a40] mb-8">The Full Story</h2>
             
             <div className="prose prose-lg max-w-none">
-              <h3>The Discovery</h3>
+              <h3>The Founder's Journey</h3>
               <p>
-                Our journey began when our founder, Elena, was traveling through La Mosquitia, the easternmost region of Honduras. While staying with a Miskito community, she noticed the extraordinarily healthy hair and skin of the local women, despite their limited access to commercial beauty products.
+                Jessica Jones Taplin's journey began with a personal struggle. For years, she searched for truly natural hair care products that would nourish her hair without causing irritation or damage. Time and again, products that promised natural care left her hair dry, brittle, or irritated.
               </p>
               <p>
-                She learned that they used an oil extracted from the American palm fruit (Elaeis oleifera), which they called "Batana." The oil was made through a labor-intensive process that had been passed down through generations of Miskito women.
+                Drawing on her sensitivity to harsh chemicals and her passion for holistic wellness, Jessica became determined to create something better—a line of hair products made purely from nature's finest ingredients, without compromises.
               </p>
               
               <div className="my-8">
                 <img 
                   src="/images/founder.png" 
-                  alt="Our Founder Elena" 
+                  alt="Our Founder Jessica" 
                   className="w-full h-auto rounded-lg shadow-md"
                 />
-                <p className="text-sm text-neutral-600 italic mt-2">Our founder Elena, who discovered the transformative properties of Batana Oil</p>
+                <p className="text-sm text-neutral-600 italic mt-2">Our founder Jessica Jones Taplin, who developed Pure Batana Oil</p>
               </div>
               
-              <h3>The Tradition</h3>
+              <h3>Our Commitment to Nature</h3>
               <p>
-                For centuries, Miskito women have harvested the fruit of the American palm, extracting its oil through a meticulous process:
-              </p>
-              <ol>
-                <li>The ripe fruits are collected and their seeds removed</li>
-                <li>The pulp is boiled in water until the oil separates</li>
-                <li>The oil is carefully skimmed off the surface</li>
-                <li>This process is repeated several times to purify the oil</li>
-                <li>The final product is stored in calabash gourds for use</li>
-              </ol>
-              <p>
-                This traditional method preserves all the beneficial properties of the oil while ensuring its purity.
-              </p>
-              
-              <h3>Our Mission</h3>
-              <p>
-                Inspired by the transformative properties of Batana oil and the rich cultural heritage behind it, Elena returned to the United States with a vision: to create a company that would bring this extraordinary oil to a wider audience while supporting the indigenous communities who have been its stewards for generations.
-              </p>
-              <p>
-                Pure Batana was founded on three core principles:
+                At Gaia Grow, we firmly believe that what's good for your hair should also be good for the planet. This philosophy guides everything we do:
               </p>
               <ul>
-                <li><strong>Quality</strong> - Maintaining the traditional methods that preserve the oil's potency</li>
-                <li><strong>Sustainability</strong> - Ensuring responsible harvesting practices that protect the rainforest</li>
-                <li><strong>Fair Trade</strong> - Providing fair compensation and economic opportunities for Miskito communities</li>
+                <li>Sustainably sourced botanical extracts from trusted providers</li>
+                <li>No sulfates, parabens, or harsh chemicals in any of our products</li>
+                <li>Eco-friendly packaging that minimizes environmental impact</li>
+                <li>Recyclable materials used throughout our supply chain</li>
+                <li>Carbon-neutral shipping options for all orders</li>
               </ul>
-              
-              <h3>The Partnership</h3>
               <p>
-                We established direct partnerships with Miskito communities in La Mosquitia, creating a cooperative model that:
+                These commitments help us cultivate a healthier, more natural environment for everyone.
+              </p>
+              
+              <h3>Making a Global Impact</h3>
+              <p>
+                Jessica's vision extends beyond creating exceptional hair care products. She takes pride in building a better world, which is why we pledge a portion of every sale to support community-driven projects in Liberia and beyond.
+              </p>
+              <p>
+                Our global initiatives include:
               </p>
               <ul>
-                <li>Pays a premium well above market rates for the oil</li>
-                <li>Invests in community infrastructure like schools and healthcare</li>
-                <li>Provides training in sustainable harvesting techniques</li>
-                <li>Supports women's economic independence through employment opportunities</li>
+                <li><strong>Clean Water</strong> - Funding wells and water purification systems in rural villages</li>
+                <li><strong>Education</strong> - Supporting schools and educational programs for children</li>
+                <li><strong>Women's Empowerment</strong> - Creating economic opportunities for women in developing regions</li>
+                <li><strong>Environmental Conservation</strong> - Protecting natural resources and supporting sustainable practices</li>
+              </ul>
+              
+              <h3>Growing Hope Together</h3>
+              <p>
+                When you purchase Pure Batana Oil, you're joining us in a mission that extends far beyond beauty. Your support helps us:
+              </p>
+              <ul>
+                <li>Provide clean drinking water to families in need</li>
+                <li>Fund school supplies and teacher training in underserved communities</li>
+                <li>Support women entrepreneurs through microloans and business education</li>
+                <li>Preserve natural environments through conservation initiatives</li>
               </ul>
               <p>
-                These partnerships ensure that as our business grows, the benefits flow back to the communities who have shared their traditional knowledge with us.
+                Together, we're not just growing healthy hair—we're growing hope for a better future.
               </p>
               
               <div className="my-8">
@@ -91,24 +92,24 @@ export default function StoryPage() {
                   alt="Pure Batana Oil Usage" 
                   className="w-full h-auto rounded-lg shadow-md"
                 />
-                <p className="text-sm text-neutral-600 italic mt-2">Our cooperative partners preparing Batana oil using traditional methods</p>
+                <p className="text-sm text-neutral-600 italic mt-2">Natural ingredients for natural results</p>
               </div>
               
               <h3>Looking Forward</h3>
               <p>
-                Today, Pure Batana continues to expand its product line while staying true to our founding principles. We remain committed to:
+                Today, Gaia Grow continues to expand its product line while staying true to our founding principles. We remain committed to:
               </p>
               <ul>
-                <li>Preserving and honoring the traditional knowledge of the Miskito people</li>
-                <li>Creating products that harness the full potential of this remarkable oil</li>
-                <li>Maintaining sustainable practices that protect the environment</li>
-                <li>Building a business model that benefits everyone in the supply chain, from harvesters to customers</li>
+                <li>Creating clean, effective products without harmful chemicals</li>
+                <li>Maintaining sustainable practices that protect our precious environment</li>
+                <li>Supporting communities in need around the world</li>
+                <li>Growing our positive impact with every bottle sold</li>
               </ul>
               <p>
-                When you purchase Pure Batana products, you're not just buying a beauty oil—you're participating in a cycle of positive impact that supports indigenous communities, preserves cultural traditions, and protects the rainforest while providing you with nature's most effective beauty solution.
+                When you choose Pure Batana Oil, you're not just choosing exceptional hair care—you're choosing to be part of a movement that values both personal wellness and global responsibility.
               </p>
               <p>
-                We invite you to join us on this journey.
+                We invite you to join Jessica on this journey toward a more beautiful world, inside and out.
               </p>
             </div>
           </div>
