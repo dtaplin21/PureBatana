@@ -86,8 +86,7 @@ export default function ProductPage() {
   };
 
   const handleBuyNow = () => {
-    addToCart(product, quantity);
-    window.location.href = "/checkout";
+    window.location.href = "https://buy.stripe.com/bIYaH15It3iq2yI6oo";
   };
 
   return (

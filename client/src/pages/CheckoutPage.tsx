@@ -402,13 +402,39 @@ export default function CheckoutPage() {
                 </div>
               </div>
               
-              <Button 
-                type="submit" 
-                className="w-full bg-[#3a5a40] hover:bg-[#588157] text-lg h-12"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Processing..." : `Continue to Payment • $${orderTotal.toFixed(2)}`}
-              </Button>
+              <div className="space-y-4">
+                <Button 
+                  type="submit" 
+                  className="w-full bg-[#3a5a40] hover:bg-[#588157] text-lg h-12"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Processing..." : `Continue to Payment • $${orderTotal.toFixed(2)}`}
+                </Button>
+                
+                <div className="text-center relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-gray-300"></span>
+                  </div>
+                  <div className="relative flex justify-center">
+                    <span className="px-2 bg-white text-sm text-gray-500">or</span>
+                  </div>
+                </div>
+                
+                <a 
+                  href="https://buy.stripe.com/bIYaH15It3iq2yI6oo" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full"
+                >
+                  <Button 
+                    type="button"
+                    variant="outline"
+                    className="w-full border-[#3a5a40] text-[#3a5a40] hover:bg-[#3a5a40] hover:text-white text-lg h-12"
+                  >
+                    <i className="fas fa-credit-card mr-2"></i> Checkout with Stripe
+                  </Button>
+                </a>
+              </div>
             </form>
           )}
         </div>
