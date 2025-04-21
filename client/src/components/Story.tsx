@@ -5,8 +5,8 @@ export default function Story() {
         <div className="flex flex-col md:flex-row items-center gap-12">
           <div className="md:w-1/2">
             <img 
-              src="/images/jar-front.jpg" 
-              alt="Pure Batana Oil Jar" 
+              src="/images/founder.png" 
+              alt="Our Founder" 
               className="w-full h-auto rounded-lg shadow-md"
               loading="lazy"
             />

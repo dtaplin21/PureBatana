@@ -36,11 +36,11 @@ export default function StoryPage() {
               
               <div className="my-8">
                 <img 
-                  src="/images/jar-benefits.jpg" 
-                  alt="Pure Batana Oil Benefits" 
+                  src="/images/founder.png" 
+                  alt="Our Founder Elena" 
                   className="w-full h-auto rounded-lg shadow-md"
                 />
-                <p className="text-sm text-neutral-600 italic mt-2">The lush rainforests of La Mosquitia where the American palm grows wild</p>
+                <p className="text-sm text-neutral-600 italic mt-2">Our founder Elena, who discovered the transformative properties of Batana Oil</p>
               </div>
               
               <h3>The Tradition</h3>
