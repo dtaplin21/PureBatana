@@ -8,8 +8,6 @@ import { CartProvider } from "@/context/CartContext";
 import HomePage from "@/pages/HomePage";
 import ProductPage from "@/pages/ProductPage";
 import CartPage from "@/pages/CartPage";
-import CheckoutPage from "@/pages/CheckoutPage";
-import CheckoutSuccessPage from "@/pages/CheckoutSuccessPage";
 import AccountPage from "@/pages/AccountPage";
 import OrdersPage from "@/pages/OrdersPage";
 import ContactPage from "@/pages/ContactPage";
@@ -33,8 +31,6 @@ function Router() {
           <Route path="/" component={HomePage} />
           <Route path="/product/:slug" component={ProductPage} />
           <Route path="/cart" component={CartPage} />
-          <Route path="/checkout" component={CheckoutPage} />
-          <Route path="/checkout/success" component={CheckoutSuccessPage} />
           <Route path="/account" component={AccountPage} />
           <Route path="/orders" component={OrdersPage} />
           <Route path="/contact" component={ContactPage} />
