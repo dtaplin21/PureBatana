@@ -121,7 +121,7 @@ export default function CartPage() {
             </div>
             
             <a 
-              href={`https://buy.stripe.com/bIYaH15It3iq2yI6oo?quantity=${totalQuantity}`}
+              href={`https://buy.stripe.com/bIYaH15It3iq2yI6oo?items[0][quantity]=${totalQuantity}&adjust_quantity[pure_batana]=total&quantity=${totalQuantity}`}
               target="_blank"
               rel="noopener noreferrer"
               className="block w-full"

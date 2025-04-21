@@ -86,8 +86,8 @@ export default function ProductPage() {
   };
 
   const handleBuyNow = () => {
-    // Add quantity parameter to the Stripe URL
-    window.location.href = `https://buy.stripe.com/bIYaH15It3iq2yI6oo?quantity=${quantity}`;
+    // Add quantity parameter to the Stripe URL using multiple formats to ensure compatibility
+    window.location.href = `https://buy.stripe.com/bIYaH15It3iq2yI6oo?items[0][quantity]=${quantity}&adjust_quantity[pure_batana]=total&quantity=${quantity}`;
   };
 
   return (
