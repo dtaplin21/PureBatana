@@ -2,6 +2,8 @@ import { Link } from "@/lib/routing";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { Product } from "@shared/schema";
+import { useCart } from "@/context/CartContext";
+import { useToast } from "@/hooks/use-toast";
 
 // Extended type for product with review count
 type ProductWithMeta = Product & {
@@ -13,6 +15,19 @@ export default function Hero() {
   const { data: product, isLoading } = useQuery<ProductWithMeta>({
     queryKey: ['/api/products/pure-batana-oil'],
   });
+  
+  const { addToCart } = useCart();
+  const { toast } = useToast();
+  
+  const handleAddToCart = () => {
+    if (product) {
+      addToCart(product, 1);
+      toast({
+        title: "Added to cart",
+        description: `1 × ${product.name} added to your cart`,
+      });
+    }
+  };
 
   return (
     <section className="py-16 md:py-24 bg-gradient-to-r from-[rgba(58,90,64,0.05)] to-[rgba(163,177,138,0.1)]">
@@ -72,11 +87,13 @@ export default function Hero() {
                   <i className="fas fa-credit-card mr-2"></i> Buy Now
                 </Button>
               </a>
-              <Link href="/product/pure-batana-oil">
-                <Button variant="outline" className="border-[#3a5a40] text-[#3a5a40] hover:bg-[#3a5a40] hover:text-white h-12 px-8">
-                  Learn More
-                </Button>
-              </Link>
+              <Button 
+                onClick={handleAddToCart}
+                variant="outline" 
+                className="border-[#3a5a40] text-[#3a5a40] hover:bg-[#3a5a40] hover:text-white h-12 px-8"
+              >
+                <i className="fas fa-shopping-cart mr-2"></i> Add to Cart
+              </Button>
             </div>
           </div>
           <div className="md:w-1/2">
