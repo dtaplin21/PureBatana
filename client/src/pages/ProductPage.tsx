@@ -97,11 +97,8 @@ export default function ProductPage() {
           <div className="flex flex-col lg:flex-row gap-12">
             {/* Product Gallery */}
             <div className="lg:w-1/2">
-              {product.slug === "pure-batana-oil" ? (
-                <ProductGallery images={["/images/batana-front.jpg", "/images/batana-instructions.jpg", "/images/batana-benefits.jpg", "/images/batana-topview.jpg"]} />
-              ) : (
-                <ProductGallery images={product.images} />
-              )}
+              {/* Always use our hardcoded images for Pure Batana Oil */}
+              <ProductGallery images={["/images/batana-front.jpg", "/images/batana-instructions.jpg", "/images/batana-benefits.jpg", "/images/batana-topview.jpg"]} />
             </div>
             
             {/* Product Details */}
