@@ -144,6 +144,31 @@ export default function AccountPage() {
                   </Link>
                   <Button variant="outline" className="w-full">Edit Profile</Button>
                 </div>
+                
+                <div className="mt-8">
+                  <h3 className="text-lg font-semibold mb-4">Recent Order</h3>
+                  <div className="border rounded-lg p-4">
+                    <div className="flex items-center space-x-4">
+                      <div className="flex-shrink-0 w-20 h-20 bg-gray-100 rounded overflow-hidden">
+                        <img 
+                          src="/images/batana-front.jpg" 
+                          alt="Pure Batana Oil" 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div>
+                        <h4 className="font-medium">Pure Batana Oil</h4>
+                        <div className="text-sm text-gray-500 mt-1">Order #1001 • April 20, 2025</div>
+                        <div className="text-sm font-medium text-green-600 mt-1">Delivered</div>
+                      </div>
+                    </div>
+                    <div className="mt-4 pt-4 border-t border-gray-100">
+                      <Link href="/orders/1">
+                        <Button variant="outline" size="sm" className="w-full">View Order Details</Button>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>

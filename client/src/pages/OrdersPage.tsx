@@ -76,9 +76,24 @@ export default function OrdersPage() {
                   <p>Total: ${order.total.toFixed(2)}</p>
                 </div>
                 
-                <Link href={`/orders/${order.id}`}>
-                  <Button variant="outline" size="sm">View Order Details</Button>
-                </Link>
+                <div className="mt-4 border-t pt-4">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="flex-shrink-0 w-16 h-16 bg-gray-100 rounded overflow-hidden">
+                      <img 
+                        src="/images/batana-front.jpg" 
+                        alt="Pure Batana Oil" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div>
+                      <p className="font-medium">Pure Batana Oil</p>
+                      <p className="text-sm text-gray-500">Qty: 1</p>
+                    </div>
+                  </div>
+                  <Link href={`/orders/${order.id}`}>
+                    <Button variant="outline" size="sm">View Order Details</Button>
+                  </Link>
+                </div>
               </CardContent>
             </Card>
           ))}
