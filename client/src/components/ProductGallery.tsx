@@ -5,7 +5,7 @@ interface ProductGalleryProps {
 }
 
 export default function ProductGallery({ images }: ProductGalleryProps) {
-  const [mainImage, setMainImage] = useState(images[0] || "/images/batana-front.jpg");
+  const [mainImage, setMainImage] = useState(images[0] || "/batana-front.jpg");
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const handleThumbnailClick = (image: string, index: number) => {
@@ -14,7 +14,7 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
   };
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    e.currentTarget.src = "/images/batana-front.jpg";
+    e.currentTarget.src = "/batana-front.jpg";
   };
 
   return (
