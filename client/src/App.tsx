@@ -12,6 +12,8 @@ import OrdersPage from "@/pages/OrdersPage";
 import ContactPage from "@/pages/ContactPage";
 import SimpleContactPage from "@/pages/SimpleContactPage";
 import AdminPage from "@/pages/AdminPage";
+import EmbeddedCheckoutPage from "@/pages/EmbeddedCheckoutPage";
+import CheckoutSuccessPage from "@/pages/CheckoutSuccessPage";
 
 import BenefitsPage from "@/pages/BenefitsPage";
 import StoryPage from "@/pages/StoryPage";
@@ -30,6 +32,8 @@ function Router() {
           <Route path="/" component={HomePage} />
           <Route path="/product/:slug" component={ProductPage} />
           <Route path="/cart" component={CartPage} />
+          <Route path="/checkout" component={EmbeddedCheckoutPage} />
+          <Route path="/checkout-success" component={CheckoutSuccessPage} />
           <Route path="/orders" component={OrdersPage} />
           <Route path="/contact" component={ContactPage} />
           <Route path="/contact-simple" component={SimpleContactPage} />
