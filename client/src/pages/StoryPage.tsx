@@ -88,7 +88,7 @@ export default function StoryPage() {
               
               <div className="my-8">
                 <img 
-                  src="/images/batana-instruction.jpg" 
+                  src="/images/batana-instructions.jpg" 
                   alt="Pure Batana Oil Usage" 
                   className="w-full h-auto rounded-lg shadow-md"
                 />
