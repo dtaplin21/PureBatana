@@ -3,6 +3,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { format } from 'date-fns';
 import { apiRequest, buildApiUrl } from "@/lib/queryClient";
 
 interface Product {
@@ -22,9 +25,51 @@ interface Product {
   isNew: boolean | null;
 }
 
+interface StripeCustomer {
+  id: string;
+  email: string;
+  name: string;
+  phone: string | null;
+  address: {
+    line1: string | null;
+    line2: string | null;
+    city: string | null;
+    state: string | null;
+    postal_code: string | null;
+    country: string | null;
+  } | null;
+}
+
+interface StripeOrder {
+  id: string;
+  customer: StripeCustomer;
+  amount: number;
+  currency: string;
+  status: string;
+  created: number;
+  items: {
+    description: string;
+    quantity: number;
+    amount: number;
+  }[];
+  shipping: {
+    name: string;
+    address: {
+      line1: string;
+      line2: string | null;
+      city: string;
+      state: string;
+      postal_code: string;
+      country: string;
+    };
+  } | null;
+}
+
 export default function AdminPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [orders, setOrders] = useState<StripeOrder[]>([]);
   const [loading, setLoading] = useState(true);
+  const [ordersLoading, setOrdersLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const { toast } = useToast();
   
@@ -33,6 +78,7 @@ export default function AdminPage() {
   
   useEffect(() => {
     fetchProducts();
+    fetchStripeOrders();
   }, []);
   
   const fetchProducts = async () => {
@@ -101,6 +147,29 @@ export default function AdminPage() {
     }
   };
   
+  const fetchStripeOrders = async () => {
+    try {
+      setOrdersLoading(true);
+      const response = await apiRequest('GET', '/api/stripe/orders');
+      
+      if (response.ok) {
+        const data = await response.json();
+        setOrders(data.orders);
+      } else {
+        throw new Error("Failed to fetch Stripe orders");
+      }
+    } catch (error) {
+      console.error('Error fetching Stripe orders:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load Stripe orders",
+        variant: "destructive",
+      });
+    } finally {
+      setOrdersLoading(false);
+    }
+  };
+  
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
@@ -114,57 +183,151 @@ export default function AdminPage() {
   return (
     <div className="container mx-auto px-4 py-16">
       <h1 className="font-display font-bold text-3xl text-[#3a5a40] mb-6">Admin Panel</h1>
-      <h2 className="font-display text-xl mb-6">Manage Product Prices</h2>
       
-      <div className="grid grid-cols-1 gap-6">
-        {products.map(product => (
-          <Card key={product.id} className="shadow-sm">
-            <CardHeader>
-              <CardTitle>{product.name}</CardTitle>
-              <CardDescription>{product.shortDescription}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-4">
-                <div className="w-24 h-24 bg-gray-100 rounded-md overflow-hidden">
-                  {product.images && product.images.length > 0 && (
-                    <img 
-                      src={product.images[0]} 
-                      alt={product.name} 
-                      className="w-full h-full object-cover"
-                    />
-                  )}
-                </div>
-                <div className="flex-1">
-                  <p className="mb-2 text-sm text-gray-600">Current Price: ${product.price.toFixed(2)}</p>
-                  <div className="flex gap-2 items-center">
-                    <label htmlFor={`price-${product.id}`} className="text-sm font-medium">
-                      New Price ($):
-                    </label>
-                    <Input
-                      id={`price-${product.id}`}
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={editedPrices[product.id]}
-                      onChange={(e) => handlePriceChange(product.id, e.target.value)}
-                      className="max-w-[120px]"
-                    />
+      <Tabs defaultValue="products" className="w-full">
+        <TabsList className="mb-8">
+          <TabsTrigger value="products">Manage Products</TabsTrigger>
+          <TabsTrigger value="orders">View Orders</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="products">
+          <h2 className="font-display text-xl mb-6">Manage Product Prices</h2>
+          
+          <div className="grid grid-cols-1 gap-6">
+            {products.map(product => (
+              <Card key={product.id} className="shadow-sm">
+                <CardHeader>
+                  <CardTitle>{product.name}</CardTitle>
+                  <CardDescription>{product.shortDescription}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-4">
+                    <div className="w-24 h-24 bg-gray-100 rounded-md overflow-hidden">
+                      {product.images && product.images.length > 0 && (
+                        <img 
+                          src={product.images[0]} 
+                          alt={product.name} 
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            console.error("Product image failed to load");
+                            e.currentTarget.src = "/images/batana-front.jpg"; // Fallback image
+                          }}
+                        />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <p className="mb-2 text-sm text-gray-600">Current Price: ${product.price.toFixed(2)}</p>
+                      <div className="flex gap-2 items-center">
+                        <label htmlFor={`price-${product.id}`} className="text-sm font-medium">
+                          New Price ($):
+                        </label>
+                        <Input
+                          id={`price-${product.id}`}
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={editedPrices[product.id]}
+                          onChange={(e) => handlePriceChange(product.id, e.target.value)}
+                          className="max-w-[120px]"
+                        />
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter className="flex justify-end">
-              <Button 
-                onClick={() => updateProductPrice(product.id)} 
-                disabled={updating || editedPrices[product.id] === product.price}
-                className="bg-[#3a5a40] hover:bg-[#588157]"
-              >
-                {updating ? 'Updating...' : 'Update Price'}
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
+                </CardContent>
+                <CardFooter className="flex justify-end">
+                  <Button 
+                    onClick={() => updateProductPrice(product.id)} 
+                    disabled={updating || editedPrices[product.id] === product.price}
+                    className="bg-[#3a5a40] hover:bg-[#588157]"
+                  >
+                    {updating ? 'Updating...' : 'Update Price'}
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="orders">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="font-display text-xl">Customer Orders</h2>
+            <Button 
+              onClick={fetchStripeOrders} 
+              className="bg-[#3a5a40] hover:bg-[#588157]"
+              disabled={ordersLoading}
+            >
+              {ordersLoading ? (
+                <>
+                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                  Refreshing...
+                </>
+              ) : (
+                'Refresh Orders'
+              )}
+            </Button>
+          </div>
+          
+          {ordersLoading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading orders...</p>
+            </div>
+          ) : orders.length === 0 ? (
+            <div className="text-center py-8 bg-gray-50 rounded-lg">
+              <p className="text-gray-500">No orders found</p>
+              <p className="text-sm text-gray-400 mt-2">Orders will appear here when customers make purchases</p>
+            </div>
+          ) : (
+            <div className="overflow-auto border rounded-lg">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Order ID</TableHead>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Items</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {orders.map(order => (
+                    <TableRow key={order.id}>
+                      <TableCell className="font-medium">{order.id.substring(0, 8)}...</TableCell>
+                      <TableCell>
+                        <div>
+                          <div>{order.customer?.name || 'Anonymous'}</div>
+                          <div className="text-sm text-gray-500">{order.customer?.email || 'No email'}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>{format(new Date(order.created * 1000), 'MMM d, yyyy')}</TableCell>
+                      <TableCell>
+                        {order.items.map((item, index) => (
+                          <div key={index} className="mb-1">
+                            <span className="font-medium">{item.quantity}x</span> {item.description}
+                          </div>
+                        ))}
+                      </TableCell>
+                      <TableCell>${(order.amount / 100).toFixed(2)}</TableCell>
+                      <TableCell>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          order.status === 'succeeded' 
+                            ? 'bg-green-100 text-green-800' 
+                            : order.status === 'pending'
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : 'bg-red-100 text-red-800'
+                        }`}>
+                          {order.status === 'succeeded' ? 'Paid' : order.status}
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
