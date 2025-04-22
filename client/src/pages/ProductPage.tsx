@@ -183,12 +183,20 @@ export default function ProductPage() {
                   >
                     <i className="fas fa-shopping-cart mr-2"></i> Add to Cart
                   </button>
-                  <button 
-                    className="border border-[#3a5a40] text-[#3a5a40] hover:bg-[#3a5a40] hover:text-white font-medium py-3 px-8 rounded-full transition-colors w-full sm:w-auto justify-center"
-                    onClick={handleBuyNow}
-                  >
-                    Buy Now
-                  </button>
+                  <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-3">
+                    <button 
+                      className="border border-[#3a5a40] text-[#3a5a40] hover:bg-[#3a5a40] hover:text-white font-medium py-3 px-8 rounded-full transition-colors w-full justify-center"
+                      onClick={handleBuyNow}
+                    >
+                      <i className="fas fa-credit-card mr-2"></i> Buy Now
+                    </button>
+                    <button 
+                      className="border border-gray-400 text-gray-600 hover:bg-gray-600 hover:border-gray-600 hover:text-white font-medium py-3 px-8 rounded-full transition-colors w-full justify-center"
+                      onClick={handleExternalCheckout}
+                    >
+                      <i className="fas fa-external-link-alt mr-2"></i> Checkout with Stripe
+                    </button>
+                  </div>
                 </div>
               </div>
               
