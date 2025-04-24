@@ -80,6 +80,7 @@ export default function AdminPage() {
   const [phoneNumber, setPhoneNumber] = useState('5103261121');
   const [carrier, setCarrier] = useState('att');
   const [notificationSettingsLoading, setNotificationSettingsLoading] = useState(false);
+  const [testingSms, setTestingSms] = useState(false);
   
   // Handler for updating notification settings
   const updateNotificationSettings = async () => {
@@ -108,6 +109,35 @@ export default function AdminPage() {
       });
     } finally {
       setNotificationSettingsLoading(false);
+    }
+  };
+  
+  // Handler for testing SMS notifications
+  const testSmsNotification = async () => {
+    try {
+      setTestingSms(true);
+      
+      const response = await apiRequest('POST', '/api/notifications/test-sms', {});
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        toast({
+          title: "Test SMS Sent",
+          description: "A test SMS notification has been sent to your phone. You should receive it shortly.",
+        });
+      } else {
+        throw new Error("Failed to send test SMS notification");
+      }
+    } catch (error) {
+      console.error('Error sending test SMS:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send test SMS notification. Make sure your SendGrid API key is configured correctly.",
+        variant: "destructive",
+      });
+    } finally {
+      setTestingSms(false);
     }
   };
   
@@ -411,7 +441,7 @@ export default function AdminPage() {
                 </select>
               </div>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="flex flex-col space-y-3">
               <Button 
                 onClick={updateNotificationSettings} 
                 disabled={notificationSettingsLoading || phoneNumber.length !== 10}
@@ -424,6 +454,25 @@ export default function AdminPage() {
                   </>
                 ) : (
                   'Update Notification Settings'
+                )}
+              </Button>
+              
+              <Button 
+                onClick={testSmsNotification} 
+                disabled={testingSms || phoneNumber.length !== 10}
+                variant="outline"
+                className="border-[#3a5a40] text-[#3a5a40] hover:bg-[#3a5a40] hover:text-white w-full"
+              >
+                {testingSms ? (
+                  <>
+                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-[#3a5a40] border-t-transparent"></div>
+                    Sending Test SMS...
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-paper-plane mr-2"></i>
+                    Send Test SMS
+                  </>
                 )}
               </Button>
             </CardFooter>
