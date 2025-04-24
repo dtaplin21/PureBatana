@@ -1,10 +1,17 @@
 import sgMail from '@sendgrid/mail';
 
+// Initialize SendGrid with API key
+if (!process.env.SENDGRID_API_KEY) {
+  console.warn("SENDGRID_API_KEY environment variable is not set.");
+} else {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+}
+
 // This is the phone number to receive SMS alerts in the format 1234567890
-const PHONE_NUMBER = process.env.ALERT_PHONE_NUMBER || '2133379858';
+const PHONE_NUMBER = process.env.ALERT_PHONE_NUMBER || '5103261121';
 
 // The carrier of the phone (can be updated as needed)
-const CARRIER = process.env.ALERT_CARRIER || 'tmobile';
+const CARRIER = process.env.ALERT_CARRIER || 'att';
 
 /**
  * Get the SMS gateway email address for a carrier
@@ -59,7 +66,7 @@ export async function sendSaleNotificationSms(
     // Send email to SMS gateway
     await sgMail.send({
       to: smsGatewayEmail,
-      from: 'noreply@replit.com', // Must be verified with SendGrid
+      from: process.env.SENDGRID_FROM_EMAIL || 'batana.oil@gmail.com', // Must be verified with SendGrid
       subject: '',
       text: message,
     });
