@@ -90,11 +90,6 @@ export default function ProductPage() {
     addToCart(product, quantity);
     window.location.href = '/checkout';
   };
-  
-  const handleExternalCheckout = () => {
-    // Direct to Stripe-hosted checkout page
-    window.location.href = `https://buy.stripe.com/bIYaH15It3iq2yI6oo?items[0][quantity]=${quantity}&adjust_quantity[pure_batana]=total&quantity=${quantity}`;
-  };
 
   return (
     <>
