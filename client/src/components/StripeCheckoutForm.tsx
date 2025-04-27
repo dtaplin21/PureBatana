@@ -18,7 +18,6 @@ export default function StripeCheckoutForm({ amount, orderItems, quantity, onSuc
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [sameBillingAddress, setSameBillingAddress] = useState(true);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,21 +51,19 @@ export default function StripeCheckoutForm({ amount, orderItems, quantity, onSuc
       return;
     }
     
-    // Check if billing address is complete when different from shipping
-    if (!sameBillingAddress) {
-      const billingLine1 = document.getElementById('billing-address-line1')?.getAttribute('data-value');
-      const billingCity = document.getElementById('billing-address-city')?.getAttribute('data-value');
-      const billingPostalCode = document.getElementById('billing-address-postal-code')?.getAttribute('data-value');
-      const billingCountry = document.getElementById('billing-address-country')?.getAttribute('data-value');
-      
-      if (!billingLine1 || !billingCity || !billingPostalCode || !billingCountry) {
-        toast({
-          title: "Missing Billing Address",
-          description: "Please provide a complete billing address",
-          variant: "destructive",
-        });
-        return;
-      }
+    // Check if billing address is complete
+    const billingLine1 = document.getElementById('billing-address-line1')?.getAttribute('data-value');
+    const billingCity = document.getElementById('billing-address-city')?.getAttribute('data-value');
+    const billingPostalCode = document.getElementById('billing-address-postal-code')?.getAttribute('data-value');
+    const billingCountry = document.getElementById('billing-address-country')?.getAttribute('data-value');
+    
+    if (!billingLine1 || !billingCity || !billingPostalCode || !billingCountry) {
+      toast({
+        title: "Missing Billing Address",
+        description: "Please provide a complete billing address",
+        variant: "destructive",
+      });
+      return;
     }
 
     setIsProcessing(true);
@@ -85,20 +82,15 @@ export default function StripeCheckoutForm({ amount, orderItems, quantity, onSuc
         country: document.getElementById('shipping-address-country')?.getAttribute('data-value') || '',
       };
       
-      // Get billing address details if different from shipping
-      let billingAddress;
-      if (!sameBillingAddress) {
-        billingAddress = {
-          line1: document.getElementById('billing-address-line1')?.getAttribute('data-value') || '',
-          line2: document.getElementById('billing-address-line2')?.getAttribute('data-value') || '',
-          city: document.getElementById('billing-address-city')?.getAttribute('data-value') || '',
-          state: document.getElementById('billing-address-state')?.getAttribute('data-value') || '',
-          postal_code: document.getElementById('billing-address-postal-code')?.getAttribute('data-value') || '',
-          country: document.getElementById('billing-address-country')?.getAttribute('data-value') || '',
-        };
-      } else {
-        billingAddress = shippingAddress;
-      }
+      // Get billing address details
+      const billingAddress = {
+        line1: document.getElementById('billing-address-line1')?.getAttribute('data-value') || '',
+        line2: document.getElementById('billing-address-line2')?.getAttribute('data-value') || '',
+        city: document.getElementById('billing-address-city')?.getAttribute('data-value') || '',
+        state: document.getElementById('billing-address-state')?.getAttribute('data-value') || '',
+        postal_code: document.getElementById('billing-address-postal-code')?.getAttribute('data-value') || '',
+        country: document.getElementById('billing-address-country')?.getAttribute('data-value') || '',
+      };
 
       const { error } = await stripe.confirmPayment({
         elements,
@@ -220,34 +212,18 @@ export default function StripeCheckoutForm({ amount, orderItems, quantity, onSuc
       </div>
       
       <div className="mb-4">
-        <label className="flex items-center">
-          <input
-            type="checkbox"
-            className="h-4 w-4 text-[#3a5a40] focus:ring-[#588157] border-gray-300 rounded"
-            checked={sameBillingAddress}
-            onChange={(e) => setSameBillingAddress(e.target.checked)}
-          />
-          <span className="ml-2 text-sm text-gray-700">
-            Billing address same as shipping address
-          </span>
+        <label 
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
+          Billing Address <span className="text-red-500">*</span>
         </label>
+        <AddressElement 
+          options={{
+            mode: 'billing',
+          }}
+          id="billing-address"
+        />
       </div>
-      
-      {!sameBillingAddress && (
-        <div className="mb-4">
-          <label 
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Billing Address <span className="text-red-500">*</span>
-          </label>
-          <AddressElement 
-            options={{
-              mode: 'billing',
-            }}
-            id="billing-address"
-          />
-        </div>
-      )}
       
       <div className="mb-4">
         <label 
