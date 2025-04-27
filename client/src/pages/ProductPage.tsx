@@ -190,12 +190,7 @@ export default function ProductPage() {
                     >
                       <i className="fas fa-credit-card mr-2"></i> Buy Now
                     </button>
-                    <button 
-                      className="border border-gray-400 text-gray-600 hover:bg-gray-600 hover:border-gray-600 hover:text-white font-medium py-3 px-8 rounded-full transition-colors w-full justify-center"
-                      onClick={handleExternalCheckout}
-                    >
-                      <i className="fas fa-external-link-alt mr-2"></i> Checkout with Stripe
-                    </button>
+                    {/* External Stripe checkout button removed */}
                   </div>
                 </div>
               </div>

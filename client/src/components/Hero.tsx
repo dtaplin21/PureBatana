@@ -82,11 +82,11 @@ export default function Hero() {
               <span className="text-neutral-600">2 oz (60ml)</span>
             </div>
             <div className="flex flex-wrap gap-3">
-              <a href="https://buy.stripe.com/bIYaH15It3iq2yI6oo?items[0][quantity]=1&adjust_quantity[pure_batana]=total&quantity=1" target="_blank" rel="noopener noreferrer">
-                <Button className="bg-[#3a5a40] hover:bg-[#588157] h-12 px-8">
+              <Link href="/checkout">
+                <Button className="bg-[#3a5a40] hover:bg-[#588157] h-12 px-8" onClick={() => { if (product) addToCart(product, 1); }}>
                   <i className="fas fa-credit-card mr-2"></i> Buy Now
                 </Button>
-              </a>
+              </Link>
               <Button 
                 onClick={handleAddToCart}
                 variant="outline" 
