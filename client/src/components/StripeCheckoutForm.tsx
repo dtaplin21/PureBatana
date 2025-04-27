@@ -43,18 +43,6 @@ export default function StripeCheckoutForm({ amount, orderItems, quantity, onSuc
     const returnUrl = `${window.location.origin}/checkout-success`;
 
     try {
-      // Get shipping information from the AddressElement
-      const shippingAddress = {
-        name: name,
-        phone: phone,
-        line1: document.getElementById('shipping-address-line1')?.getAttribute('data-value') || '',
-        line2: document.getElementById('shipping-address-line2')?.getAttribute('data-value') || '',
-        city: document.getElementById('shipping-address-city')?.getAttribute('data-value') || '',
-        state: document.getElementById('shipping-address-state')?.getAttribute('data-value') || '',
-        postal_code: document.getElementById('shipping-address-postal-code')?.getAttribute('data-value') || '',
-        country: document.getElementById('shipping-address-country')?.getAttribute('data-value') || '',
-      };
-
       const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
@@ -65,27 +53,11 @@ export default function StripeCheckoutForm({ amount, orderItems, quantity, onSuc
               name: name,
               email: email,
               phone: phone,
-              address: sameBillingAddress ? {
-                line1: shippingAddress.line1,
-                line2: shippingAddress.line2,
-                city: shippingAddress.city,
-                state: shippingAddress.state,
-                postal_code: shippingAddress.postal_code,
-                country: shippingAddress.country,
-              } : undefined,
             },
           },
           shipping: {
             name: name,
             phone: phone,
-            address: {
-              line1: shippingAddress.line1,
-              line2: shippingAddress.line2,
-              city: shippingAddress.city,
-              state: shippingAddress.state,
-              postal_code: shippingAddress.postal_code,
-              country: shippingAddress.country,
-            }
           }
         },
       });
@@ -182,14 +154,7 @@ export default function StripeCheckoutForm({ amount, orderItems, quantity, onSuc
         <AddressElement 
           options={{
             mode: 'shipping',
-            fields: {
-              phone: 'never', // We already have a separate phone field
-            },
-            validation: {
-              phone: {
-                required: 'never',
-              },
-            },
+            // Remove phone field and validation since we have a separate field
           }}
           id="shipping-address"
         />
