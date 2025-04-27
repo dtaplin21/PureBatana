@@ -36,6 +36,38 @@ export default function StripeCheckoutForm({ amount, orderItems, quantity, onSuc
       });
       return;
     }
+    
+    // Check if shipping address is complete
+    const shippingLine1 = document.getElementById('shipping-address-line1')?.getAttribute('data-value');
+    const shippingCity = document.getElementById('shipping-address-city')?.getAttribute('data-value');
+    const shippingPostalCode = document.getElementById('shipping-address-postal-code')?.getAttribute('data-value');
+    const shippingCountry = document.getElementById('shipping-address-country')?.getAttribute('data-value');
+    
+    if (!shippingLine1 || !shippingCity || !shippingPostalCode || !shippingCountry) {
+      toast({
+        title: "Missing Shipping Address",
+        description: "Please provide a complete shipping address",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Check if billing address is complete when different from shipping
+    if (!sameBillingAddress) {
+      const billingLine1 = document.getElementById('billing-address-line1')?.getAttribute('data-value');
+      const billingCity = document.getElementById('billing-address-city')?.getAttribute('data-value');
+      const billingPostalCode = document.getElementById('billing-address-postal-code')?.getAttribute('data-value');
+      const billingCountry = document.getElementById('billing-address-country')?.getAttribute('data-value');
+      
+      if (!billingLine1 || !billingCity || !billingPostalCode || !billingCountry) {
+        toast({
+          title: "Missing Billing Address",
+          description: "Please provide a complete billing address",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
 
     setIsProcessing(true);
 
@@ -43,6 +75,31 @@ export default function StripeCheckoutForm({ amount, orderItems, quantity, onSuc
     const returnUrl = `${window.location.origin}/checkout-success`;
 
     try {
+      // Get shipping address details
+      const shippingAddress = {
+        line1: document.getElementById('shipping-address-line1')?.getAttribute('data-value') || '',
+        line2: document.getElementById('shipping-address-line2')?.getAttribute('data-value') || '',
+        city: document.getElementById('shipping-address-city')?.getAttribute('data-value') || '',
+        state: document.getElementById('shipping-address-state')?.getAttribute('data-value') || '',
+        postal_code: document.getElementById('shipping-address-postal-code')?.getAttribute('data-value') || '',
+        country: document.getElementById('shipping-address-country')?.getAttribute('data-value') || '',
+      };
+      
+      // Get billing address details if different from shipping
+      let billingAddress;
+      if (!sameBillingAddress) {
+        billingAddress = {
+          line1: document.getElementById('billing-address-line1')?.getAttribute('data-value') || '',
+          line2: document.getElementById('billing-address-line2')?.getAttribute('data-value') || '',
+          city: document.getElementById('billing-address-city')?.getAttribute('data-value') || '',
+          state: document.getElementById('billing-address-state')?.getAttribute('data-value') || '',
+          postal_code: document.getElementById('billing-address-postal-code')?.getAttribute('data-value') || '',
+          country: document.getElementById('billing-address-country')?.getAttribute('data-value') || '',
+        };
+      } else {
+        billingAddress = shippingAddress;
+      }
+
       const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
@@ -53,11 +110,13 @@ export default function StripeCheckoutForm({ amount, orderItems, quantity, onSuc
               name: name,
               email: email,
               phone: phone,
+              address: billingAddress,
             },
           },
           shipping: {
             name: name,
             phone: phone,
+            address: shippingAddress,
           }
         },
       });
@@ -160,7 +219,7 @@ export default function StripeCheckoutForm({ amount, orderItems, quantity, onSuc
         />
       </div>
       
-      <div className="mb-6">
+      <div className="mb-4">
         <label className="flex items-center">
           <input
             type="checkbox"
@@ -173,6 +232,22 @@ export default function StripeCheckoutForm({ amount, orderItems, quantity, onSuc
           </span>
         </label>
       </div>
+      
+      {!sameBillingAddress && (
+        <div className="mb-4">
+          <label 
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Billing Address <span className="text-red-500">*</span>
+          </label>
+          <AddressElement 
+            options={{
+              mode: 'billing',
+            }}
+            id="billing-address"
+          />
+        </div>
+      )}
       
       <div className="mb-4">
         <label 
@@ -190,7 +265,7 @@ export default function StripeCheckoutForm({ amount, orderItems, quantity, onSuc
               }
             },
             fields: {
-              billingDetails: sameBillingAddress ? 'never' : 'auto',
+              billingDetails: 'never', // We're handling billing details separately
             }
           }}
         />
