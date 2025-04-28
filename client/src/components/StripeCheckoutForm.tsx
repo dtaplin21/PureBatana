@@ -36,80 +36,22 @@ export default function StripeCheckoutForm({ amount, orderItems, quantity, onSuc
       return;
     }
     
-    // Check if shipping address is complete
-    const shippingLine1 = document.getElementById('shipping-address-line1')?.getAttribute('data-value');
-    const shippingCity = document.getElementById('shipping-address-city')?.getAttribute('data-value');
-    const shippingPostalCode = document.getElementById('shipping-address-postal-code')?.getAttribute('data-value');
-    const shippingCountry = document.getElementById('shipping-address-country')?.getAttribute('data-value');
+    // Debug to check if Stripe elements are properly mounted
+    console.log("Payment element:", elements.getElement('payment'));
+    console.log("Shipping element:", elements.getElement('address'));
     
-    if (!shippingLine1 || !shippingCity || !shippingPostalCode || !shippingCountry) {
-      toast({
-        title: "Missing Shipping Address",
-        description: "Please provide a complete shipping address",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    // Check if billing address is complete
-    const billingLine1 = document.getElementById('billing-address-line1')?.getAttribute('data-value');
-    const billingCity = document.getElementById('billing-address-city')?.getAttribute('data-value');
-    const billingPostalCode = document.getElementById('billing-address-postal-code')?.getAttribute('data-value');
-    const billingCountry = document.getElementById('billing-address-country')?.getAttribute('data-value');
-    
-    if (!billingLine1 || !billingCity || !billingPostalCode || !billingCountry) {
-      toast({
-        title: "Missing Billing Address",
-        description: "Please provide a complete billing address",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsProcessing(true);
 
     // Get the return URL for successful payments or cancellations
     const returnUrl = `${window.location.origin}/checkout-success`;
 
     try {
-      // Get shipping address details
-      const shippingAddress = {
-        line1: document.getElementById('shipping-address-line1')?.getAttribute('data-value') || '',
-        line2: document.getElementById('shipping-address-line2')?.getAttribute('data-value') || '',
-        city: document.getElementById('shipping-address-city')?.getAttribute('data-value') || '',
-        state: document.getElementById('shipping-address-state')?.getAttribute('data-value') || '',
-        postal_code: document.getElementById('shipping-address-postal-code')?.getAttribute('data-value') || '',
-        country: document.getElementById('shipping-address-country')?.getAttribute('data-value') || '',
-      };
-      
-      // Get billing address details
-      const billingAddress = {
-        line1: document.getElementById('billing-address-line1')?.getAttribute('data-value') || '',
-        line2: document.getElementById('billing-address-line2')?.getAttribute('data-value') || '',
-        city: document.getElementById('billing-address-city')?.getAttribute('data-value') || '',
-        state: document.getElementById('billing-address-state')?.getAttribute('data-value') || '',
-        postal_code: document.getElementById('billing-address-postal-code')?.getAttribute('data-value') || '',
-        country: document.getElementById('billing-address-country')?.getAttribute('data-value') || '',
-      };
-
+      // Let Stripe handle the validation and collection of all address details
       const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
           return_url: returnUrl,
           receipt_email: email,
-          payment_method_data: {
-            billing_details: {
-              name: name,
-              email: email,
-              phone: phone,
-              address: billingAddress,
-            },
-          },
-          shipping: {
-            name: name,
-            phone: phone,
-            address: shippingAddress,
-          }
         },
       });
 
