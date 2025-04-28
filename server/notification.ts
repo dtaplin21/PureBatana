@@ -66,7 +66,7 @@ export async function sendSaleNotificationSms(
     // Send email to SMS gateway
     await sgMail.send({
       to: smsGatewayEmail,
-      from: process.env.SENDGRID_FROM_EMAIL || 'batana.oil@gmail.com', // Must be verified with SendGrid
+      from: process.env.SENDGRID_FROM_EMAIL || 'dtaplin21@aol.com', // Must be verified with SendGrid
       subject: '',
       text: message,
     });

@@ -278,7 +278,7 @@ Total: $${orderData.total.toFixed(2)}
 
 Your Pure Batana products will be carefully packaged and shipped to you shortly. You will receive a shipping notification once your order is on its way.
 
-If you have any questions about your order, please contact us at Dtaplin21@gmail.com.
+If you have any questions about your order, please contact us at dtaplin21@aol.com.
 
 Thank you for choosing Pure Batana!
 
@@ -418,7 +418,7 @@ The Pure Batana Team
     
     <p>Your Pure Batana products will be carefully packaged and shipped to you shortly. You will receive a shipping notification once your order is on its way.</p>
     
-    <p>If you have any questions about your order, please contact us at <a href="mailto:Dtaplin21@gmail.com">Dtaplin21@gmail.com</a>.</p>
+    <p>If you have any questions about your order, please contact us at <a href="mailto:dtaplin21@aol.com">dtaplin21@aol.com</a>.</p>
     
     <p>Thank you for choosing Pure Batana!</p>
     
