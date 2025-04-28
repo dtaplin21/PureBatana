@@ -36,22 +36,25 @@ export default function StripeCheckoutForm({ amount, orderItems, quantity, onSuc
       return;
     }
     
-    // Debug to check if Stripe elements are properly mounted
-    console.log("Payment element:", elements.getElement('payment'));
-    console.log("Shipping element:", elements.getElement('address'));
-    
     setIsProcessing(true);
 
     // Get the return URL for successful payments or cancellations
     const returnUrl = `${window.location.origin}/checkout-success`;
 
     try {
-      // Let Stripe handle the validation and collection of all address details
+      // Add customer info to the payment confirmation
       const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
           return_url: returnUrl,
           receipt_email: email,
+          payment_method_data: {
+            billing_details: {
+              name,
+              email,
+              phone,
+            }
+          },
         },
       });
 
