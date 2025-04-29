@@ -78,6 +78,8 @@ export default function StripeCheckoutForm({ amount, orderItems, quantity, onSuc
     const returnUrl = `${window.location.origin}/checkout-success`;
 
     try {
+      console.log("Initiating payment confirmation");
+      
       // Add customer info to the payment confirmation
       const { error } = await stripe.confirmPayment({
         elements,
@@ -92,6 +94,7 @@ export default function StripeCheckoutForm({ amount, orderItems, quantity, onSuc
             }
           },
         },
+        redirect: 'if_required', // Only redirect if 3D Secure is required
       });
 
       if (error) {
