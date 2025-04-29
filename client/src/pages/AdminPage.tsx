@@ -73,6 +73,11 @@ export default function AdminPage() {
   const [updating, setUpdating] = useState(false);
   const { toast } = useToast();
   
+  // Access code verification
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [accessCode, setAccessCode] = useState('');
+  const [verifying, setVerifying] = useState(false);
+  
   // Track edited prices
   const [editedPrices, setEditedPrices] = useState<Record<number, number>>({});
   
@@ -141,9 +146,56 @@ export default function AdminPage() {
     }
   };
   
+  // Handler for verifying access code
+  const verifyAccessCode = async () => {
+    try {
+      setVerifying(true);
+      
+      const response = await apiRequest('POST', '/api/admin/verify', {
+        accessCode
+      });
+      
+      if (response.ok) {
+        setIsAuthenticated(true);
+        
+        // Save authentication status in sessionStorage (will persist until browser tab is closed)
+        sessionStorage.setItem('adminAuthenticated', 'true');
+        
+        // Now load the data
+        fetchProducts();
+        fetchStripeOrders();
+        
+        toast({
+          title: "Access Granted",
+          description: "Welcome to the admin panel",
+        });
+      } else {
+        throw new Error("Invalid access code");
+      }
+    } catch (error) {
+      console.error('Error verifying access code:', error);
+      toast({
+        title: "Access Denied",
+        description: "Invalid access code. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setVerifying(false);
+    }
+  };
+  
   useEffect(() => {
-    fetchProducts();
-    fetchStripeOrders();
+    // Check if already authenticated from sessionStorage
+    const authenticated = sessionStorage.getItem('adminAuthenticated') === 'true';
+    
+    if (authenticated) {
+      setIsAuthenticated(true);
+      fetchProducts();
+      fetchStripeOrders();
+    } else {
+      // Still need to set loading to false if not authenticated
+      setLoading(false);
+    }
   }, []);
   
   const fetchProducts = async () => {
@@ -240,14 +292,85 @@ export default function AdminPage() {
       <div className="container mx-auto px-4 py-16 text-center">
         <h1 className="font-display font-bold text-3xl text-[#3a5a40] mb-6">Admin Panel</h1>
         <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
-        <p className="mt-4 text-gray-600">Loading products...</p>
+        <p className="mt-4 text-gray-600">Loading...</p>
+      </div>
+    );
+  }
+
+  // If not authenticated, show login form
+  if (!isAuthenticated) {
+    return (
+      <div className="container mx-auto px-4 py-16">
+        <h1 className="font-display font-bold text-3xl text-[#3a5a40] mb-6">Admin Panel</h1>
+        
+        <div className="max-w-md mx-auto">
+          <Card className="shadow-md">
+            <CardHeader>
+              <CardTitle>Admin Access</CardTitle>
+              <CardDescription>Enter your access code to manage products and view orders</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label htmlFor="access-code" className="text-sm font-medium">
+                    Access Code
+                  </label>
+                  <Input
+                    id="access-code"
+                    type="password"
+                    placeholder="Enter your access code"
+                    value={accessCode}
+                    onChange={(e) => setAccessCode(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        verifyAccessCode();
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button 
+                className="w-full bg-[#3a5a40] hover:bg-[#588157]"
+                onClick={verifyAccessCode}
+                disabled={verifying || !accessCode}
+              >
+                {verifying ? (
+                  <>
+                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                    Verifying...
+                  </>
+                ) : (
+                  'Access Admin Panel'
+                )}
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
       </div>
     );
   }
   
+  // If authenticated, show admin panel
   return (
     <div className="container mx-auto px-4 py-16">
-      <h1 className="font-display font-bold text-3xl text-[#3a5a40] mb-6">Admin Panel</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="font-display font-bold text-3xl text-[#3a5a40]">Admin Panel</h1>
+        <Button 
+          variant="outline" 
+          onClick={() => {
+            setIsAuthenticated(false);
+            sessionStorage.removeItem('adminAuthenticated');
+            toast({
+              title: "Logged Out",
+              description: "You have been logged out of the admin panel",
+            });
+          }}
+        >
+          <i className="fas fa-sign-out-alt mr-2"></i> Log Out
+        </Button>
+      </div>
       
       <Tabs defaultValue="products" className="w-full">
         <TabsList className="mb-8">
