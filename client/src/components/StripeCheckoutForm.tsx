@@ -1,5 +1,5 @@
 import { useStripe, useElements, PaymentElement, AddressElement } from '@stripe/react-stripe-js';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 
@@ -10,14 +10,41 @@ interface StripeCheckoutFormProps {
   onSuccess?: () => void;
 }
 
+// Keys for localStorage
+const CUSTOMER_INFO_KEY = 'batana_customer_info';
+
+// Type for customer info storage
+interface StoredCustomerInfo {
+  name: string;
+  email: string;
+  phone: string;
+}
+
 export default function StripeCheckoutForm({ amount, orderItems, quantity, onSuccess }: StripeCheckoutFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
+  
+  // Initialize state with values from localStorage if available
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+
+  // Load saved customer info from localStorage on component mount
+  useEffect(() => {
+    try {
+      const savedInfo = localStorage.getItem(CUSTOMER_INFO_KEY);
+      if (savedInfo) {
+        const parsedInfo: StoredCustomerInfo = JSON.parse(savedInfo);
+        setName(parsedInfo.name);
+        setEmail(parsedInfo.email);
+        setPhone(parsedInfo.phone);
+      }
+    } catch (err) {
+      console.error('Error loading saved customer info:', err);
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,6 +61,15 @@ export default function StripeCheckoutForm({ amount, orderItems, quantity, onSuc
         variant: "destructive",
       });
       return;
+    }
+    
+    // Save customer info to localStorage
+    try {
+      const customerInfo: StoredCustomerInfo = { name, email, phone };
+      localStorage.setItem(CUSTOMER_INFO_KEY, JSON.stringify(customerInfo));
+    } catch (err) {
+      console.error('Error saving customer info:', err);
+      // Non-blocking - continue with payment even if storage fails
     }
     
     setIsProcessing(true);
@@ -207,9 +243,17 @@ export default function StripeCheckoutForm({ amount, orderItems, quantity, onSuc
         }
       </Button>
       
-      <p className="text-xs text-gray-500 text-center mt-4">
-        Your information is secured with SSL encryption. We never store your card details.
-      </p>
+      <div className="space-y-2 mt-4 text-center">
+        <p className="text-xs text-gray-500">
+          Your information is secured with SSL encryption. We never store your card details.
+        </p>
+        <p className="text-xs text-gray-600">
+          <span className="inline-flex items-center">
+            <i className="fas fa-save mr-1 text-green-600"></i>
+            We'll save your name, email, and phone to make checkout easier next time.
+          </span>
+        </p>
+      </div>
     </form>
   );
 }
