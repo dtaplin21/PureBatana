@@ -22,8 +22,11 @@ export async function sendNewOrderSms(
   orderNumber: string,
   customerName: string,
   amount: number, 
-  toPhoneNumber: string = '+12133379858' // Default to your phone number
+  toPhoneNumber?: string
 ): Promise<boolean> {
+  // Use the provided phone number, or the one from settings, or fall back to default
+  const recipientNumber: string = toPhoneNumber || process.env.RECIPIENT_PHONE_NUMBER || '+12133379858';
+  
   if (!client || !process.env.TWILIO_PHONE_NUMBER) {
     console.warn('Twilio client not initialized. SMS not sent.');
     return false;
@@ -37,10 +40,10 @@ export async function sendNewOrderSms(
     await client.messages.create({
       body: message,
       from: process.env.TWILIO_PHONE_NUMBER,
-      to: toPhoneNumber
+      to: recipientNumber
     });
     
-    console.log(`SMS notification sent to ${toPhoneNumber}`);
+    console.log(`SMS notification sent to ${recipientNumber}`);
     return true;
   } catch (error) {
     console.error('Error sending SMS notification:', error);

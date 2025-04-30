@@ -138,7 +138,7 @@ export default function AdminPage() {
       console.error('Error sending test SMS:', error);
       toast({
         title: "Error",
-        description: "Failed to send test SMS notification. Make sure your SendGrid API key is configured correctly.",
+        description: "Failed to send test SMS notification. Please make sure your Twilio credentials are configured correctly.",
         variant: "destructive",
       });
     } finally {
@@ -525,7 +525,7 @@ export default function AdminPage() {
               <CardTitle>Order SMS Alerts</CardTitle>
               <CardDescription>
                 Configure your phone number to receive SMS alerts when new orders are placed.
-                Messages will be sent via your mobile carrier's email-to-SMS gateway.
+                Messages will be sent directly to your phone via Twilio SMS service.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -544,24 +544,9 @@ export default function AdminPage() {
               </div>
               
               <div className="space-y-2">
-                <label htmlFor="carrier" className="text-sm font-medium">
-                  Mobile Carrier
-                </label>
-                <select 
-                  id="carrier"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  value={carrier}
-                  onChange={(e) => setCarrier(e.target.value)}
-                >
-                  <option value="att">AT&T</option>
-                  <option value="verizon">Verizon</option>
-                  <option value="tmobile">T-Mobile</option>
-                  <option value="sprint">Sprint</option>
-                  <option value="boost">Boost Mobile</option>
-                  <option value="cricket">Cricket</option>
-                  <option value="uscellular">US Cellular</option>
-                  <option value="metro">Metro by T-Mobile</option>
-                </select>
+                <p className="text-sm text-gray-500">
+                  Twilio SMS service will send messages directly to your phone number regardless of carrier.
+                </p>
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-3">
@@ -604,15 +589,15 @@ export default function AdminPage() {
           <div className="mt-8 bg-gray-50 p-4 rounded-lg border border-gray-200">
             <h3 className="text-lg font-medium mb-2">How This Works</h3>
             <p className="text-sm text-gray-600 mb-4">
-              This notification system uses your cellular carrier's email-to-SMS gateway to deliver alerts.
-              When someone places an order, our system will send a message to your phone with order details.
+              This notification system uses Twilio's reliable SMS messaging service to deliver alerts.
+              When someone places an order, you'll receive a text message on your phone with order details.
             </p>
             <div className="text-sm text-gray-600">
-              <strong>Note:</strong> For this to work, you must:
+              <strong>Note:</strong> For this to work effectively:
               <ul className="list-disc pl-5 mt-2 space-y-1">
                 <li>Enter a valid phone number (just the digits)</li>
-                <li>Select your correct mobile carrier</li>
-                <li>Have text messaging enabled on your phone plan</li>
+                <li>Make sure your entered phone number can receive SMS messages</li>
+                <li>Ensure the Twilio account has sufficient credit for sending messages</li>
               </ul>
             </div>
           </div>
