@@ -225,7 +225,7 @@ Order Date: ${formattedDate}
     // Send the email to admin
     return await sendEmail({
       to: 'dtaplin21@gmail.com', // Your email for order notifications
-      from: 'noreply@replit.com', // Using Replit's domain which should be pre-verified
+      from: process.env.SENDGRID_FROM_EMAIL || 'dtaplin21@gmail.com', // Using verified sender email
       subject: `New Order #${orderData.orderNumber} - Pure Batana`,
       text: textNotification,
       html: htmlNotification
@@ -435,7 +435,7 @@ The Pure Batana Team
     // Send the email
     return await sendEmail({
       to: orderData.customerEmail,
-      from: 'noreply@replit.com', // Using Replit's domain which should be pre-verified
+      from: process.env.SENDGRID_FROM_EMAIL || 'dtaplin21@gmail.com', // Using verified sender email
       subject: `Pure Batana - Order Confirmation #${orderData.orderNumber}`,
       text: textReceipt,
       html: htmlReceipt
