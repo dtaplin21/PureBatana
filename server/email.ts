@@ -6,9 +6,15 @@ if (!process.env.SENDGRID_API_KEY) {
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
+// Type for SendGrid email address format
+interface EmailAddress {
+  email: string;
+  name?: string;
+}
+
 interface EmailParams {
   to: string;
-  from: string;
+  from: string | EmailAddress;
   subject: string;
   text: string;
   html: string;
@@ -223,9 +229,15 @@ Order Date: ${formattedDate}
     `;
     
     // Send the email to admin
+    // Get the verified sender email
+    const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@jessicajonesdesigns.com';
+    
     return await sendEmail({
       to: 'dtaplin21@gmail.com', // Your email for order notifications
-      from: process.env.SENDGRID_FROM_EMAIL || 'dtaplin21@gmail.com', // Using verified sender email
+      from: {
+        email: fromEmail,
+        name: 'Pure Batana'
+      }, // Using properly formatted sender
       subject: `New Order #${orderData.orderNumber} - Pure Batana`,
       text: textNotification,
       html: htmlNotification
@@ -432,10 +444,16 @@ The Pure Batana Team
 </html>
     `;
     
+    // Get the verified sender email
+    const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@jessicajonesdesigns.com';
+    
     // Send the email
     return await sendEmail({
       to: orderData.customerEmail,
-      from: process.env.SENDGRID_FROM_EMAIL || 'dtaplin21@gmail.com', // Using verified sender email
+      from: {
+        email: fromEmail,
+        name: 'Pure Batana'
+      }, // Using properly formatted sender
       subject: `Pure Batana - Order Confirmation #${orderData.orderNumber}`,
       text: textReceipt,
       html: htmlReceipt

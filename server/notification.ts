@@ -105,10 +105,19 @@ async function sendSmsViaCarrier(
     const smsGatewayEmail = `${formattedNumber}@${domain}`;
     console.log(`Attempting SMS via ${domain} gateway: ${smsGatewayEmail}`);
     
+    // Ensure the from email is properly formatted
+    const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@jessicajonesdesigns.com';
+    
+    // Log the from email for debugging
+    console.log(`Using from email: ${fromEmail}`);
+    
     // Send email to SMS gateway with complete email structure
     await sgMail.send({
       to: smsGatewayEmail,
-      from: process.env.SENDGRID_FROM_EMAIL || 'dtaplin21@gmail.com',
+      from: {
+        email: fromEmail,
+        name: 'Pure Batana'
+      },
       subject: 'Order Alert', // Short subject for SMS
       text: message,
       html: message,
