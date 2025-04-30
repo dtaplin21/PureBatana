@@ -63,18 +63,25 @@ export async function sendSaleNotificationSms(
     // Create a short message (SMS are limited in length)
     const message = `NEW ORDER: #${orderNumber} from ${customerName} for $${amount.toFixed(2)}`;
     
-    // Send email to SMS gateway
+    // Send email to SMS gateway with more complete email structure
     await sgMail.send({
       to: smsGatewayEmail,
       from: process.env.SENDGRID_FROM_EMAIL || 'dtaplin21@gmail.com', // Using verified sender email
-      subject: '',
+      subject: 'New Order Alert',  // Carrier gateways often require a subject
       text: message,
+      html: message, // Add HTML version as well
     });
     
     console.log(`SMS notification sent to ${smsGatewayEmail}`);
     return true;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error sending SMS notification via email gateway:', error);
+    
+    // Log detailed error information if available
+    if (error.response && error.response.body && error.response.body.errors) {
+      console.error('SendGrid API Error Details:', JSON.stringify(error.response.body.errors));
+    }
+    
     return false;
   }
 }
