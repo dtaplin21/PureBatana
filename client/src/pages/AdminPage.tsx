@@ -122,7 +122,9 @@ export default function AdminPage() {
     try {
       setTestingSms(true);
       
-      const response = await apiRequest('POST', '/api/notifications/test-sms', {});
+      const response = await apiRequest('POST', '/api/notifications/test-sms', {
+        phoneNumber
+      });
       
       if (response.ok) {
         const data = await response.json();

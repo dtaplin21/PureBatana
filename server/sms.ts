@@ -31,15 +31,24 @@ export async function sendNewOrderSms(
     console.warn('Twilio client not initialized. SMS not sent.');
     return false;
   }
+  
+  // Log phone number formats for debugging
+  console.log('Twilio From number:', process.env.TWILIO_PHONE_NUMBER);
+  console.log('Recipient number:', recipientNumber);
 
   try {
     // Format the message
     const message = `New Order Alert! Order #${orderNumber} from ${customerName} for $${amount.toFixed(2)}. Check your email for details.`;
     
+    // Ensure the Twilio phone number is in the correct format
+    const fromNumber = process.env.TWILIO_PHONE_NUMBER?.startsWith('+')
+      ? process.env.TWILIO_PHONE_NUMBER
+      : `+${process.env.TWILIO_PHONE_NUMBER}`;
+      
     // Send the SMS
     await client.messages.create({
       body: message,
-      from: process.env.TWILIO_PHONE_NUMBER,
+      from: fromNumber,
       to: recipientNumber
     });
     
