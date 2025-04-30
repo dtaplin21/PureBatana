@@ -229,8 +229,8 @@ Order Date: ${formattedDate}
     `;
     
     // Send the email to admin
-    // Get the verified sender email
-    const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@jessicajonesdesigns.com';
+    // Use the verified sender email address
+    const fromEmail = 'dtaplin21@gmail.com';
     
     return await sendEmail({
       to: 'dtaplin21@gmail.com', // Your email for order notifications
@@ -444,8 +444,8 @@ The Pure Batana Team
 </html>
     `;
     
-    // Get the verified sender email
-    const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@jessicajonesdesigns.com';
+    // Use the verified sender email address
+    const fromEmail = 'dtaplin21@gmail.com';
     
     // Send the email
     return await sendEmail({
