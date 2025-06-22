@@ -401,7 +401,7 @@ export default function AdminPage() {
                           className="w-full h-full object-cover"
                           onError={(e) => {
                             console.error("Product image failed to load");
-                            e.currentTarget.src = "/images/batana-new.jpg"; // Fallback image
+                            e.currentTarget.src = "/images/batana-front.jpg"; // Fallback image
                           }}
                         />
                       )}

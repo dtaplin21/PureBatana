@@ -80,7 +80,7 @@ export default function OrdersPage() {
                   <div className="flex items-center space-x-4 mb-4">
                     <div className="flex-shrink-0 w-16 h-16 bg-gray-100 rounded overflow-hidden">
                       <img 
-                        src="/images/batana-new.jpg" 
+                        src="/images/batana-front.jpg" 
                         alt="Pure Batana Oil" 
                         className="w-full h-full object-cover"
                       />

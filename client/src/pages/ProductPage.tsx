@@ -99,7 +99,7 @@ export default function ProductPage() {
             {/* Product Gallery */}
             <div className="lg:w-1/2">
               {/* Always use our hardcoded images for Pure Batana Oil */}
-              <ProductGallery images={["/images/batana-new.jpg", "/images/batana-new.jpg", "/images/batana-new.jpg", "/images/batana-new.jpg"]} />
+              <ProductGallery images={["/images/batana-front.jpg", "/images/batana-front.jpg", "/images/batana-front.jpg", "/images/batana-front.jpg"]} />
             </div>
             
             {/* Product Details */}
