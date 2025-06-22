@@ -15,7 +15,7 @@ export default function Story() {
           <div className="md:w-1/2">
             <h2 className="font-display font-bold text-3xl md:text-4xl text-[#3a5a40] mb-6">Our Mission</h2>
             
-            <p className="mb-4">At Pure Batana, we believe true beauty starts with intention. Our mission is to deliver pure, natural hair care powered by Batana oil—while using every purchase to fund education and build opportunity in Segbeh, Liberia.</p>
+            <p className="mb-4">At Grand Gaia, we believe true beauty starts with intention. Our mission is to deliver pure, natural hair care powered by Batana oil—while using every purchase to fund education and build opportunity in Segbeh, Liberia.</p>
             
             <p className="mb-4">We are more than a hair care company. We are a bridge between wellness and purpose. Every bottle sold fuels our commitment to healthy, transformative products and sustainable change for the people of Segbeh.</p>
             
