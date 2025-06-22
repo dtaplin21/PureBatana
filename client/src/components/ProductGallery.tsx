@@ -5,7 +5,7 @@ interface ProductGalleryProps {
 }
 
 export default function ProductGallery({ images }: ProductGalleryProps) {
-  const [mainImage, setMainImage] = useState(images[0] || "/images/batana-front.jpg");
+  const [mainImage, setMainImage] = useState(images[0] || "/images/batana-new.jpg");
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const handleThumbnailClick = (image: string, index: number) => {
@@ -15,7 +15,7 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     console.error("Image failed to load in ProductGallery", e.currentTarget.src);
-    e.currentTarget.src = "/images/batana-front.jpg";
+    e.currentTarget.src = "/images/batana-new.jpg";
   };
 
   return (
