@@ -98,13 +98,13 @@ export default function Hero() {
           </div>
           <div className="md:w-1/2">
             <img 
-              src="/images/batana-new.jpg" 
+              src="/images/batana-new.jpeg" 
               alt="Pure Batana Oil" 
               className="w-full max-w-md mx-auto rounded-lg shadow-xl" 
               loading="eager"
               onError={(e) => {
                 console.error("Image failed to load");
-                e.currentTarget.src = "/images/batana-new.jpg"; // Fallback image
+                e.currentTarget.src = "/images/batana-new.jpeg"; // Fallback image
               }}
             />
           </div>

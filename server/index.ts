@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import express, { type Request, Response, NextFunction } from "express";
+import path from "path";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { seedDatabase } from "./storage";
@@ -10,6 +11,9 @@ import { seedDatabase } from "./storage";
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Serve static files from public directory with correct MIME types
+app.use('/images', express.static(path.resolve(import.meta.dirname, '..', 'public', 'images')));
 
 app.use((req, res, next) => {
   const start = Date.now();

@@ -9,12 +9,12 @@ export default function HowToUse() {
         
         <div className="max-w-2xl mx-auto mb-16">
           <img 
-            src="/images/batana-new.jpg" 
+            src="/images/batana-new.jpeg" 
             alt="Pure Batana Oil Usage Instructions" 
             className="w-full rounded-lg mx-auto shadow-md"
             onError={(e) => {
               console.error("Image failed to load in HowToUse");
-              e.currentTarget.src = "/images/batana-new.jpg"; // Fallback image
+              e.currentTarget.src = "/images/batana-new.jpeg"; // Fallback image
             }}
           />
         </div>

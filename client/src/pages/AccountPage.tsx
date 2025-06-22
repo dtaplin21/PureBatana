@@ -72,7 +72,7 @@ export default function AccountPage() {
                     <div className="flex items-center space-x-4">
                       <div className="flex-shrink-0 w-20 h-20 bg-gray-100 rounded overflow-hidden">
                         <img 
-                          src="/images/batana-new.jpg" 
+                          src="/images/batana-new.jpeg" 
                           alt="Pure Batana Oil" 
                           className="w-full h-full object-cover"
                         />
@@ -94,7 +94,7 @@ export default function AccountPage() {
                     <div className="flex items-center space-x-4">
                       <div className="flex-shrink-0 w-20 h-20 bg-gray-100 rounded overflow-hidden">
                         <img 
-                          src="/images/batana-new.jpg" 
+                          src="/images/batana-new.jpeg" 
                           alt="Pure Batana Oil" 
                           className="w-full h-full object-cover"
                         />
