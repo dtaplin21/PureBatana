@@ -18,11 +18,11 @@ export default function CartItem({ item, onRemove, onUpdateQuantity }: CartItemP
         <div className="flex-shrink-0">
           <Link href={`/product/${product.slug}`}>
             <img 
-              src={product.images && product.images.length > 0 ? product.images[0] : "/images/batana-front.jpg"} 
+              src={product.images && product.images.length > 0 ? product.images[0] : "/images/batana-new.jpg"} 
               alt={product.name} 
               className="w-16 h-16 object-cover rounded-md"
               onError={(e) => {
-                (e.target as HTMLImageElement).src = "/images/batana-front.jpg";
+                (e.target as HTMLImageElement).src = "/images/batana-new.jpg";
               }}
             />
           </Link>
