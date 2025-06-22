@@ -104,7 +104,7 @@ export default function Hero() {
               loading="eager"
               onError={(e) => {
                 console.error("Image failed to load");
-                e.currentTarget.src = "/images/jar-front.jpg"; // Fallback image
+                e.currentTarget.src = "/images/batana-front.jpg"; // Fallback image
               }}
             />
           </div>
