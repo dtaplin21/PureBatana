@@ -11,12 +11,12 @@ export default function Benefits() {
         
         <div className="max-w-2xl mx-auto mb-16">
           <img 
-            src="/images/batana-replenish.jpg" 
+            src="/images/batana-front.jpg" 
             alt="Pure Batana Oil Benefits" 
             className="w-full rounded-lg mx-auto shadow-md"
             onError={(e) => {
               console.error("Image failed to load in Benefits");
-              e.currentTarget.src = "/images/jar-benefits.jpg"; // Fallback image
+              e.currentTarget.src = "/images/batana-front.jpg"; // Fallback image
             }}
           />
         </div>
