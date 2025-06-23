@@ -105,6 +105,11 @@ export const reviews = pgTable("reviews", {
   comment: text("comment"),
   customerName: text("customer_name"), // Optional customer name for display
   createdAt: timestamp("created_at").defaultNow(),
+}, (table) => {
+  return {
+    // Add a unique constraint so a user can only review a product once
+    userProductUnique: uniqueIndex("review_user_product_idx").on(table.userId, table.productId),
+  };
 });
 
 export const insertReviewSchema = createInsertSchema(reviews).omit({
