@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 const reviewSchema = z.object({
   rating: z.string().min(1, "Please select a rating"),
   comment: z.string().min(10, "Comment must be at least 10 characters").max(500, "Comment must be less than 500 characters"),
+  customerName: z.string().optional(),
 });
 
 type Product = {
@@ -57,6 +58,7 @@ export default function ReviewForm({
     defaultValues: {
       rating: "",
       comment: "",
+      customerName: "",
     },
   });
 
@@ -67,6 +69,7 @@ export default function ReviewForm({
         productId: 1,
         rating: parseInt(values.rating),
         comment: values.comment,
+        customerName: values.customerName || null,
         // User ID will be handled on server based on session
       });
 
@@ -152,6 +155,23 @@ export default function ReviewForm({
                     <Textarea 
                       placeholder="Share your experience with this product..."
                       className="resize-none h-32"
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="customerName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Your Name (Optional)</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="Enter your name (leave blank to post anonymously)"
                       {...field} 
                     />
                   </FormControl>

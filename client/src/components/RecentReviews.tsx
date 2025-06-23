@@ -66,14 +66,21 @@ export default function RecentReviews() {
     });
   };
 
-  const getInitials = (firstName?: string, lastName?: string) => {
-    if (!firstName && !lastName) return "A"; // Anonymous
-    return `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
+  const getInitials = (review: Review) => {
+    // Use customerName if provided, otherwise fall back to user data
+    if (review.customerName) {
+      const parts = review.customerName.trim().split(' ');
+      return parts.length > 1 ? `${parts[0][0]}${parts[parts.length-1][0]}`.toUpperCase() : parts[0][0].toUpperCase();
+    }
+    if (!review.user?.firstName && !review.user?.lastName) return "A"; // Anonymous
+    return `${review.user.firstName?.[0] || ""}${review.user.lastName?.[0] || ""}`.toUpperCase();
   };
 
-  const getName = (user?: { firstName: string; lastName: string }) => {
-    if (!user?.firstName && !user?.lastName) return "Anonymous";
-    return `${user.firstName || ""} ${user.lastName || ""}`.trim();
+  const getName = (review: Review) => {
+    // Use customerName if provided, otherwise fall back to user data
+    if (review.customerName) return review.customerName;
+    if (!review.user?.firstName && !review.user?.lastName) return "Anonymous";
+    return `${review.user.firstName || ""} ${review.user.lastName || ""}`.trim();
   };
 
   return (
@@ -90,10 +97,10 @@ export default function RecentReviews() {
               <CardContent className="p-6">
                 <div className="flex items-center mb-4">
                   <div className="w-10 h-10 bg-[#3a5a40] text-white rounded-full flex items-center justify-center text-sm font-medium mr-3">
-                    {getInitials(review.user?.firstName, review.user?.lastName)}
+                    {getInitials(review)}
                   </div>
                   <div>
-                    <p className="font-medium text-sm">{getName(review.user)}</p>
+                    <p className="font-medium text-sm">{getName(review)}</p>
                     <p className="text-xs text-neutral-500">{formatDate(review.createdAt)}</p>
                   </div>
                 </div>

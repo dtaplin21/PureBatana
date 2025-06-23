@@ -103,6 +103,7 @@ export const reviews = pgTable("reviews", {
   productId: integer("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
   rating: integer("rating").notNull(), // Integer rating from 1-5
   comment: text("comment"),
+  customerName: text("customer_name"), // Optional customer name for display
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => {
   return {

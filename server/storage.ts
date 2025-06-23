@@ -52,6 +52,7 @@ export interface IStorage {
   getAllReviews(): Promise<Review[]>;
   getProductReviews(productId: number): Promise<Review[]>;
   createReview(review: InsertReview): Promise<Review>;
+  deleteReview(id: number): Promise<boolean>;
   
   // Newsletter subscribers
   createSubscriber(subscriber: InsertSubscriber): Promise<Subscriber>;
@@ -689,6 +690,11 @@ export class DatabaseStorage implements IStorage {
   async createReview(review: InsertReview): Promise<Review> {
     const [newReview] = await db.insert(reviews).values(review).returning();
     return newReview;
+  }
+
+  async deleteReview(id: number): Promise<boolean> {
+    const result = await db.delete(reviews).where(eq(reviews.id, id));
+    return result.rowCount > 0;
   }
 
   // Newsletter subscribers
