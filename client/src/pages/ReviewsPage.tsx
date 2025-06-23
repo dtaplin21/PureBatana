@@ -159,7 +159,7 @@ export default function ReviewsPage() {
                   </div>
                   <div>
                     <h3 className="font-medium">
-                      {review.customerName || (review.user ? `${review.user.firstName || ''} ${review.user.lastName ? review.user.lastName.charAt(0) + '.' : ''}`.trim() || 'Anonymous User' : 'Anonymous User')}
+                      {review.customerName || 'Anonymous'}
                     </h3>
                     <p className="text-sm text-neutral-500">Verified Buyer</p>
                   </div>
