@@ -180,21 +180,24 @@ export class MemStorage implements IStorage {
       userId: 1, // We'll create a fake user for this
       productId: 1,
       rating: 5,
-      comment: "After just two weeks of using Batana Oil on my dry, damaged hair, I noticed incredible improvement in texture and shine. It's become the only hair product I'll ever need."
+      comment: "After just two weeks of using Batana Oil on my dry, damaged hair, I noticed incredible improvement in texture and shine. It's become the only hair product I'll ever need.",
+      customerName: null
     });
     
     this.createReview({
       userId: 2,
       productId: 1,
       rating: 5,
-      comment: "I've struggled with sensitive skin my entire life. Pure Batana is the first oil that moisturizes deeply without causing breakouts. It's truly miraculous."
+      comment: "I've struggled with sensitive skin my entire life. Pure Batana is the first oil that moisturizes deeply without causing breakouts. It's truly miraculous.",
+      customerName: null
     });
     
     this.createReview({
       userId: 3,
       productId: 1,
-      rating: 4.5,
-      comment: "The scent is subtle and natural, and the oil absorbs beautifully into my skin without feeling greasy. I love that it's ethically sourced too!"
+      rating: 4,
+      comment: "The scent is subtle and natural, and the oil absorbs beautifully into my skin without feeling greasy. I love that it's ethically sourced too!",
+      customerName: null
     });
     
     // Create some demo users
@@ -446,6 +449,10 @@ export class MemStorage implements IStorage {
     };
     this.reviews.set(id, newReview);
     return newReview;
+  }
+
+  async deleteReview(id: number): Promise<boolean> {
+    return this.reviews.delete(id);
   }
 
   // Newsletter subscribers
