@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, queryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Star, StarHalf, User } from "lucide-react";
+import { Star, StarHalf, User, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
 import ReviewForm from "@/components/ReviewForm";
 
 interface Review {
@@ -14,6 +15,7 @@ interface Review {
   rating: number;
   comment: string;
   createdAt: string;
+  customerName?: string;
   user?: {
     firstName: string | null;
     lastName: string | null;
@@ -38,6 +40,7 @@ interface Product {
 }
 
 export default function ReviewsPage() {
+  const { toast } = useToast();
   // Setting filteredProductId to null to show all reviews
   const filteredProductId = null;
   
@@ -59,6 +62,26 @@ export default function ReviewsPage() {
       const data = await response.json();
       return data as Product[];
     }
+  });
+
+  const deleteReviewMutation = useMutation({
+    mutationFn: async (reviewId: number) => {
+      return await apiRequest("DELETE", `/api/reviews/${reviewId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/reviews'] });
+      toast({
+        title: "Review deleted",
+        description: "Your review has been successfully deleted.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete review. Please try again.",
+        variant: "destructive",
+      });
+    },
   });
   
   // Filter reviews by product if needed
@@ -129,19 +152,30 @@ export default function ReviewsPage() {
         {displayedReviews && displayedReviews.length > 0 ? (
           displayedReviews.map(review => (
             <div key={review.id} className="bg-white p-6 rounded-lg shadow-sm border border-neutral-100">
-              <div className="flex items-center mb-4">
-                <div className="bg-[#f8f7f4] w-10 h-10 rounded-full flex items-center justify-center mr-3">
-                  <User className="w-5 h-5 text-[#3a5a40]" />
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center">
+                  <div className="bg-[#f8f7f4] w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                    <User className="w-5 h-5 text-[#3a5a40]" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium">
+                      {review.customerName || (review.user ? `${review.user.firstName || ''} ${review.user.lastName ? review.user.lastName.charAt(0) + '.' : ''}`.trim() || 'Anonymous User' : 'Anonymous User')}
+                    </h3>
+                    <p className="text-sm text-neutral-500">Verified Buyer</p>
+                  </div>
+                  <div className="ml-4 text-sm text-neutral-500">
+                    {review.createdAt ? formatDate(review.createdAt) : ''}
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-medium">
-                    {review.user ? `${review.user.firstName || ''} ${review.user.lastName ? review.user.lastName.charAt(0) + '.' : ''}`.trim() || 'Anonymous User' : 'Anonymous User'}
-                  </h3>
-                  <p className="text-sm text-neutral-500">Verified Buyer</p>
-                </div>
-                <div className="ml-auto text-sm text-neutral-500">
-                  {review.createdAt ? formatDate(review.createdAt) : ''}
-                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => deleteReviewMutation.mutate(review.id)}
+                  disabled={deleteReviewMutation.isPending}
+                  className="h-8 w-8 p-0 text-neutral-400 hover:text-red-600 hover:bg-red-50"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
               
               <div className="flex mb-3">
