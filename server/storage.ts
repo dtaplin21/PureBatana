@@ -52,6 +52,7 @@ export interface IStorage {
   getAllReviews(): Promise<Review[]>;
   getProductReviews(productId: number): Promise<Review[]>;
   createReview(review: InsertReview): Promise<Review>;
+  getReviewById(id: number): Promise<Review | undefined>;
   deleteReview(id: number): Promise<boolean>;
   
   // Newsletter subscribers
@@ -451,6 +452,10 @@ export class MemStorage implements IStorage {
     return newReview;
   }
 
+  async getReviewById(id: number): Promise<Review | undefined> {
+    return this.reviews.get(id);
+  }
+
   async deleteReview(id: number): Promise<boolean> {
     return this.reviews.delete(id);
   }
@@ -697,6 +702,11 @@ export class DatabaseStorage implements IStorage {
   async createReview(review: InsertReview): Promise<Review> {
     const [newReview] = await db.insert(reviews).values(review).returning();
     return newReview;
+  }
+
+  async getReviewById(id: number): Promise<Review | undefined> {
+    const [review] = await db.select().from(reviews).where(eq(reviews.id, id));
+    return review || undefined;
   }
 
   async deleteReview(id: number): Promise<boolean> {

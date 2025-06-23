@@ -28,7 +28,7 @@ export default function RecentReviews() {
 
   const deleteReviewMutation = useMutation({
     mutationFn: async (reviewId: number) => {
-      return await apiRequest("DELETE", `/api/reviews/${reviewId}`);
+      return await apiRequest("DELETE", `/api/reviews/${reviewId}`, { userId: 1 });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/reviews'] });
