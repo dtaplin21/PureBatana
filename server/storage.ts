@@ -260,7 +260,18 @@ export class MemStorage implements IStorage {
 
   async createProduct(product: InsertProduct): Promise<Product> {
     const id = this.currentProductId++;
-    const newProduct: Product = { ...product, id };
+    const newProduct: Product = { 
+      ...product, 
+      id,
+      shortDescription: product.shortDescription ?? null,
+      stock: product.stock ?? 0,
+      featured: product.featured ?? false,
+      benefits: product.benefits ?? null,
+      usage: product.usage ?? null,
+      isBestseller: product.isBestseller ?? false,
+      isNew: product.isNew ?? false,
+      viewCount: product.viewCount ?? 0
+    };
     this.products.set(id, newProduct);
     return newProduct;
   }
@@ -314,7 +325,18 @@ export class MemStorage implements IStorage {
 
   async createUser(user: InsertUser): Promise<User> {
     const id = this.currentUserId++;
-    const newUser: User = { ...user, id };
+    const newUser: User = { 
+      ...user, 
+      id,
+      firstName: user.firstName ?? null,
+      lastName: user.lastName ?? null,
+      address: user.address ?? null,
+      city: user.city ?? null,
+      state: user.state ?? null,
+      zip: user.zip ?? null,
+      country: user.country ?? null,
+      phone: user.phone ?? null
+    };
     this.users.set(id, newUser);
     return newUser;
   }
@@ -347,6 +369,9 @@ export class MemStorage implements IStorage {
     const newOrder: Order = { 
       ...order, 
       id,
+      status: order.status ?? "pending",
+      shippingAddress: order.shippingAddress ?? null,
+      billingAddress: order.billingAddress ?? null,
       createdAt: now,
       updatedAt: now
     };
@@ -446,6 +471,8 @@ export class MemStorage implements IStorage {
     const newReview: Review = { 
       ...review, 
       id,
+      comment: review.comment ?? null,
+      customerName: review.customerName ?? null,
       createdAt: new Date()
     };
     this.reviews.set(id, newReview);
@@ -521,7 +548,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteProduct(id: number): Promise<boolean> {
     const result = await db.delete(products).where(eq(products.id, id));
-    return result.count > 0;
+    return result.rowCount !== null && result.rowCount > 0;
   }
   
   async incrementProductViewCount(id: number): Promise<boolean> {
@@ -667,12 +694,12 @@ export class DatabaseStorage implements IStorage {
 
   async deleteCartItem(id: number): Promise<boolean> {
     const result = await db.delete(cartItems).where(eq(cartItems.id, id));
-    return result.count > 0;
+    return result.rowCount !== null && result.rowCount > 0;
   }
 
   async clearCart(userId: number): Promise<boolean> {
     const result = await db.delete(cartItems).where(eq(cartItems.userId, userId));
-    return result.count > 0;
+    return result.rowCount !== null && result.rowCount > 0;
   }
 
   // Reviews
@@ -711,7 +738,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteReview(id: number): Promise<boolean> {
     const result = await db.delete(reviews).where(eq(reviews.id, id));
-    return result.rowCount > 0;
+    return result.rowCount !== null && result.rowCount > 0;
   }
 
   // Newsletter subscribers
