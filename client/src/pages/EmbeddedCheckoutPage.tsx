@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { useCart } from '../context/CartContext';
-import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'wouter';
 
 const LIVE_STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
 const stripePromise = loadStripe(LIVE_STRIPE_PUBLIC_KEY);
 
 const EmbeddedCheckoutPage: React.FC = () => {
   const { cart, clearCart } = useCart();
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (cart.length === 0) {
-      navigate('/cart');
+      setLocation('/cart');
     }
-  }, [cart, navigate]);
+  }, [cart, setLocation]);
 
   const handleCheckout = async () => {
     if (cart.length === 0) return;
@@ -127,12 +127,12 @@ const EmbeddedCheckoutPage: React.FC = () => {
 
             {/* Back to Cart */}
             <div className="mt-6 text-center">
-              <button
-                onClick={() => navigate('/cart')}
-                className="text-blue-600 hover:text-blue-700 font-medium"
-              >
-                ← Back to Cart
-              </button>
+                          <button
+              onClick={() => setLocation('/cart')}
+              className="text-blue-600 hover:text-blue-700 font-medium"
+            >
+              ← Back to Cart
+            </button>
             </div>
           </div>
         </div>

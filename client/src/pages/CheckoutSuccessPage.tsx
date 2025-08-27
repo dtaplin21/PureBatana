@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useLocation, Link } from 'wouter';
 import { loadStripe } from '@stripe/stripe-js';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
 
@@ -7,19 +7,20 @@ const LIVE_STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
 const stripePromise = loadStripe(LIVE_STRIPE_PUBLIC_KEY);
 
 const CheckoutSuccessPage: React.FC = () => {
-  const [searchParams] = useSearchParams();
+  const [location] = useLocation();
   const [orderDetails, setOrderDetails] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const sessionId = searchParams.get('session_id');
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
     if (sessionId) {
       // Fetch order details from your backend
       fetchOrderDetails(sessionId);
     } else {
       setLoading(false);
     }
-  }, [searchParams]);
+  }, [location]);
 
   const fetchOrderDetails = async (sessionId: string) => {
     try {
