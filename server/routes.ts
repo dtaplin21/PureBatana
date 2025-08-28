@@ -488,3 +488,8 @@ router.get('/order-details', async (req, res) => {
 });
 
 export default router;
+
+export function registerRoutes(app: any) {
+  app.use('/api', router);
+  return app;
+}
