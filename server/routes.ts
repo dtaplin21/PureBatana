@@ -410,6 +410,54 @@ router.delete('/users/:userId/cart', async (req, res) => {
   }
 });
 
+// Create payment intent for embedded checkout
+router.post('/create-payment-intent', async (req, res) => {
+  try {
+    const { amount, orderItems = [], metadata = {} } = req.body;
+    
+    if (!amount) {
+      return res.status(400).json({ error: 'Amount is required' });
+    }
+
+    console.log('Creating payment intent:', { amount, orderItems, metadata });
+
+    // Create payment intent with order details
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(amount * 100), // Convert to cents
+      currency: 'usd',
+      metadata: {
+        ...metadata,
+        orderItems: JSON.stringify(orderItems),
+        orderTotal: amount.toString(),
+      },
+      automatic_payment_methods: {
+        enabled: true,
+      },
+      // Add customer details if available
+      receipt_email: metadata.email,
+      description: `Order for ${metadata.customerName || 'Customer'}`,
+    });
+
+    console.log('Payment intent created:', paymentIntent.id);
+
+    res.json({
+      success: true,
+      clientSecret: paymentIntent.client_secret,
+      paymentIntentId: paymentIntent.id,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('Error creating payment intent:', error);
+    res.status(500).json({ 
+      success: false,
+      error: 'Failed to create payment intent',
+      message: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // Stripe checkout session creation
 router.post('/create-checkout-session', async (req, res) => {
   try {
@@ -427,9 +475,6 @@ router.post('/create-checkout-session', async (req, res) => {
       return res.status(404).json({ error: 'Product not found' });
     }
 
-    const product = productsData[0];
-    
-    // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: items.map((item: any) => ({

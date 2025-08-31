@@ -38,7 +38,7 @@ const EmbeddedCheckoutPage: React.FC = () => {
         },
         body: JSON.stringify({
           items: cart.map(item => ({
-            id: item.id,
+            id: item.product.id,
             quantity: item.quantity,
           })),
         }),
@@ -65,7 +65,7 @@ const EmbeddedCheckoutPage: React.FC = () => {
     }
   };
 
-  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const total = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
 
   if (cart.length === 0) {
     return null;
@@ -83,19 +83,19 @@ const EmbeddedCheckoutPage: React.FC = () => {
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Summary</h2>
               <div className="space-y-4">
                 {cart.map((item) => (
-                  <div key={item.id} className="flex justify-between items-center py-3 border-b border-gray-200">
+                  <div key={item.product.id} className="flex justify-between items-center py-3 border-b border-gray-200">
                     <div className="flex items-center space-x-4">
                       <img 
-                        src={item.images[0]} 
-                        alt={item.name}
+                        src={item.product.images[0]} 
+                        alt={item.product.name}
                         className="w-16 h-16 object-cover rounded-md"
                       />
                       <div>
-                        <h3 className="font-medium text-gray-900">{item.name}</h3>
+                        <h3 className="font-medium text-gray-900">{item.product.name}</h3>
                         <p className="text-gray-600">Qty: {item.quantity}</p>
                       </div>
                     </div>
-                    <p className="font-medium text-gray-900">${(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="font-medium text-gray-900">${(item.product.price * item.quantity).toFixed(2)}</p>
                   </div>
                 ))}
               </div>

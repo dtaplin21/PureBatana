@@ -165,6 +165,7 @@ export default function CheckoutPage() {
       const createPaymentIntent = async () => {
         try {
           setIsSubmitting(true);
+          console.log("Creating payment intent...", { amount: orderTotal, orderItems: cart });
           
           // Create a payment intent by calling your server
           const orderItems = cart.map(item => ({
@@ -175,11 +176,26 @@ export default function CheckoutPage() {
           
           const response = await apiRequest("POST", "/api/create-payment-intent", {
             amount: orderTotal,
-            orderItems
+            orderItems,
+            metadata: {
+              email: email,
+              customerName: `${firstName} ${lastName}`,
+              phone: phone,
+              shippingAddress: `${address}, ${city}, ${state} ${zip}, ${country}`
+            }
           });
           
+          console.log("Payment intent response:", response);
           const data = await response.json();
-          setClientSecret(data.clientSecret);
+          console.log("Payment intent data:", data);
+          
+          if (data.clientSecret) {
+            setClientSecret(data.clientSecret);
+            console.log("Client secret set:", data.clientSecret);
+          } else {
+            console.error("No client secret in response:", data);
+            throw new Error("No client secret received");
+          }
         } catch (error) {
           console.error("Error creating payment intent:", error);
           toast({
@@ -300,6 +316,20 @@ export default function CheckoutPage() {
               >
                 Back to Shipping Information
               </Button>
+            </div>
+          ) : showStripeForm && !clientSecret ? (
+            <div className="bg-white rounded-lg shadow-sm border border-neutral-100 p-6 mb-6">
+              <h2 className="font-display font-semibold text-xl mb-4">Loading Payment Form...</h2>
+              <p className="text-gray-600 mb-4">Setting up secure payment...</p>
+              <div className="flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3a5a40]"></div>
+              </div>
+              <div className="mt-4 text-sm text-gray-500">
+                <p>Debug Info:</p>
+                <p>showStripeForm: {showStripeForm.toString()}</p>
+                <p>clientSecret: {clientSecret ? 'Set' : 'Not set'}</p>
+                <p>isSubmitting: {isSubmitting.toString()}</p>
+              </div>
             </div>
           ) : (
             <form onSubmit={handleContinueToPayment}>
