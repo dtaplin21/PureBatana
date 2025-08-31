@@ -8,7 +8,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
       const { productId } = req.query;
       
-      let baseQuery = db.select().from(reviews);
+      let baseQuery = db.select().from(reviews) as any;
       
       if (productId) {
         baseQuery = baseQuery.where(eq(reviews.productId, parseInt(productId as string)));
