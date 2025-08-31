@@ -8,13 +8,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
       const { productId } = req.query;
       
-      let query = db.select().from(reviews);
+      let baseQuery = db.select().from(reviews);
       
       if (productId) {
-        query = query.where(eq(reviews.productId, parseInt(productId as string)));
+        baseQuery = baseQuery.where(eq(reviews.productId, parseInt(productId as string)));
       }
       
-      const allReviews = await query.orderBy(desc(reviews.createdAt));
+      const allReviews = await baseQuery.orderBy(desc(reviews.createdAt));
 
       return res.status(200).json({
         success: true,
@@ -25,10 +25,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     } catch (error) {
       console.error('Error fetching reviews:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       return res.status(500).json({
         success: false,
         error: 'Failed to fetch reviews',
-        message: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error',
+        message: process.env.NODE_ENV === 'development' ? errorMessage : 'Internal server error',
         timestamp: new Date().toISOString()
       });
     }
@@ -63,10 +64,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     } catch (error) {
       console.error('Error creating review:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       return res.status(500).json({
         success: false,
         error: 'Failed to create review',
-        message: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error',
+        message: process.env.NODE_ENV === 'development' ? errorMessage : 'Internal server error',
         timestamp: new Date().toISOString()
       });
     }

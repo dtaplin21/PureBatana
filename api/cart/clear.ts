@@ -34,10 +34,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   } catch (error) {
     console.error('Error clearing cart:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return res.status(500).json({
       success: false,
       error: 'Failed to clear cart',
-      message: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error',
+      message: process.env.NODE_ENV === 'development' ? errorMessage : 'Internal server error',
       timestamp: new Date().toISOString()
     });
   }

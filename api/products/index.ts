@@ -23,37 +23,55 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       limit = 20
     } = req.query;
 
-    let query = db.select().from(products);
-
-    // Apply filters
+    // Build base query with type assertion to bypass Drizzle type issues
+    let baseQuery = db.select().from(products) as any;
+    
+    // Apply filters one by one
     if (category) {
-      query = query.where(eq(products.category, category as string));
+      baseQuery = baseQuery.where(eq(products.category, category as string));
     }
-
+    
     if (featured === 'true') {
-      query = query.where(eq(products.featured, true));
+      baseQuery = baseQuery.where(eq(products.featured, true));
     }
-
+    
     if (search) {
-      query = query.where(like(products.name, `%${search}%`));
+      baseQuery = baseQuery.where(like(products.name, `%${search}%`));
     }
 
-    // Apply sorting
-    const sortColumn = sortBy as keyof typeof products;
-    if (sortOrder === 'desc') {
-      query = query.orderBy(desc(products[sortColumn]));
+    // Apply sorting safely with type assertion
+    let sortedQuery = baseQuery;
+    if (sortBy === 'name') {
+      if (sortOrder === 'desc') {
+        sortedQuery = sortedQuery.orderBy(desc(products.name));
+      } else {
+        sortedQuery = sortedQuery.orderBy(asc(products.name));
+      }
+    } else if (sortBy === 'price') {
+      if (sortOrder === 'desc') {
+        sortedQuery = sortedQuery.orderBy(desc(products.price));
+      } else {
+        sortedQuery = sortedQuery.orderBy(asc(products.price));
+      }
+    } else if (sortBy === 'createdAt') {
+      if (sortOrder === 'desc') {
+        sortedQuery = sortedQuery.orderBy(desc(products.createdAt));
+      } else {
+        sortedQuery = sortedQuery.orderBy(asc(products.createdAt));
+      }
     } else {
-      query = query.orderBy(asc(products[sortColumn]));
+      // Default sorting
+      sortedQuery = sortedQuery.orderBy(asc(products.name));
     }
 
     // Apply pagination
     const offset = (parseInt(page as string) - 1) * parseInt(limit as string);
-    query = query.limit(parseInt(limit as string)).offset(offset);
+    const paginatedQuery = sortedQuery.limit(parseInt(limit as string)).offset(offset);
 
-    const allProducts = await query;
+    const allProducts = await paginatedQuery;
 
-    // Get total count for pagination
-    let countQuery = db.select({ count: products.id }).from(products);
+    // Get total count for pagination - use a separate simple query with type assertion
+    let countQuery = db.select({ count: products.id }).from(products) as any;
     
     if (category) {
       countQuery = countQuery.where(eq(products.category, category as string));
@@ -65,7 +83,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       countQuery = countQuery.where(like(products.name, `%${search}%`));
     }
 
-    const totalCount = await countQuery;
+    const totalCountResult = await countQuery;
+    const totalCount = totalCountResult.length;
 
     return res.status(200).json({
       success: true,
@@ -73,8 +92,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       pagination: {
         page: parseInt(page as string),
         limit: parseInt(limit as string),
-        total: totalCount.length,
-        pages: Math.ceil(totalCount.length / parseInt(limit as string))
+        total: totalCount,
+        pages: Math.ceil(totalCount / parseInt(limit as string))
       },
       filters: {
         category: category || null,
@@ -86,10 +105,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   } catch (error) {
     console.error('Error fetching products:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return res.status(500).json({
       success: false,
       error: 'Failed to fetch products',
-      message: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error',
+      message: process.env.NODE_ENV === 'development' ? errorMessage : 'Internal server error',
       timestamp: new Date().toISOString()
     });
   }
