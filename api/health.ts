@@ -1,5 +1,4 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { db } from '../lib/db';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') {
@@ -11,13 +10,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // Simple health check without database for now
+    // Simple health check - no database dependency
     return res.status(200).json({
       success: true,
       status: 'healthy',
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV || 'development',
-      message: 'API is running'
+      message: 'API is running',
+      version: '1.0.0'
     });
 
   } catch (error) {
@@ -26,8 +26,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(503).json({
       success: false,
       status: 'unhealthy',
-      database: 'disconnected',
-      error: process.env.NODE_ENV === 'development' ? errorMessage : 'Database connection failed',
+      error: process.env.NODE_ENV === 'development' ? errorMessage : 'Health check failed',
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV || 'development'
     });

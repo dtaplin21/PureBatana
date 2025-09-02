@@ -4,6 +4,7 @@ import * as schema from "./schema";
 
 // Configure for Vercel serverless environment
 neonConfig.fetchConnectionCache = true;
+neonConfig.useSecureWebSocket = true;
 
 if (!process.env.DATABASE_URL) {
   throw new Error(
@@ -11,5 +12,12 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+// Create connection pool with serverless-optimized settings
+export const pool = new Pool({ 
+  connectionString: process.env.DATABASE_URL,
+  max: 1, // Limit connections for serverless
+  idleTimeoutMillis: 10000,
+  connectionTimeoutMillis: 5000
+});
+
 export const db = drizzle(pool, { schema });
