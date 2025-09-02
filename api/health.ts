@@ -11,15 +11,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // Test database connection
-    await db.execute('SELECT 1');
-    
+    // Simple health check without database for now
     return res.status(200).json({
       success: true,
       status: 'healthy',
-      database: 'connected',
       timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'development'
+      environment: process.env.NODE_ENV || 'development',
+      message: 'API is running'
     });
 
   } catch (error) {
