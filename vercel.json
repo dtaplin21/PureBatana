@@ -2,6 +2,11 @@
   "buildCommand": "npm install && npm run build:client",
   "outputDirectory": "dist/public",
   "framework": "vite",
+  "functions": {
+    "api/**": {
+      "runtime": "@vercel/node@4.0.0"
+    }
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",

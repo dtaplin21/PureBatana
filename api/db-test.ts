@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 
-export const config = { runtime: 'nodejs' };
+
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   console.log('🔍 Starting Supabase db-test endpoint...');
