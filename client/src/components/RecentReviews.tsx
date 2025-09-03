@@ -59,7 +59,7 @@ export default function RecentReviews() {
     );
   }
 
-  const recentReviews = reviews?.slice(0, 5) || [];
+  const recentReviews = Array.isArray(reviews) ? reviews.slice(0, 5) : [];
 
   if (recentReviews.length === 0) {
     return (
