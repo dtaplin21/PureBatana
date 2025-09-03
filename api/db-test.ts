@@ -1,4 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { Pool, neonConfig } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-serverless';
 
 // Ensure Node.js runtime for database operations
 export const config = {
@@ -22,9 +24,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('- DATABASE_URL starts with:', process.env.DATABASE_URL?.substring(0, 20) + '...');
     console.log('- NODE_ENV:', process.env.NODE_ENV);
     
-    console.log('📦 Attempting to import database...');
-    const { db } = await import('../lib/db');
-    console.log('✅ Database import successful');
+    if (!process.env.DATABASE_URL) {
+      throw new Error('DATABASE_URL environment variable is not set');
+    }
+    
+    console.log('🔧 Creating database connection...');
+    
+    // Configure for Vercel serverless environment
+    neonConfig.fetchConnectionCache = true;
+    neonConfig.useSecureWebSocket = true;
+    
+    // Create connection pool
+    const pool = new Pool({ 
+      connectionString: process.env.DATABASE_URL,
+      max: 1,
+      idleTimeoutMillis: 0,
+      connectionTimeoutMillis: 10000,
+      ssl: true
+    });
+    
+    console.log('✅ Connection pool created');
+    
+    // Create drizzle instance
+    const db = drizzle(pool);
+    console.log('✅ Drizzle database instance created');
     
     console.log('🔗 Testing database connection...');
     const result = await db.execute('SELECT 1 as test');
@@ -37,14 +60,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       timestamp: new Date().toISOString()
     });
 
-  } catch (importError) {
-    console.error('❌ Import Error:', importError);
-    return res.status(500).json({ 
-      error: 'Import failed', 
-      details: importError.message,
-      stack: process.env.NODE_ENV === 'development' ? importError.stack : undefined,
-      timestamp: new Date().toISOString()
-    });
   } catch (error) {
     console.error('❌ Database test failed:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
