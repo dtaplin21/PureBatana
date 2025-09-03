@@ -1,15 +1,28 @@
 import {
-  products, Product, InsertProduct,
-  users, User, InsertUser,
-  orders, Order, InsertOrder,
-  orderItems, OrderItem, InsertOrderItem,
-  cartItems, CartItem, InsertCartItem,
-  reviews, Review, InsertReview,
-  subscribers, Subscriber, InsertSubscriber,
-  contactMessages, ContactMessage, InsertContactMessage
-} from "@shared/schema";
+  products,
+  users,
+  orders,
+  orderItems,
+  cartItems,
+  reviews
+} from "./schema";
+import type { InferSelectModel, InferInsertModel } from 'drizzle-orm';
 import { db } from "./db";
 import { eq, and, count } from "drizzle-orm";
+
+// Define types using Drizzle's inferred types
+export type Product = InferSelectModel<typeof products>;
+export type InsertProduct = InferInsertModel<typeof products>;
+export type User = InferSelectModel<typeof users>;
+export type InsertUser = InferInsertModel<typeof users>;
+export type Order = InferSelectModel<typeof orders>;
+export type InsertOrder = InferInsertModel<typeof orders>;
+export type OrderItem = InferSelectModel<typeof orderItems>;
+export type InsertOrderItem = InferInsertModel<typeof orderItems>;
+export type CartItem = InferSelectModel<typeof cartItems>;
+export type InsertCartItem = InferInsertModel<typeof cartItems>;
+export type Review = InferSelectModel<typeof reviews>;
+export type InsertReview = InferInsertModel<typeof reviews>;
 
 export interface IStorage {
   // Products
@@ -24,7 +37,7 @@ export interface IStorage {
   // Users
   getUsers(): Promise<User[]>;
   getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
+
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, user: Partial<InsertUser>): Promise<User | undefined>;
@@ -55,12 +68,7 @@ export interface IStorage {
   getReviewById(id: number): Promise<Review | undefined>;
   deleteReview(id: number): Promise<boolean>;
   
-  // Newsletter subscribers
-  createSubscriber(subscriber: InsertSubscriber): Promise<Subscriber>;
-  getSubscriberByEmail(email: string): Promise<Subscriber | undefined>;
-  
-  // Contact messages
-  createContactMessage(message: InsertContactMessage): Promise<ContactMessage>;
+  // Note: Newsletter subscribers and contact messages tables not implemented yet
 }
 
 export class MemStorage implements IStorage {
@@ -70,17 +78,12 @@ export class MemStorage implements IStorage {
   private orderItems: Map<number, OrderItem>;
   private cartItems: Map<number, CartItem>;
   private reviews: Map<number, Review>;
-  private subscribers: Map<number, Subscriber>;
-  private contactMessages: Map<number, ContactMessage>;
-  
   private currentProductId: number;
   private currentUserId: number;
   private currentOrderId: number;
   private currentOrderItemId: number;
   private currentCartItemId: number;
   private currentReviewId: number;
-  private currentSubscriberId: number;
-  private currentContactMessageId: number;
   
   constructor() {
     this.products = new Map();
@@ -89,8 +92,6 @@ export class MemStorage implements IStorage {
     this.orderItems = new Map();
     this.cartItems = new Map();
     this.reviews = new Map();
-    this.subscribers = new Map();
-    this.contactMessages = new Map();
     
     this.currentProductId = 1;
     this.currentUserId = 1;
@@ -98,8 +99,6 @@ export class MemStorage implements IStorage {
     this.currentOrderItemId = 1;
     this.currentCartItemId = 1;
     this.currentReviewId = 1;
-    this.currentSubscriberId = 1;
-    this.currentContactMessageId = 1;
     
     // Initialize with some demo products
     this.seedProducts();
@@ -203,45 +202,18 @@ export class MemStorage implements IStorage {
     
     // Create some demo users
     this.createUser({
-      username: "sarah_k",
-      password: "password123", // In a real app, this would be hashed
       email: "sarah_k@example.com",
-      firstName: "Sarah",
-      lastName: "K",
-      address: "123 Main St",
-      city: "Portland",
-      state: "OR",
-      zip: "97205",
-      country: "USA",
-      phone: "555-123-4567"
+      name: "Sarah K"
     });
     
     this.createUser({
-      username: "michael_t",
-      password: "password123",
       email: "michael_t@example.com",
-      firstName: "Michael",
-      lastName: "T",
-      address: "456 Oak Ave",
-      city: "Seattle",
-      state: "WA",
-      zip: "98101",
-      country: "USA",
-      phone: "555-987-6543"
+      name: "Michael T"
     });
     
     this.createUser({
-      username: "jennifer_l",
-      password: "password123",
       email: "jennifer_l@example.com",
-      firstName: "Jennifer",
-      lastName: "L",
-      address: "789 Pine St",
-      city: "San Francisco",
-      state: "CA",
-      zip: "94105",
-      country: "USA",
-      phone: "555-567-8901"
+      name: "Jennifer L"
     });
   }
 
@@ -270,7 +242,10 @@ export class MemStorage implements IStorage {
       usage: product.usage ?? null,
       isBestseller: product.isBestseller ?? false,
       isNew: product.isNew ?? false,
-      viewCount: product.viewCount ?? 0
+      viewCount: product.viewCount ?? 0,
+      images: product.images ?? null,
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
     this.products.set(id, newProduct);
     return newProduct;
@@ -315,9 +290,7 @@ export class MemStorage implements IStorage {
     return this.users.get(id);
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.username === username);
-  }
+
 
   async getUserByEmail(email: string): Promise<User | undefined> {
     return Array.from(this.users.values()).find(user => user.email === email);
@@ -328,14 +301,8 @@ export class MemStorage implements IStorage {
     const newUser: User = { 
       ...user, 
       id,
-      firstName: user.firstName ?? null,
-      lastName: user.lastName ?? null,
-      address: user.address ?? null,
-      city: user.city ?? null,
-      state: user.state ?? null,
-      zip: user.zip ?? null,
-      country: user.country ?? null,
-      phone: user.phone ?? null
+      name: user.name ?? null,
+      createdAt: new Date()
     };
     this.users.set(id, newUser);
     return newUser;
@@ -370,8 +337,7 @@ export class MemStorage implements IStorage {
       ...order, 
       id,
       status: order.status ?? "pending",
-      shippingAddress: order.shippingAddress ?? null,
-      billingAddress: order.billingAddress ?? null,
+      stripePaymentIntentId: order.stripePaymentIntentId ?? null,
       createdAt: now,
       updatedAt: now
     };
@@ -399,7 +365,11 @@ export class MemStorage implements IStorage {
 
   async createOrderItem(item: InsertOrderItem): Promise<OrderItem> {
     const id = this.currentOrderItemId++;
-    const newItem: OrderItem = { ...item, id };
+    const newItem: OrderItem = { 
+      ...item, 
+      id,
+      quantity: item.quantity ?? 1
+    };
     this.orderItems.set(id, newItem);
     return newItem;
   }
@@ -417,7 +387,12 @@ export class MemStorage implements IStorage {
 
   async createCartItem(item: InsertCartItem): Promise<CartItem> {
     const id = this.currentCartItemId++;
-    const newItem: CartItem = { ...item, id };
+    const newItem: CartItem = { 
+      ...item, 
+      id,
+      quantity: item.quantity ?? 1,
+      createdAt: new Date()
+    };
     this.cartItems.set(id, newItem);
     return newItem;
   }
@@ -453,8 +428,7 @@ export class MemStorage implements IStorage {
         return {
           ...review,
           user: {
-            firstName: user.firstName,
-            lastName: user.lastName
+            name: user.name
           }
         };
       }
@@ -487,33 +461,7 @@ export class MemStorage implements IStorage {
     return this.reviews.delete(id);
   }
 
-  // Newsletter subscribers
-  async createSubscriber(subscriber: InsertSubscriber): Promise<Subscriber> {
-    const id = this.currentSubscriberId++;
-    const newSubscriber: Subscriber = { 
-      ...subscriber, 
-      id,
-      createdAt: new Date()
-    };
-    this.subscribers.set(id, newSubscriber);
-    return newSubscriber;
-  }
-
-  async getSubscriberByEmail(email: string): Promise<Subscriber | undefined> {
-    return Array.from(this.subscribers.values()).find(sub => sub.email === email);
-  }
-
-  // Contact messages
-  async createContactMessage(message: InsertContactMessage): Promise<ContactMessage> {
-    const id = this.currentContactMessageId++;
-    const newMessage: ContactMessage = { 
-      ...message, 
-      id,
-      createdAt: new Date()
-    };
-    this.contactMessages.set(id, newMessage);
-    return newMessage;
-  }
+  // Note: Newsletter subscribers and contact messages not implemented in MemStorage
 }
 
 export class DatabaseStorage implements IStorage {
@@ -582,10 +530,7 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
-    return user;
-  }
+
 
   async getUserByEmail(email: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.email, email));
@@ -674,7 +619,7 @@ export class DatabaseStorage implements IStorage {
         if (existingItem) {
           const updatedItem = await this.updateCartItemQuantity(
             existingItem.id,
-            existingItem.quantity + item.quantity
+            existingItem.quantity + (item.quantity ?? 1)
           );
           if (updatedItem) return updatedItem;
         }
@@ -708,8 +653,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db.select({
       review: reviews,
       user: {
-        firstName: users.firstName,
-        lastName: users.lastName
+        name: users.name
       }
     })
     .from(reviews)
@@ -741,22 +685,7 @@ export class DatabaseStorage implements IStorage {
     return result.rowCount !== null && result.rowCount > 0;
   }
 
-  // Newsletter subscribers
-  async createSubscriber(subscriber: InsertSubscriber): Promise<Subscriber> {
-    const [newSubscriber] = await db.insert(subscribers).values(subscriber).returning();
-    return newSubscriber;
-  }
-
-  async getSubscriberByEmail(email: string): Promise<Subscriber | undefined> {
-    const [subscriber] = await db.select().from(subscribers).where(eq(subscribers.email, email));
-    return subscriber;
-  }
-
-  // Contact messages
-  async createContactMessage(message: InsertContactMessage): Promise<ContactMessage> {
-    const [newMessage] = await db.insert(contactMessages).values(message).returning();
-    return newMessage;
-  }
+  // Note: Newsletter subscribers and contact messages not implemented in DatabaseStorage
 }
 
 // Initialize storage
@@ -842,43 +771,16 @@ export async function seedDatabase() {
     // Create demo users
     const demoUsers: InsertUser[] = [
       {
-        username: "sarah_k",
-        password: "password123", // In a real app, this would be hashed
         email: "sarah_k@example.com",
-        firstName: "Sarah",
-        lastName: "K",
-        address: "123 Main St",
-        city: "Portland",
-        state: "OR",
-        zip: "97205",
-        country: "USA",
-        phone: "555-123-4567"
+        name: "Sarah K"
       },
       {
-        username: "michael_t",
-        password: "password123",
         email: "michael_t@example.com",
-        firstName: "Michael",
-        lastName: "T",
-        address: "456 Oak Ave",
-        city: "Seattle",
-        state: "WA",
-        zip: "98101",
-        country: "USA",
-        phone: "555-987-6543"
+        name: "Michael T"
       },
       {
-        username: "jennifer_l",
-        password: "password123",
         email: "jennifer_l@example.com",
-        firstName: "Jennifer",
-        lastName: "L",
-        address: "789 Pine St",
-        city: "San Francisco",
-        state: "CA",
-        zip: "94105",
-        country: "USA",
-        phone: "555-567-8901"
+        name: "Jennifer L"
       }
     ];
     
