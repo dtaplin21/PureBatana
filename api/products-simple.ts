@@ -70,6 +70,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const db = drizzle(pool, { schema: { products } });
     console.log('✅ Drizzle database instance created with schema');
     
+    console.log('🔗 Testing simple query first...');
+    // Test with a simple query first
+    const testResult = await db.execute('SELECT COUNT(*) as count FROM products');
+    console.log('✅ Count query successful:', testResult);
+    
     console.log('🔗 Querying products...');
     // Simple products query without complex filtering
     const allProducts = await db.select().from(products);
@@ -79,6 +84,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       success: true,
       data: allProducts,
       count: allProducts.length,
+      testResult: testResult,
       timestamp: new Date().toISOString()
     });
 
