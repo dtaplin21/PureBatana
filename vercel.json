@@ -2,11 +2,6 @@
   "buildCommand": "npm install && npm run build:client",
   "outputDirectory": "dist/public",
   "framework": "vite",
-  "functions": {
-    "api/**/*.ts": {
-      "runtime": "@vercel/node"
-    }
-  },
   "rewrites": [
     {
       "source": "/api/(.*)",
