@@ -88,7 +88,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       success: false,
       error: 'Supabase database connection failed',
       message: process.env.NODE_ENV === 'development' ? errorMessage : 'Internal server error',
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+      stack: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.stack : undefined) : undefined,
       timestamp: new Date().toISOString()
     });
   }

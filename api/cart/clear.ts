@@ -27,8 +27,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(200).json({
       success: true,
-      message: `Cleared ${result.rowCount} cart items`,
-      itemsRemoved: result.rowCount,
+      message: `Cleared cart items for user ${userId}`,
+      itemsRemoved: result.length || 0,
       timestamp: new Date().toISOString()
     });
 

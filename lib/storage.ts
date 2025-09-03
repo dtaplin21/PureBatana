@@ -496,7 +496,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteProduct(id: number): Promise<boolean> {
     const result = await db.delete(products).where(eq(products.id, id));
-    return result.rowCount !== null && result.rowCount > 0;
+    return result.length > 0;
   }
   
   async incrementProductViewCount(id: number): Promise<boolean> {
@@ -639,12 +639,12 @@ export class DatabaseStorage implements IStorage {
 
   async deleteCartItem(id: number): Promise<boolean> {
     const result = await db.delete(cartItems).where(eq(cartItems.id, id));
-    return result.rowCount !== null && result.rowCount > 0;
+    return result.length > 0;
   }
 
   async clearCart(userId: number): Promise<boolean> {
     const result = await db.delete(cartItems).where(eq(cartItems.userId, userId));
-    return result.rowCount !== null && result.rowCount > 0;
+    return result.length > 0;
   }
 
   // Reviews
@@ -682,7 +682,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteReview(id: number): Promise<boolean> {
     const result = await db.delete(reviews).where(eq(reviews.id, id));
-    return result.rowCount !== null && result.rowCount > 0;
+    return result.length > 0;
   }
 
   // Note: Newsletter subscribers and contact messages not implemented in DatabaseStorage

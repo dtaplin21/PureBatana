@@ -25,7 +25,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const result = await db.delete(cartItems).where(eq(cartItems.id, parseInt(id as string)));
 
-    if (result.rowCount === 0) {
+    if (!result || result.length === 0) {
       return res.status(404).json({
         success: false,
         error: 'Cart item not found',
