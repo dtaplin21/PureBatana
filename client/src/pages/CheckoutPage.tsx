@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { paymentService } from "@/lib/paymentService";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   Elements,
@@ -174,7 +175,7 @@ export default function CheckoutPage() {
             price: item.product.price
           }));
           
-          const response = await apiRequest("POST", "/api/create-payment-intent", {
+          const response = await paymentService.createPaymentIntent({
             amount: orderTotal,
             orderItems,
             metadata: {
@@ -186,8 +187,7 @@ export default function CheckoutPage() {
           });
           
           console.log("Payment intent response:", response);
-          const data = await response.json();
-          console.log("Payment intent data:", data);
+          const data = response;
           
           if (data.clientSecret) {
             setClientSecret(data.clientSecret);

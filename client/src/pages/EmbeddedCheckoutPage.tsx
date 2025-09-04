@@ -3,6 +3,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useCart } from '../context/CartContext';
 import { useLocation } from 'wouter';
+import { paymentService } from '../lib/paymentService';
 
 const LIVE_STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
 const stripePromise = loadStripe(LIVE_STRIPE_PUBLIC_KEY);
@@ -120,26 +121,19 @@ const EmbeddedCheckoutPage: React.FC = () => {
             price: item.product.price
           }));
           
-          const response = await fetch("/api/create-payment-intent", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              amount: orderTotal,
-              orderItems,
-              metadata: {
-                email: email,
-                customerName: `${firstName} ${lastName}`,
-                phone: phone,
-                shippingAddress: `${address}, ${city}, ${state} ${zip}, ${country}`
-              }
-            }),
+          const response = await paymentService.createPaymentIntent({
+            amount: orderTotal,
+            orderItems,
+            metadata: {
+              email: email,
+              customerName: `${firstName} ${lastName}`,
+              phone: phone,
+              shippingAddress: `${address}, ${city}, ${state} ${zip}, ${country}`
+            }
           });
           
           console.log("Payment intent response:", response);
-          const data = await response.json();
-          console.log("Payment intent data:", data);
+          const data = response;
           
           if (data.clientSecret) {
             setClientSecret(data.clientSecret);

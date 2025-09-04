@@ -1,0 +1,38 @@
+{
+  "name": "pure-batana-backend",
+  "version": "1.0.0",
+  "description": "Dedicated backend for Pure Batana e-commerce with Stripe integration",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "build": "echo 'No build step required'",
+    "test": "echo 'No tests specified'"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "dotenv": "^16.3.1",
+    "stripe": "^18.0.0",
+    "pg": "^8.11.3",
+    "drizzle-orm": "^0.44.5",
+    "@types/pg": "^8.10.9"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "ecommerce",
+    "stripe",
+    "payments",
+    "render",
+    "express"
+  ],
+  "author": "Grand Gaia LLC",
+  "license": "MIT"
+}

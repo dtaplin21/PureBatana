@@ -1,5 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import stripe from './lib/stripe';
+import Stripe from 'stripe';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2025-03-31.basil', // MUST match the dashboard
+  timeout: 10000,
+  maxNetworkRetries: 2,
+});
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   console.log('🔍 Starting Stripe test endpoint...');
