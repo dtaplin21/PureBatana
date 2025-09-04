@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import Stripe from 'stripe';
+import stripe from './lib/stripe';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   console.log('🔍 Starting Stripe test endpoint...');
@@ -16,9 +16,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     
     console.log('✅ Stripe key found, length:', process.env.STRIPE_SECRET_KEY.length);
     
-    // Test 2: Initialize Stripe
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-    console.log('✅ Stripe instance created');
+    // Test 2: Stripe instance already initialized
+    console.log('✅ Stripe instance ready');
     
     // Test 3: Try to retrieve account info (simple API call)
     const account = await stripe.accounts.retrieve();

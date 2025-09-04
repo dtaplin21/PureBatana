@@ -1,9 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import Stripe from 'stripe';
-
-
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+import stripe from '../lib/stripe';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -71,12 +67,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({
       success: false,
       error: 'Failed to create checkout session',
-      message: process.env.NODE_ENV === 'development' ? errorMessage : 'Internal server error',
-      details: process.env.NODE_ENV === 'development' ? {
+      message: errorMessage,
+      details: {
         type: (error as any)?.type,
         code: (error as any)?.code,
-        statusCode: (error as any)?.statusCode
-      } : undefined,
+        statusCode: (error as any)?.statusCode,
+        requestId: (error as any)?.requestId
+      },
       timestamp: new Date().toISOString()
     });
   }
