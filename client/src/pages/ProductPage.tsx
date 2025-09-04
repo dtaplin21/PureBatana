@@ -31,12 +31,22 @@ export default function ProductPage() {
 
   const { data: product, isLoading: productLoading, isError: productError } = useQuery<ProductWithMeta>({
     queryKey: [`/api/products/${slug}`],
+    queryFn: async () => {
+      const response = await fetch(`/api/products/${slug}`);
+      const result = await response.json();
+      return result.data; // Extract the data from the API response
+    }
   });
   
   // Fetch reviews once we have the product ID
   const { data: reviews, isLoading: reviewsLoading } = useQuery<ReviewWithUser[]>({
     queryKey: [`/api/reviews/product/${product?.id}`],
     enabled: !!product?.id, // Only run the query if we have a product ID
+    queryFn: async () => {
+      const response = await fetch(`/api/reviews/product/${product?.id}`);
+      const result = await response.json();
+      return result.data; // Extract the data from the API response
+    }
   });
 
   if (productLoading) {

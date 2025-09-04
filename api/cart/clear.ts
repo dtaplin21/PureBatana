@@ -35,13 +35,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const db = drizzle(sql);
     console.log('✅ Drizzle database instance created');
     
-    const { userId } = req.body;
+    // For DELETE requests, get userId from query params or body
+    const userId = req.query.userId || req.body?.userId;
 
     if (!userId) {
       return res.status(400).json({
         success: false,
         error: 'Missing required fields',
-        message: 'userId is required',
+        message: 'userId is required (can be provided as query param or in body)',
         timestamp: new Date().toISOString()
       });
     }

@@ -3,9 +3,7 @@ import Stripe from 'stripe';
 
 
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-03-31.basil',
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -29,7 +27,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Create payment intent with order details
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // Convert to cents
+      amount: Math.round(amount), // Amount is already in cents
       currency,
       metadata: {
         ...metadata,
@@ -52,12 +50,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
   } catch (error) {
-    console.error('Error creating payment intent:', error);
+    console.error('Detailed Stripe Payment Intent Error:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      type: (error as any)?.type,
+      code: (error as any)?.code,
+      statusCode: (error as any)?.statusCode,
+      requestId: (error as any)?.requestId,
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return res.status(500).json({
       success: false,
       error: 'Failed to create payment intent',
       message: process.env.NODE_ENV === 'development' ? errorMessage : 'Internal server error',
+      details: process.env.NODE_ENV === 'development' ? {
+        type: (error as any)?.type,
+        code: (error as any)?.code,
+        statusCode: (error as any)?.statusCode
+      } : undefined,
       timestamp: new Date().toISOString()
     });
   }

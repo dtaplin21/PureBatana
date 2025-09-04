@@ -3,9 +3,7 @@ import Stripe from 'stripe';
 
 
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-03-31.basil',
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -27,37 +25,58 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // Create payment intent with order details
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // Convert to cents
-      currency,
+    // Create checkout session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: orderItems.map((item: any) => ({
+        price_data: {
+          currency: currency,
+          product_data: {
+            name: `Product ${item.id}`,
+            description: `Quantity: ${item.quantity}`,
+          },
+          unit_amount: Math.round(item.price || amount / orderItems.length), // Price per item in cents
+        },
+        quantity: item.quantity || 1,
+      })),
+      mode: 'payment',
+      success_url: `${req.headers.origin || 'http://localhost:3000'}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${req.headers.origin || 'http://localhost:3000'}/cart`,
       metadata: {
         ...metadata,
         orderItems: JSON.stringify(orderItems),
         orderTotal: amount.toString(),
       },
-      automatic_payment_methods: {
-        enabled: true,
-      },
-      // Add customer details if available
-      receipt_email: metadata.email,
-      description: `Order for ${metadata.customerName || 'Customer'}`,
+      customer_email: metadata.email,
     });
 
     return res.status(200).json({
       success: true,
-      clientSecret: paymentIntent.client_secret,
-      paymentIntentId: paymentIntent.id,
+      sessionId: session.id,
+      url: session.url,
       timestamp: new Date().toISOString()
     });
 
   } catch (error) {
-    console.error('Error creating payment intent:', error);
+    console.error('Detailed Stripe Checkout Session Error:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      type: (error as any)?.type,
+      code: (error as any)?.code,
+      statusCode: (error as any)?.statusCode,
+      requestId: (error as any)?.requestId,
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return res.status(500).json({
       success: false,
-      error: 'Failed to create payment intent',
+      error: 'Failed to create checkout session',
       message: process.env.NODE_ENV === 'development' ? errorMessage : 'Internal server error',
+      details: process.env.NODE_ENV === 'development' ? {
+        type: (error as any)?.type,
+        code: (error as any)?.code,
+        statusCode: (error as any)?.statusCode
+      } : undefined,
       timestamp: new Date().toISOString()
     });
   }

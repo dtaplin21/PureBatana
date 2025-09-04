@@ -14,6 +14,11 @@ export default function Hero() {
   // Fetch the product data for the hero 
   const { data: product, isLoading } = useQuery<ProductWithMeta>({
     queryKey: ['/api/products/pure-batana-oil'],
+    queryFn: async () => {
+      const response = await fetch('/api/products/pure-batana-oil');
+      const result = await response.json();
+      return result.data; // Extract the data from the API response
+    }
   });
   
   const { addToCart } = useCart();
@@ -77,7 +82,7 @@ export default function Hero() {
             </div>
             <div className="flex items-center mb-8">
               <p className="text-2xl font-display font-bold mr-4">
-                ${isLoading ? '29.95' : product?.price.toFixed(2)}
+                ${isLoading ? '29.95' : (product?.price ? product.price.toFixed(2) : '29.95')}
               </p>
               <span className="text-neutral-600">2 oz (60ml)</span>
             </div>
