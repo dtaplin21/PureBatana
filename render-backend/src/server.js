@@ -8,7 +8,7 @@ import { dirname, join } from 'path';
 // Import routes
 import stripeRoutes from './routes/stripe.js';
 import healthRoutes from './routes/health.js';
-import dataRoutes from './routes/data-simple.js';
+import dataRoutes from './routes/data.js';
 
 // Load environment variables
 dotenv.config();
@@ -81,6 +81,18 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🔗 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
   console.log(`☁️  Platform: Render`);
+  console.log(`📊 Database: ${process.env.DATABASE_URL ? 'Connected' : 'Using mock data'}`);
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught Exception:', error);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
 });
 
 export default app;

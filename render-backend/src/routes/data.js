@@ -27,7 +27,13 @@ if (connectionString) {
   } catch (error) {
     console.error('❌ Database connection failed:', error.message);
     console.warn('⚠️ Falling back to mock data');
+    client = null;
+    db = null;
   }
+} else {
+  console.warn('⚠️ No DATABASE_URL provided, using mock data');
+  client = null;
+  db = null;
 }
 
 // Mock data fallback
