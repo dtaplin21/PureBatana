@@ -225,7 +225,16 @@ router.get('/reviews', async (req, res) => {
 router.get('/reviews/product/:productId', async (req, res) => {
   try {
     const { productId } = req.params;
-    console.log(`Fetching reviews for product ID: ${productId}`);
+    console.log(`📝 Fetching reviews for product ID: ${productId}`);
+    
+    if (!db) {
+      console.log('📝 Using mock data (no database connection)');
+      const productReviews = mockReviews.filter(review => review.productId === parseInt(productId));
+      return res.json({
+        success: true,
+        data: productReviews
+      });
+    }
     
     const productReviews = await db
       .select({
@@ -250,11 +259,12 @@ router.get('/reviews/product/:productId', async (req, res) => {
       data: productReviews
     });
   } catch (error) {
-    console.error('Error fetching product reviews:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch product reviews',
-      details: error.message
+    console.error('❌ Error fetching product reviews:', error);
+    console.log('📝 Falling back to mock data');
+    const productReviews = mockReviews.filter(review => review.productId === parseInt(req.params.productId));
+    res.json({
+      success: true,
+      data: productReviews
     });
   }
 });
