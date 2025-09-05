@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Product } from "@shared/schema";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
+import { API_ENDPOINTS } from "@/lib/apiConfig";
 
 // Extended type for product with review count
 type ProductWithMeta = Product & {
@@ -15,7 +16,7 @@ export default function Hero() {
   const { data: product, isLoading } = useQuery<ProductWithMeta>({
     queryKey: ['/api/products/pure-batana-oil'],
     queryFn: async () => {
-      const response = await fetch('/api/products/pure-batana-oil');
+      const response = await fetch(API_ENDPOINTS.VERCEL.PRODUCT_BY_SLUG('pure-batana-oil'));
       const result = await response.json();
       return result.data; // Extract the data from the API response
     }

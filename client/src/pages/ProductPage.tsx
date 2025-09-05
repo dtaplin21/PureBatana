@@ -8,6 +8,7 @@ import ProductGallery from "@/components/ProductGallery";
 import QuantitySelector from "@/components/QuantitySelector";
 import { Badge } from "@/components/ui/badge";
 import { format } from 'date-fns';
+import { API_ENDPOINTS } from "@/lib/apiConfig";
 
 // Extended type for product with review count
 type ProductWithMeta = Product & {
@@ -32,7 +33,7 @@ export default function ProductPage() {
   const { data: product, isLoading: productLoading, isError: productError } = useQuery<ProductWithMeta>({
     queryKey: [`/api/products/${slug}`],
     queryFn: async () => {
-      const response = await fetch(`/api/products/${slug}`);
+      const response = await fetch(API_ENDPOINTS.VERCEL.PRODUCT_BY_SLUG(slug));
       const result = await response.json();
       return result.data; // Extract the data from the API response
     }
@@ -43,7 +44,7 @@ export default function ProductPage() {
     queryKey: [`/api/reviews/product/${product?.id}`],
     enabled: !!product?.id, // Only run the query if we have a product ID
     queryFn: async () => {
-      const response = await fetch(`/api/reviews/product/${product?.id}`);
+      const response = await fetch(API_ENDPOINTS.VERCEL.REVIEWS_BY_PRODUCT(product?.id || 0));
       const result = await response.json();
       return result.data; // Extract the data from the API response
     }

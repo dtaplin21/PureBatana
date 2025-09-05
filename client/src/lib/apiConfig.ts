@@ -27,15 +27,55 @@ export const API_ENDPOINTS = {
 
 // Helper function to get the correct API URL based on endpoint type
 export const getApiUrl = (endpoint: string) => {
-  // Check if it's a Stripe/payment endpoint
-  if (endpoint.includes('create-payment-intent') || 
-      endpoint.includes('create-checkout-session') || 
-      endpoint.includes('stripe')) {
-    return API_ENDPOINTS.STRIPE.CREATE_PAYMENT_INTENT;
+  // If it's already a full URL, return as is
+  if (endpoint.startsWith('http')) {
+    return endpoint;
   }
   
-  // Default to Vercel for data endpoints
-  return endpoint.startsWith('http') ? endpoint : `${VERCEL_API_URL}${endpoint}`;
+  // Normalize the endpoint to start with /
+  const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  
+  // Check if it's a Stripe/payment endpoint
+  if (normalizedEndpoint.includes('create-payment-intent')) {
+    return API_ENDPOINTS.STRIPE.CREATE_PAYMENT_INTENT;
+  }
+  if (normalizedEndpoint.includes('create-checkout-session')) {
+    return API_ENDPOINTS.STRIPE.CREATE_CHECKOUT_SESSION;
+  }
+  if (normalizedEndpoint.includes('stripe')) {
+    return API_ENDPOINTS.STRIPE.TEST;
+  }
+  
+  // Handle specific Vercel endpoints
+  if (normalizedEndpoint === '/api/products') {
+    return API_ENDPOINTS.VERCEL.PRODUCTS;
+  }
+  if (normalizedEndpoint.startsWith('/api/products/') && normalizedEndpoint !== '/api/products') {
+    const slug = normalizedEndpoint.replace('/api/products/', '');
+    return API_ENDPOINTS.VERCEL.PRODUCT_BY_SLUG(slug);
+  }
+  if (normalizedEndpoint === '/api/reviews') {
+    return API_ENDPOINTS.VERCEL.REVIEWS;
+  }
+  if (normalizedEndpoint.startsWith('/api/reviews/product/')) {
+    const productId = parseInt(normalizedEndpoint.replace('/api/reviews/product/', ''));
+    return API_ENDPOINTS.VERCEL.REVIEWS_BY_PRODUCT(productId);
+  }
+  if (normalizedEndpoint === '/api/cart/add') {
+    return API_ENDPOINTS.VERCEL.CART_ADD;
+  }
+  if (normalizedEndpoint === '/api/cart/remove') {
+    return API_ENDPOINTS.VERCEL.CART_REMOVE;
+  }
+  if (normalizedEndpoint === '/api/cart/clear') {
+    return API_ENDPOINTS.VERCEL.CART_CLEAR;
+  }
+  if (normalizedEndpoint.startsWith('/api/orders')) {
+    return API_ENDPOINTS.VERCEL.ORDERS;
+  }
+  
+  // Default to Vercel for any other endpoints
+  return `${VERCEL_API_URL}${normalizedEndpoint}`;
 };
 
 // Environment configuration

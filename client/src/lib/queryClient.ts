@@ -1,5 +1,5 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
-import { API_BASE_URL } from "./config";
+import { API_ENDPOINTS, getApiUrl } from "./apiConfig";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -17,11 +17,8 @@ export function buildApiUrl(path: string): string {
     return path;
   }
   
-  // Make sure the path starts with a slash
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-  
-  // Combine with API base URL
-  return `${API_BASE_URL}${normalizedPath}`;
+  // Use our apiConfig to get the correct URL
+  return getApiUrl(path);
 }
 
 export async function apiRequest(
