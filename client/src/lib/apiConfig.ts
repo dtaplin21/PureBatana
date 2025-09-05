@@ -46,36 +46,37 @@ export const getApiUrl = (endpoint: string) => {
     return API_ENDPOINTS.STRIPE.TEST;
   }
   
-  // Handle specific Vercel endpoints
+  // ALL OTHER ENDPOINTS NOW GO TO RENDER BACKEND
+  // Handle specific Render endpoints
   if (normalizedEndpoint === '/api/products') {
-    return API_ENDPOINTS.VERCEL.PRODUCTS;
+    return `${RENDER_API_URL}/api/products`;
   }
   if (normalizedEndpoint.startsWith('/api/products/') && normalizedEndpoint !== '/api/products') {
     const slug = normalizedEndpoint.replace('/api/products/', '');
-    return API_ENDPOINTS.VERCEL.PRODUCT_BY_SLUG(slug);
+    return `${RENDER_API_URL}/api/products/${slug}`;
   }
   if (normalizedEndpoint === '/api/reviews') {
-    return API_ENDPOINTS.VERCEL.REVIEWS;
+    return `${RENDER_API_URL}/api/reviews`;
   }
   if (normalizedEndpoint.startsWith('/api/reviews/product/')) {
-    const productId = parseInt(normalizedEndpoint.replace('/api/reviews/product/', ''));
-    return API_ENDPOINTS.VERCEL.REVIEWS_BY_PRODUCT(productId);
+    const productId = normalizedEndpoint.replace('/api/reviews/product/', '');
+    return `${RENDER_API_URL}/api/reviews/product/${productId}`;
   }
   if (normalizedEndpoint === '/api/cart/add') {
-    return API_ENDPOINTS.VERCEL.CART_ADD;
+    return `${RENDER_API_URL}/api/cart/add`;
   }
   if (normalizedEndpoint === '/api/cart/remove') {
-    return API_ENDPOINTS.VERCEL.CART_REMOVE;
+    return `${RENDER_API_URL}/api/cart/remove`;
   }
   if (normalizedEndpoint === '/api/cart/clear') {
-    return API_ENDPOINTS.VERCEL.CART_CLEAR;
+    return `${RENDER_API_URL}/api/cart/clear`;
   }
   if (normalizedEndpoint.startsWith('/api/orders')) {
-    return API_ENDPOINTS.VERCEL.ORDERS;
+    return `${RENDER_API_URL}/api/orders`;
   }
   
-  // Default to Vercel for any other endpoints
-  return `${VERCEL_API_URL}${normalizedEndpoint}`;
+  // Default to Render for any other endpoints
+  return `${RENDER_API_URL}${normalizedEndpoint}`;
 };
 
 // Environment configuration

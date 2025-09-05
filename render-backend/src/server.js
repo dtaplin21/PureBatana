@@ -8,6 +8,7 @@ import { dirname, join } from 'path';
 // Import routes
 import stripeRoutes from './routes/stripe.js';
 import healthRoutes from './routes/health.js';
+import dataRoutes from './routes/data.js';
 
 // Load environment variables
 dotenv.config();
@@ -40,6 +41,7 @@ app.use((req, res, next) => {
 
 // Routes
 app.use('/api/stripe', stripeRoutes);
+app.use('/api', dataRoutes);
 app.use('/health', healthRoutes);
 
 // Root endpoint
