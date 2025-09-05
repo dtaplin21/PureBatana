@@ -26,7 +26,7 @@ app.use(helmet({
 }));
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: process.env.FRONTEND_URL || 'https://www.thegrandgaia.com',
   credentials: true
 }));
 
@@ -79,7 +79,7 @@ app.use((err, req, res, next) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Pure Batana Backend running on port ${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔗 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
+  console.log(`🔗 Frontend URL: ${process.env.FRONTEND_URL || 'https://www.thegrandgaia.com'}`);
   console.log(`☁️  Platform: Render`);
   console.log(`📊 Database: ${process.env.DATABASE_URL ? 'Connected' : 'Using mock data'}`);
 });
