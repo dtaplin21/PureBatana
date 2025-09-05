@@ -100,7 +100,8 @@ const EmbeddedCheckoutPage: React.FC = () => {
   const orderTotal = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0) + shippingFee;
 
   useEffect(() => {
-    if (cart.length === 0) {
+    // Only redirect if we're on the checkout page and cart is empty
+    if (cart.length === 0 && window.location.pathname === '/checkout') {
       setLocation('/cart');
     }
   }, [cart, setLocation]);
