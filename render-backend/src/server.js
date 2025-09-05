@@ -8,7 +8,7 @@ import { dirname, join } from 'path';
 // Import routes
 import stripeRoutes from './routes/stripe.js';
 import healthRoutes from './routes/health.js';
-import dataRoutes from './routes/data.js';
+import dataRoutes from './routes/data-simple.js';
 
 // Load environment variables
 dotenv.config();
