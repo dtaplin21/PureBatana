@@ -22,7 +22,7 @@
 4. Select `render-backend` folder
 5. Configure environment variables:
    - `STRIPE_SECRET_KEY`: `sk_live_your_stripe_secret_key_here`
-   - `FRONTEND_URL`: `https://your-vercel-frontend.vercel.app`
+   - `FRONTEND_URL`: `https://thegrandgaia.com`
    - `NODE_ENV`: `production`
 6. Deploy and note the service URL
 
@@ -60,6 +60,7 @@ NODE_ENV=production
 VITE_STRIPE_PUBLIC_KEY=pk_live_your_stripe_publishable_key_here
 VITE_RENDER_API_URL=https://your-render-service.onrender.com
 VITE_USE_RENDER_PAYMENTS=true
+VITE_PRODUCTION_URL=https://thegrandgaia.com
 ```
 
 ## 🧪 Testing Checklist
