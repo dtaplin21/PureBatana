@@ -43,7 +43,7 @@ const mockProducts = [
     name: "Pure Batana Oil",
     slug: "pure-batana-oil",
     description: "Premium 100% pure Batana oil for hair and skin care",
-    price: "29.95",
+    price: 29.95,
     imageUrl: "/images/batana-front.jpg",
     inStock: true,
     reviewCount: 15,
@@ -92,6 +92,7 @@ router.get('/products', async (req, res) => {
         
         return {
           ...product,
+          price: parseFloat(product.price), // Convert decimal to number
           reviewCount: reviewCount[0]?.count || 0
         };
       })
@@ -153,6 +154,7 @@ router.get('/products/:slug', async (req, res) => {
     
     const productWithReviewCount = {
       ...product[0],
+      price: parseFloat(product[0].price), // Convert decimal to number
       reviewCount: reviewCount[0]?.count || 0
     };
     
