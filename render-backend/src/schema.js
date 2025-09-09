@@ -18,6 +18,7 @@ export const reviews = pgTable('reviews', {
   productId: integer('product_id').notNull().references(() => products.id),
   rating: integer('rating').notNull(),
   comment: text('comment'),
+  customerName: text('customer_name'),
   createdAt: timestamp('created_at').defaultNow()
 });
 

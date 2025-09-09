@@ -3,8 +3,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
+import { API_ENDPOINTS } from "@/lib/apiConfig";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -64,14 +64,24 @@ export default function ReviewForm({
 
   const onSubmit = async (values: z.infer<typeof reviewSchema>) => {
     try {
-      await apiRequest("POST", "/api/reviews", {
-        // Always use the first product (Pure Batana Oil) for reviews
-        productId: 1,
-        rating: parseInt(values.rating),
-        comment: values.comment,
-        customerName: values.customerName || null,
-        // User ID will be handled on server based on session
+      const response = await fetch(API_ENDPOINTS.RENDER.REVIEWS, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          // Always use the first product (Pure Batana Oil) for reviews
+          productId: 1,
+          rating: parseInt(values.rating),
+          comment: values.comment,
+          customerName: values.customerName || null,
+          // User ID will be handled on server based on session
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
 
       toast({
         title: "Review submitted",
@@ -110,9 +120,9 @@ export default function ReviewForm({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="text-[#3a5a40] text-xl">Write a Review</DialogTitle>
-          <p className="text-sm text-muted-foreground mt-1">
+          <DialogDescription className="text-sm text-muted-foreground mt-1">
             Share your experience with Pure Batana Oil
-          </p>
+          </DialogDescription>
         </DialogHeader>
         
         <Form {...form}>

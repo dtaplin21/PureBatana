@@ -25,7 +25,7 @@ export default function RecentReviews() {
   const { toast } = useToast();
   
   // Fetch reviews from API
-  const { data: reviews, isLoading, error } = useQuery<Review[]>({
+  const { data: reviews, isLoading, error, refetch } = useQuery<Review[]>({
     queryKey: ['/api/reviews'],
     queryFn: async () => {
       const response = await fetch(API_ENDPOINTS.RENDER.REVIEWS);
@@ -35,8 +35,10 @@ export default function RecentReviews() {
       const result = await response.json();
       return result.data || result; // Handle different response formats
     },
-    retry: 2,
+    retry: 3, // Retry up to 3 times
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
     staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: true, // Retry when window regains focus
   });
 
   const deleteReviewMutation = useMutation({
@@ -78,8 +80,18 @@ export default function RecentReviews() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="font-display font-bold text-3xl md:text-4xl text-[#3a5a40] mb-4">Customer Reviews</h2>
-            <p className="text-red-600 mb-4">Unable to load reviews</p>
-            <p className="text-neutral-600">Please check your connection and try again.</p>
+            <div className="mb-6">
+              <i className="fas fa-exclamation-triangle text-yellow-500 text-4xl mb-4"></i>
+              <p className="text-red-600 mb-2">Unable to load reviews</p>
+              <p className="text-neutral-600 mb-4">This might be due to a network issue.</p>
+            </div>
+            <button 
+              onClick={() => refetch()}
+              className="bg-[#3a5a40] hover:bg-[#588157] text-white font-medium py-2 px-6 rounded-full transition-colors"
+            >
+              <i className="fas fa-redo mr-2"></i>
+              Try Again
+            </button>
           </div>
         </div>
       </section>

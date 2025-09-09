@@ -30,19 +30,33 @@ router.get('/products', async (req, res) => {
   }
 });
 
-// Get product by ID
-router.get('/products/:id', async (req, res) => {
+// Get product by ID or slug (handles both cases)
+router.get('/products/:slug', async (req, res) => {
   try {
-    const { id } = req.params;
-    const product = await db.select().from(products).where(eq(products.id, parseInt(id)));
+    const { slug } = req.params;
     
-    if (product.length === 0) {
-      return res.status(404).json({ error: 'Product not found' });
+    // Check if slug is a number (ID) or string (slug)
+    if (!isNaN(parseInt(slug))) {
+      // It's an ID, use the ID route
+      const product = await db.select().from(products).where(eq(products.id, parseInt(slug)));
+      
+      if (product.length === 0) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+      
+      return res.json(product[0]);
+    } else {
+      // It's a slug, use slug lookup
+      const product = await db.select().from(products).where(eq(products.slug, slug));
+      
+      if (product.length === 0) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+      
+      return res.json(product[0]);
     }
-    
-    res.json(product[0]);
   } catch (error) {
-    console.error('Error fetching product:', error);
+    console.error('Error fetching product by slug:', error);
     res.status(500).json({ error: 'Failed to fetch product' });
   }
 });

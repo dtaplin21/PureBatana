@@ -1,5 +1,6 @@
 import { Link } from "@/lib/routing";
 import { Button } from "@/components/ui/button";
+import ReviewForm from "@/components/ReviewForm";
 
 export default function Testimonials() {
   // Empty testimonials array - no hardcoded testimonials
@@ -40,12 +41,15 @@ export default function Testimonials() {
         )}
         
         <div className="mt-12 text-center">
-          <Link href="/reviews">
-            <Button variant="outline" className="text-[#3a5a40] border-neutral-200 font-medium py-3 px-8 rounded-full inline-flex items-center">
-              Write a Review
-              <i className="fas fa-arrow-right ml-2"></i>
-            </Button>
-          </Link>
+          <ReviewForm 
+            products={[]} 
+            buttonClassName="text-[#3a5a40] border-neutral-200 font-medium py-3 px-8 rounded-full inline-flex items-center"
+            buttonVariant="outline"
+            onSuccess={() => {
+              // Refresh the page data after a successful review submission
+              window.scrollTo(0, 0);
+            }}
+          />
         </div>
       </div>
     </section>

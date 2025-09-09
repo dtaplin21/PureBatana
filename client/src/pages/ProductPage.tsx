@@ -9,6 +9,7 @@ import QuantitySelector from "@/components/QuantitySelector";
 import { Badge } from "@/components/ui/badge";
 import { format } from 'date-fns';
 import { API_ENDPOINTS } from "@/lib/apiConfig";
+import ReviewForm from "@/components/ReviewForm";
 
 // Extended type for product with review count
 type ProductWithMeta = Product & {
@@ -239,9 +240,15 @@ export default function ProductPage() {
           {product.reviewCount === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-500 mb-4">Be the first to review this product</p>
-              <button className="bg-[#3a5a40] hover:bg-[#588157] text-white font-medium py-2 px-6 rounded-full transition-colors">
-                Write a Review
-              </button>
+              <ReviewForm 
+                products={[product]} 
+                buttonClassName="bg-[#3a5a40] hover:bg-[#588157] text-white font-medium py-2 px-6 rounded-full transition-colors"
+                productId={product.id}
+                onSuccess={() => {
+                  // Refresh the page data after a successful review submission
+                  window.scrollTo(0, 0);
+                }}
+              />
             </div>
           ) : (
             <div className="max-w-4xl mx-auto">
@@ -296,12 +303,6 @@ export default function ProductPage() {
                   <p className="text-gray-500">No reviews available at this moment.</p>
                 </div>
               )}
-              
-              <div className="text-center mt-8">
-                <button className="bg-[#3a5a40] hover:bg-[#588157] text-white font-medium py-2 px-6 rounded-full transition-colors">
-                  Write a Review
-                </button>
-              </div>
             </div>
           )}
         </div>

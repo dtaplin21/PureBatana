@@ -45,7 +45,7 @@ export default function ReviewsPage() {
   const filteredProductId = null;
   
   // Fetch all reviews
-  const { data: reviews, isLoading, isError } = useQuery({
+  const { data: reviews, isLoading, isError, refetch: refetchReviews } = useQuery({
     queryKey: ['/api/reviews'],
     queryFn: async () => {
       const response = await fetch(API_ENDPOINTS.RENDER.REVIEWS);
@@ -54,11 +54,15 @@ export default function ReviewsPage() {
       }
       const result = await response.json();
       return result.data || result; // Handle different response formats
-    }
+    },
+    retry: 3, // Retry up to 3 times
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: true, // Retry when window regains focus
   });
   
   // Fetch products for filtering
-  const { data: products } = useQuery<Product[]>({
+  const { data: products, refetch: refetchProducts } = useQuery<Product[]>({
     queryKey: ['/api/products'],
     queryFn: async () => {
       const response = await fetch(API_ENDPOINTS.RENDER.PRODUCTS);
@@ -67,7 +71,11 @@ export default function ReviewsPage() {
       }
       const result = await response.json();
       return result.data || result; // Handle different response formats
-    }
+    },
+    retry: 3, // Retry up to 3 times
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: true, // Retry when window regains focus
   });
 
   const deleteReviewMutation = useMutation({
@@ -207,6 +215,29 @@ export default function ReviewsPage() {
               )}
             </div>
           ))
+        ) : isError ? (
+          <div className="col-span-2 text-center py-12">
+            <div className="mb-4">
+              <i className="fas fa-exclamation-triangle text-yellow-500 text-4xl mb-4"></i>
+              <h3 className="text-lg font-semibold text-neutral-800 mb-2">Error Loading Reviews</h3>
+              <p className="text-neutral-500 mb-4">We couldn't load the reviews. This might be due to a network issue.</p>
+            </div>
+            <div className="space-x-4">
+              <Button 
+                onClick={() => {
+                  refetchReviews();
+                  refetchProducts();
+                }}
+                className="bg-[#3a5a40] hover:bg-[#588157]"
+              >
+                <i className="fas fa-redo mr-2"></i>
+                Try Again
+              </Button>
+              <Link href="/">
+                <Button variant="outline">Return to Home</Button>
+              </Link>
+            </div>
+          </div>
         ) : (
           <div className="col-span-2 text-center py-12">
             <p className="text-neutral-500 mb-4">No reviews found{filteredProductId !== null ? ' for this product' : ''}.</p>
