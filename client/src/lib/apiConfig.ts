@@ -1,5 +1,5 @@
 // API Configuration for Render Backend
-const RENDER_API_URL = import.meta.env.VITE_RENDER_API_URL || 'https://purebatana.onrender.com';
+const RENDER_API_URL = import.meta.env.VITE_RENDER_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://purebatana.onrender.com');
 const VERCEL_API_URL = window.location.origin;
 
 export const API_ENDPOINTS = {
