@@ -5,8 +5,7 @@ import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 import dotenv from "dotenv";
 
-// Load environment variables
-dotenv.config();
+// Vite automatically loads .env.local files from the root directory
 
 export default defineConfig({
   plugins: [
@@ -34,8 +33,6 @@ export default defineConfig({
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
   },
-  // Embed environment variables at build time
-  define: {
-    'import.meta.env.VITE_STRIPE_PUBLIC_KEY': JSON.stringify(process.env.VITE_STRIPE_PUBLIC_KEY),
-  },
+  // Vite will automatically load VITE_* environment variables
+  // No need for define object as Vite handles this automatically
 });
