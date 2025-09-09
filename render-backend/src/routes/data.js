@@ -413,16 +413,25 @@ router.get('/reviews/product/:productId', async (req, res) => {
 // Add review
 router.post('/reviews', async (req, res) => {
   try {
-    const { userId, productId, rating, comment } = req.body;
-    console.log('Adding new review:', { userId, productId, rating, comment });
+    const { productId, rating, comment, customerName } = req.body;
+    console.log('Adding new review:', { productId, rating, comment, customerName });
+    
+    // Validate required fields
+    if (!productId || !rating) {
+      return res.status(400).json({
+        success: false,
+        error: 'Product ID and rating are required'
+      });
+    }
     
     const newReview = await db
       .insert(reviews)
       .values({
-        userId: parseInt(userId),
+        userId: 1, // Default user ID for anonymous reviews
         productId: parseInt(productId),
         rating: parseInt(rating),
-        comment: comment,
+        comment: comment || null,
+        customerName: customerName || 'Anonymous',
         createdAt: new Date()
       })
       .returning();

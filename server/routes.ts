@@ -291,15 +291,68 @@ router.get('/products/:productId/reviews', async (req, res) => {
   }
 });
 
+// Helper function to ensure default user exists
+const ensureDefaultUser = async () => {
+  try {
+    // Check if user with ID 1 exists
+    const existingUser = await db.select().from(users).where(eq(users.id, 1)).limit(1);
+    
+    if (existingUser.length === 0) {
+      // Create default user (let database assign ID)
+      const newUser = await db.insert(users).values({
+        username: 'anonymous',
+        password: 'default_password',
+        email: 'anonymous@example.com',
+        firstName: 'Anonymous',
+        lastName: 'User'
+      }).returning();
+      
+      console.log('Created default user with ID:', newUser[0].id);
+      return newUser[0].id;
+    }
+    return 1; // User already exists
+  } catch (error) {
+    console.error('Error ensuring default user:', error);
+    return 1; // Fallback to ID 1
+  }
+};
+
 // Create review
 router.post('/reviews', async (req, res) => {
   try {
-    const reviewData = req.body;
-    const newReview = await db.insert(reviews).values(reviewData).returning();
-    res.status(201).json(newReview[0]);
+    const { productId, rating, comment, customerName } = req.body;
+    console.log('Adding new review:', { productId, rating, comment, customerName });
+    
+    // Validate required fields
+    if (!productId || !rating) {
+      return res.status(400).json({
+        success: false,
+        error: 'Product ID and rating are required'
+      });
+    }
+    
+    // For anonymous reviews, we'll use null for userId
+    // This requires the database schema to allow null user_id
+    const newReview = await db.insert(reviews).values({
+      userId: null, // Anonymous review - no user required
+      productId: parseInt(productId),
+      rating: parseInt(rating),
+      comment: comment || null,
+      customerName: customerName || 'Anonymous',
+      createdAt: new Date()
+    }).returning();
+    
+    res.status(201).json({
+      success: true,
+      data: newReview[0]
+    });
   } catch (error) {
     console.error('Error creating review:', error);
-    res.status(500).json({ error: 'Failed to create review' });
+    res.status(500).json({ 
+      success: false,
+      error: 'Failed to create review',
+      details: error.message 
+    });
   }
 });
 

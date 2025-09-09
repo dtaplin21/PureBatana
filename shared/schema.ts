@@ -99,7 +99,7 @@ export const insertCartItemSchema = createInsertSchema(cartItems).omit({
 // Reviews table
 export const reviews = pgTable("reviews", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  userId: integer("user_id").references(() => users.id, { onDelete: "set null" }),
   productId: integer("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
   rating: integer("rating").notNull(), // Integer rating from 1-5
   comment: text("comment"),
