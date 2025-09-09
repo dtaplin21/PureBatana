@@ -48,9 +48,12 @@ export default function ReviewsPage() {
   const { data: reviews, isLoading, isError } = useQuery({
     queryKey: ['/api/reviews'],
     queryFn: async () => {
-      const response = await apiRequest("GET", "/api/reviews");
-      const data = await response.json();
-      return data as Review[];
+      const response = await fetch(API_ENDPOINTS.RENDER.REVIEWS);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+      const result = await response.json();
+      return result.data || result; // Handle different response formats
     }
   });
   
@@ -58,9 +61,12 @@ export default function ReviewsPage() {
   const { data: products } = useQuery<Product[]>({
     queryKey: ['/api/products'],
     queryFn: async () => {
-      const response = await apiRequest("GET", "/api/products");
-      const data = await response.json();
-      return data as Product[];
+      const response = await fetch(API_ENDPOINTS.RENDER.PRODUCTS);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+      const result = await response.json();
+      return result.data || result; // Handle different response formats
     }
   });
 
@@ -185,13 +191,18 @@ export default function ReviewsPage() {
               <p className="text-neutral-700">{review.comment}</p>
               
               {/* Show product info if in "All Products" view */}
-              {filteredProductId === null && products && (
+              {filteredProductId === null && products && Array.isArray(products) && (
                 <div className="mt-4 pt-4 border-t border-neutral-100">
-                  <Link href={`/product/${products.find((p: Product) => p.id === review.productId)?.slug || ''}`}>
-                    <span className="text-sm font-medium text-[#3a5a40] hover:underline">
-                      {products.find((p: Product) => p.id === review.productId)?.name || 'Unknown Product'}
-                    </span>
-                  </Link>
+                  {(() => {
+                    const product = products.find((p: Product) => p.id === review.productId);
+                    return (
+                      <Link href={`/product/${product?.slug || ''}`}>
+                        <span className="text-sm font-medium text-[#3a5a40] hover:underline">
+                          {product?.name || 'Unknown Product'}
+                        </span>
+                      </Link>
+                    );
+                  })()}
                 </div>
               )}
             </div>
@@ -212,7 +223,7 @@ export default function ReviewsPage() {
             Continue Shopping
           </Button>
         </Link>
-        {products && <ReviewForm 
+        {products && Array.isArray(products) && <ReviewForm 
           products={products} 
           buttonClassName="bg-[#3a5a40] hover:bg-[#588157]"
           onSuccess={() => {
