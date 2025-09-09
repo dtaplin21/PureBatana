@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "@/lib/routing";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { API_ENDPOINTS } from "@/lib/apiConfig";
 import { Trash2 } from "lucide-react";
 
 type Review = {
@@ -22,8 +23,20 @@ type Review = {
 
 export default function RecentReviews() {
   const { toast } = useToast();
-  const { data: reviews, isLoading } = useQuery<Review[]>({
+  
+  // Fetch reviews from API
+  const { data: reviews, isLoading, error } = useQuery<Review[]>({
     queryKey: ['/api/reviews'],
+    queryFn: async () => {
+      const response = await fetch(API_ENDPOINTS.RENDER.REVIEWS);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+      const result = await response.json();
+      return result.data || result; // Handle different response formats
+    },
+    retry: 2,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const deleteReviewMutation = useMutation({
@@ -53,6 +66,20 @@ export default function RecentReviews() {
           <div className="text-center mb-12">
             <h2 className="font-display font-bold text-3xl md:text-4xl text-[#3a5a40] mb-4">Customer Reviews</h2>
             <p className="text-neutral-600">Loading reviews...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="py-16 md:py-24 bg-neutral-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="font-display font-bold text-3xl md:text-4xl text-[#3a5a40] mb-4">Customer Reviews</h2>
+            <p className="text-red-600 mb-4">Unable to load reviews</p>
+            <p className="text-neutral-600">Please check your connection and try again.</p>
           </div>
         </div>
       </section>

@@ -7,5 +7,6 @@
       "source": "/((?!assets|images|favicon.ico|.*\\..*).*)",
       "destination": "/index.html"
     }
-  ]
+  ],
+  "domains": ["thegrandgaia.com", "www.thegrandgaia.com"]
 }

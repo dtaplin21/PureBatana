@@ -12,7 +12,19 @@ export const API_ENDPOINTS = {
     GET_CHECKOUT_SESSION: (id: string) => `${RENDER_API_URL}/api/stripe/checkout-session/${id}`,
   },
   
-  // Vercel endpoints (existing)
+  // Render backend endpoints (production)
+  RENDER: {
+    PRODUCTS: `${RENDER_API_URL}/api/products`,
+    PRODUCT_BY_SLUG: (slug: string) => `${RENDER_API_URL}/api/products/${slug}`,
+    REVIEWS: `${RENDER_API_URL}/api/reviews`,
+    REVIEWS_BY_PRODUCT: (productId: number) => `${RENDER_API_URL}/api/reviews/product/${productId}`,
+    CART_ADD: `${RENDER_API_URL}/api/cart/add`,
+    CART_REMOVE: `${RENDER_API_URL}/api/cart/remove`,
+    CART_CLEAR: `${RENDER_API_URL}/api/cart/clear`,
+    ORDERS: `${RENDER_API_URL}/api/orders`,
+  },
+  
+  // Vercel endpoints (fallback)
   VERCEL: {
     PRODUCTS: `${VERCEL_API_URL}/api/products`,
     PRODUCT_BY_SLUG: (slug: string) => `${VERCEL_API_URL}/api/products/${slug}`,
