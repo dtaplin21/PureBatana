@@ -74,15 +74,40 @@ router.get('/products', async (req, res) => {
     
     if (!db) {
       console.log('📦 Using mock data (no database connection)');
+      // Transform mock data to match frontend Product type
+      const transformedMockProducts = mockProducts.map(product => ({
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        description: product.description,
+        shortDescription: product.description.substring(0, 100) + '...',
+        price: parseFloat(product.price), // Convert string to number
+        images: [product.imageUrl || '/images/batana-front.jpg'],
+        category: 'skincare',
+        stock: product.inStock ? 100 : 0,
+        featured: false,
+        benefits: [
+          '100% Pure and Natural',
+          'Cold-Pressed Extraction',
+          'Rich in Essential Fatty Acids',
+          'Moisturizes and Nourishes'
+        ],
+        usage: 'Apply a few drops to clean skin or hair. Massage gently until absorbed.',
+        isBestseller: false,
+        isNew: true,
+        viewCount: 0,
+        reviewCount: product.reviewCount || 0
+      }));
+      
       return res.json({
         success: true,
-        data: mockProducts
+        data: transformedMockProducts
       });
     }
     
     const allProducts = await db.select().from(products);
     
-    // Add review count to each product
+    // Add review count to each product and transform to match frontend Product type
     const productsWithReviewCount = await Promise.all(
       allProducts.map(async (product) => {
         const reviewCount = await db
@@ -91,8 +116,26 @@ router.get('/products', async (req, res) => {
           .where(eq(reviews.productId, product.id));
         
         return {
-          ...product,
+          id: product.id,
+          name: product.name,
+          slug: product.slug,
+          description: product.description,
+          shortDescription: product.shortDescription || product.description.substring(0, 100) + '...',
           price: parseFloat(product.price), // Convert decimal to number
+          images: product.images || [product.imageUrl || '/images/batana-front.jpg'],
+          category: product.category || 'skincare',
+          stock: product.stock || (product.inStock ? 100 : 0),
+          featured: product.featured || false,
+          benefits: product.benefits || [
+            '100% Pure and Natural',
+            'Cold-Pressed Extraction',
+            'Rich in Essential Fatty Acids',
+            'Moisturizes and Nourishes'
+          ],
+          usage: product.usage || 'Apply a few drops to clean skin or hair. Massage gently until absorbed.',
+          isBestseller: product.isBestseller || false,
+          isNew: product.isNew || false,
+          viewCount: product.viewCount || 0,
           reviewCount: reviewCount[0]?.count || 0
         };
       })
@@ -105,9 +148,35 @@ router.get('/products', async (req, res) => {
   } catch (error) {
     console.error('❌ Error fetching products:', error);
     console.log('📦 Falling back to mock data');
+    
+    // Transform mock data to match frontend Product type
+    const transformedMockProducts = mockProducts.map(product => ({
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      description: product.description,
+      shortDescription: product.description.substring(0, 100) + '...',
+      price: parseFloat(product.price), // Convert string to number
+      images: [product.imageUrl || '/images/batana-front.jpg'],
+      category: 'skincare',
+      stock: product.inStock ? 100 : 0,
+      featured: false,
+      benefits: [
+        '100% Pure and Natural',
+        'Cold-Pressed Extraction',
+        'Rich in Essential Fatty Acids',
+        'Moisturizes and Nourishes'
+      ],
+      usage: 'Apply a few drops to clean skin or hair. Massage gently until absorbed.',
+      isBestseller: false,
+      isNew: true,
+      viewCount: 0,
+      reviewCount: product.reviewCount || 0
+    }));
+    
     res.json({
       success: true,
-      data: mockProducts
+      data: transformedMockProducts
     });
   }
 });
@@ -127,9 +196,35 @@ router.get('/products/:slug', async (req, res) => {
           error: 'Product not found'
         });
       }
+      
+      // Transform mock data to match frontend Product type
+      const transformedProduct = {
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        description: product.description,
+        shortDescription: product.description.substring(0, 100) + '...',
+        price: parseFloat(product.price), // Convert string to number
+        images: [product.imageUrl || '/images/batana-front.jpg'],
+        category: 'skincare',
+        stock: product.inStock ? 100 : 0,
+        featured: false,
+        benefits: [
+          '100% Pure and Natural',
+          'Cold-Pressed Extraction',
+          'Rich in Essential Fatty Acids',
+          'Moisturizes and Nourishes'
+        ],
+        usage: 'Apply a few drops to clean skin or hair. Massage gently until absorbed.',
+        isBestseller: false,
+        isNew: true,
+        viewCount: 0,
+        reviewCount: product.reviewCount || 0
+      };
+      
       return res.json({
         success: true,
-        data: product
+        data: transformedProduct
       });
     }
     
@@ -153,8 +248,26 @@ router.get('/products/:slug', async (req, res) => {
       .where(eq(reviews.productId, product[0].id));
     
     const productWithReviewCount = {
-      ...product[0],
+      id: product[0].id,
+      name: product[0].name,
+      slug: product[0].slug,
+      description: product[0].description,
+      shortDescription: product[0].shortDescription || product[0].description.substring(0, 100) + '...',
       price: parseFloat(product[0].price), // Convert decimal to number
+      images: product[0].images || [product[0].imageUrl || '/images/batana-front.jpg'],
+      category: product[0].category || 'skincare',
+      stock: product[0].stock || (product[0].inStock ? 100 : 0),
+      featured: product[0].featured || false,
+      benefits: product[0].benefits || [
+        '100% Pure and Natural',
+        'Cold-Pressed Extraction',
+        'Rich in Essential Fatty Acids',
+        'Moisturizes and Nourishes'
+      ],
+      usage: product[0].usage || 'Apply a few drops to clean skin or hair. Massage gently until absorbed.',
+      isBestseller: product[0].isBestseller || false,
+      isNew: product[0].isNew || false,
+      viewCount: product[0].viewCount || 0,
       reviewCount: reviewCount[0]?.count || 0
     };
     
@@ -172,9 +285,35 @@ router.get('/products/:slug', async (req, res) => {
         error: 'Product not found'
       });
     }
+    
+    // Transform mock data to match frontend Product type
+    const transformedProduct = {
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      description: product.description,
+      shortDescription: product.description.substring(0, 100) + '...',
+      price: parseFloat(product.price), // Convert string to number
+      images: [product.imageUrl || '/images/batana-front.jpg'],
+      category: 'skincare',
+      stock: product.inStock ? 100 : 0,
+      featured: false,
+      benefits: [
+        '100% Pure and Natural',
+        'Cold-Pressed Extraction',
+        'Rich in Essential Fatty Acids',
+        'Moisturizes and Nourishes'
+      ],
+      usage: 'Apply a few drops to clean skin or hair. Massage gently until absorbed.',
+      isBestseller: false,
+      isNew: true,
+      viewCount: 0,
+      reviewCount: product.reviewCount || 0
+    };
+    
     res.json({
       success: true,
-      data: product
+      data: transformedProduct
     });
   }
 });
