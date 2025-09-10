@@ -382,16 +382,46 @@ router.put('/reviews/:id', async (req, res) => {
 router.delete('/reviews/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await db.delete(reviews).where(eq(reviews.id, parseInt(id)));
+    const { userId, isAdmin } = req.body;
+    console.log(`Deleting review ${id} for user ${userId}, admin: ${isAdmin}`);
     
-    if (result.rowCount === 0) {
-      return res.status(404).json({ error: 'Review not found' });
+    let result;
+    
+    if (isAdmin) {
+      // Admin can delete any review
+      result = await db.delete(reviews).where(eq(reviews.id, parseInt(id)));
+    } else {
+      // Regular users can only delete their own reviews
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          error: 'User ID required for review deletion'
+        });
+      }
+      
+      result = await db.delete(reviews).where(and(
+        eq(reviews.id, parseInt(id)),
+        eq(reviews.userId, parseInt(userId))
+      ));
     }
     
-    res.json({ message: 'Review deleted successfully' });
+    if (result.rowCount === 0) {
+      return res.status(404).json({ 
+        success: false,
+        error: 'Review not found or not authorized' 
+      });
+    }
+    
+    res.json({ 
+      success: true,
+      message: 'Review deleted successfully' 
+    });
   } catch (error) {
     console.error('Error deleting review:', error);
-    res.status(500).json({ error: 'Failed to delete review' });
+    res.status(500).json({ 
+      success: false,
+      error: 'Failed to delete review' 
+    });
   }
 });
 

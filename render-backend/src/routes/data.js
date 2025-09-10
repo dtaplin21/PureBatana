@@ -454,16 +454,34 @@ router.post('/reviews', async (req, res) => {
 router.delete('/reviews/:reviewId', async (req, res) => {
   try {
     const { reviewId } = req.params;
-    const { userId } = req.body;
-    console.log(`Deleting review ${reviewId} for user ${userId}`);
+    const { userId, isAdmin } = req.body;
+    console.log(`Deleting review ${reviewId} for user ${userId}, admin: ${isAdmin}`);
     
-    const deletedReview = await db
-      .delete(reviews)
-      .where(and(
-        eq(reviews.id, parseInt(reviewId)),
-        eq(reviews.userId, parseInt(userId))
-      ))
-      .returning();
+    let deletedReview;
+    
+    if (isAdmin) {
+      // Admin can delete any review
+      deletedReview = await db
+        .delete(reviews)
+        .where(eq(reviews.id, parseInt(reviewId)))
+        .returning();
+    } else {
+      // Regular users can only delete their own reviews
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          error: 'User ID required for review deletion'
+        });
+      }
+      
+      deletedReview = await db
+        .delete(reviews)
+        .where(and(
+          eq(reviews.id, parseInt(reviewId)),
+          eq(reviews.userId, parseInt(userId))
+        ))
+        .returning();
+    }
     
     if (deletedReview.length === 0) {
       return res.status(404).json({
