@@ -399,10 +399,28 @@ router.delete('/reviews/:id', async (req, res) => {
         });
       }
       
-      result = await db.delete(reviews).where(and(
-        eq(reviews.id, parseInt(id)),
-        eq(reviews.userId, parseInt(userId))
-      ));
+      console.log(`Attempting to delete review ${id} for user ${userId}`);
+      
+      // First, check if the review exists and belongs to the user
+      const existingReview = await db.select().from(reviews).where(eq(reviews.id, parseInt(id)));
+      console.log(`Found review:`, existingReview[0]);
+      
+      if (existingReview.length === 0) {
+        return res.status(404).json({
+          success: false,
+          error: 'Review not found'
+        });
+      }
+      
+      if (existingReview[0].userId !== parseInt(userId)) {
+        return res.status(403).json({
+          success: false,
+          error: 'Not authorized to delete this review'
+        });
+      }
+      
+      result = await db.delete(reviews).where(eq(reviews.id, parseInt(id)));
+      console.log(`Delete result: ${result.rowCount} rows affected`);
     }
     
     if (result.rowCount === 0) {
