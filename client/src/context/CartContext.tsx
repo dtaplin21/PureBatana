@@ -92,8 +92,13 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     setCart([]);
   };
 
-  // Calculate cart total (convert cents to dollars)
-  const cartTotal = cart.reduce((total, item) => total + (item.product.price * item.quantity / 100), 0);
+  // Calculate cart total (convert cents to dollars, handle both formats)
+  const cartTotal = cart.reduce((total, item) => {
+    // If price is less than 100, assume it's already in dollars
+    // If price is 100 or more, assume it's in cents and convert
+    const priceInDollars = item.product.price < 100 ? item.product.price : item.product.price / 100;
+    return total + (priceInDollars * item.quantity);
+  }, 0);
   
   // Calculate total number of items
   const cartCount = cart.reduce((count, item) => count + item.quantity, 0);

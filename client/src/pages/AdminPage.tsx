@@ -407,7 +407,7 @@ export default function AdminPage() {
                       )}
                     </div>
                     <div className="flex-1">
-                      <p className="mb-2 text-sm text-gray-600">Current Price: ${(product.price / 100).toFixed(2)}</p>
+                      <p className="mb-2 text-sm text-gray-600">Current Price: ${(product.price < 100 ? product.price : product.price / 100).toFixed(2)}</p>
                       <div className="flex gap-2 items-center">
                         <label htmlFor={`price-${product.id}`} className="text-sm font-medium">
                           New Price ($):

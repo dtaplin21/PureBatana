@@ -10,7 +10,8 @@ interface CartItemProps {
 
 export default function CartItem({ item, onRemove, onUpdateQuantity }: CartItemProps) {
   const { product, quantity } = item;
-  const totalPrice = (product.price * quantity) / 100;
+  const priceInDollars = product.price < 100 ? product.price : product.price / 100;
+  const totalPrice = priceInDollars * quantity;
   
   return (
     <div className="p-4 border-b border-neutral-100 flex flex-col md:grid md:grid-cols-12 gap-4 items-center">
@@ -42,7 +43,7 @@ export default function CartItem({ item, onRemove, onUpdateQuantity }: CartItemP
       
       <div className="col-span-2 text-center">
         <div className="md:hidden text-sm text-neutral-500 mb-1">Price:</div>
-        <span className="font-medium">${(product.price / 100).toFixed(2)}</span>
+        <span className="font-medium">${priceInDollars.toFixed(2)}</span>
       </div>
       
       <div className="col-span-2 flex justify-center">

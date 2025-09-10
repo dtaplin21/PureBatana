@@ -56,7 +56,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           <p className="text-neutral-600 mb-4">{product.shortDescription}</p>
         </Link>
         <div className="flex justify-between items-center">
-          <p className="font-display font-bold text-lg">${(product.price / 100).toFixed(2)}</p>
+          <p className="font-display font-bold text-lg">${(product.price < 100 ? product.price : product.price / 100).toFixed(2)}</p>
           <button 
             className="bg-[#3a5a40] hover:bg-[#588157] text-white py-2 px-4 rounded-full transition-colors text-sm"
             onClick={handleAddToCart}

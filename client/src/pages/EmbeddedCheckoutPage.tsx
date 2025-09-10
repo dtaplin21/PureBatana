@@ -97,7 +97,10 @@ const EmbeddedCheckoutPage: React.FC = () => {
   
   // Fixed shipping fee
   const shippingFee = 5.95;
-  const orderTotal = cart.reduce((sum, item) => sum + (item.product.price * item.quantity / 100), 0) + shippingFee;
+  const orderTotal = cart.reduce((sum, item) => {
+    const priceInDollars = item.product.price < 100 ? item.product.price : item.product.price / 100;
+    return sum + (priceInDollars * item.quantity);
+  }, 0) + shippingFee;
 
   useEffect(() => {
     // Only redirect if we're on the checkout page and cart is empty
@@ -389,7 +392,7 @@ const EmbeddedCheckoutPage: React.FC = () => {
                       <span className="font-medium mr-2">{item.quantity} ×</span>
                       <span>{item.product.name}</span>
                     </div>
-                    <span>${(item.product.price * item.quantity / 100).toFixed(2)}</span>
+                    <span>${((item.product.price < 100 ? item.product.price : item.product.price / 100) * item.quantity).toFixed(2)}</span>
                   </div>
                 ))}
               </div>

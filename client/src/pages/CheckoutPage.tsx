@@ -456,7 +456,7 @@ export default function CheckoutPage() {
                     <span className="font-medium mr-2">{item.quantity} ×</span>
                     <span>{item.product.name}</span>
                   </div>
-                  <span>${(item.product.price * item.quantity / 100).toFixed(2)}</span>
+                  <span>${((item.product.price < 100 ? item.product.price : item.product.price / 100) * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
             </div>
