@@ -80,7 +80,9 @@ export default function ReviewsPage() {
 
   const deleteReviewMutation = useMutation({
     mutationFn: async (reviewId: number) => {
-      return await apiRequest("DELETE", `/api/reviews/${reviewId}`, { userId: 1 });
+      // For now, use admin privileges to delete any review
+      // In a real app, you'd check if the current user is an admin
+      return await apiRequest("DELETE", `/api/reviews/${reviewId}`, { isAdmin: true });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/reviews'] });
