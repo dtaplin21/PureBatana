@@ -92,8 +92,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     setCart([]);
   };
 
-  // Calculate cart total
-  const cartTotal = cart.reduce((total, item) => total + (item.product.price * item.quantity), 0);
+  // Calculate cart total (convert cents to dollars)
+  const cartTotal = cart.reduce((total, item) => total + (item.product.price * item.quantity / 100), 0);
   
   // Calculate total number of items
   const cartCount = cart.reduce((count, item) => count + item.quantity, 0);

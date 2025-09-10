@@ -97,7 +97,7 @@ const EmbeddedCheckoutPage: React.FC = () => {
   
   // Fixed shipping fee
   const shippingFee = 5.95;
-  const orderTotal = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0) + shippingFee;
+  const orderTotal = cart.reduce((sum, item) => sum + (item.product.price * item.quantity / 100), 0) + shippingFee;
 
   useEffect(() => {
     // Only redirect if we're on the checkout page and cart is empty
@@ -123,7 +123,7 @@ const EmbeddedCheckoutPage: React.FC = () => {
           }));
           
           const response = await paymentService.createPaymentIntent({
-            amount: orderTotal,
+            amount: Math.round(orderTotal * 100), // Convert dollars to cents
             orderItems,
             metadata: {
               email: email,
@@ -389,7 +389,7 @@ const EmbeddedCheckoutPage: React.FC = () => {
                       <span className="font-medium mr-2">{item.quantity} ×</span>
                       <span>{item.product.name}</span>
                     </div>
-                    <span>${(item.product.price * item.quantity).toFixed(2)}</span>
+                    <span>${(item.product.price * item.quantity / 100).toFixed(2)}</span>
                   </div>
                 ))}
               </div>

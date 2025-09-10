@@ -150,7 +150,7 @@ export default function ProductPage() {
                   {product.isBestseller && <Badge className="bg-[#588157] mb-2 mr-2">Bestseller</Badge>}
                   {product.isNew && <Badge className="bg-[#a3b18a] mb-2">New</Badge>}
                 </div>
-                <p className="text-2xl font-display font-bold">${product.price.toFixed(2)}</p>
+                <p className="text-2xl font-display font-bold">${(product.price / 100).toFixed(2)}</p>
               </div>
               
               <div className="mb-8">

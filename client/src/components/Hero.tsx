@@ -144,7 +144,7 @@ export default function Hero() {
             </div>
             <div className="flex items-center mb-8">
               <p className="text-2xl font-display font-bold mr-4">
-                ${product.price.toFixed(2)}
+                ${(product.price / 100).toFixed(2)}
               </p>
               <span className="text-neutral-600">2 oz (60ml)</span>
             </div>

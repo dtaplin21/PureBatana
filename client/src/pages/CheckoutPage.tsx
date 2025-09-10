@@ -176,7 +176,7 @@ export default function CheckoutPage() {
           }));
           
           const response = await paymentService.createPaymentIntent({
-            amount: orderTotal,
+            amount: Math.round(orderTotal * 100), // Convert dollars to cents
             orderItems,
             metadata: {
               email: email,
@@ -456,7 +456,7 @@ export default function CheckoutPage() {
                     <span className="font-medium mr-2">{item.quantity} ×</span>
                     <span>{item.product.name}</span>
                   </div>
-                  <span>${(item.product.price * item.quantity).toFixed(2)}</span>
+                  <span>${(item.product.price * item.quantity / 100).toFixed(2)}</span>
                 </div>
               ))}
             </div>
