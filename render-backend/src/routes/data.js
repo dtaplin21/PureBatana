@@ -570,4 +570,43 @@ router.delete('/cart/clear', async (req, res) => {
   });
 });
 
+// Update product price (admin endpoint)
+router.put('/products/:id/price', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { price } = req.body;
+    
+    if (!price || isNaN(price)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Valid price is required'
+      });
+    }
+    
+    const updatedProduct = await db
+      .update(products)
+      .set({ price: parseInt(price) })
+      .where(eq(products.id, parseInt(id)))
+      .returning();
+    
+    if (updatedProduct.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Product not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: updatedProduct[0]
+    });
+  } catch (error) {
+    console.error('Error updating product price:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update product price'
+    });
+  }
+});
+
 export default router;
