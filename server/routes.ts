@@ -320,7 +320,7 @@ const ensureDefaultUser = async () => {
 // Create review
 router.post('/reviews', async (req, res) => {
   try {
-    const { productId, rating, comment, customerName } = req.body;
+    const { productId, rating, comment, customerName, userId } = req.body;
     console.log('Adding new review:', { productId, rating, comment, customerName });
     
     // Validate required fields
@@ -331,10 +331,9 @@ router.post('/reviews', async (req, res) => {
       });
     }
     
-    // For anonymous reviews, we'll use null for userId
-    // This requires the database schema to allow null user_id
+    // Use provided userId or null for anonymous reviews
     const newReview = await db.insert(reviews).values({
-      userId: null, // Anonymous review - no user required
+      userId: userId || null, // Use provided userId or null for anonymous
       productId: parseInt(productId),
       rating: parseInt(rating),
       comment: comment || null,
