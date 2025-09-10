@@ -140,8 +140,8 @@ router.post('/create-checkout-session', async (req, res) => {
         quantity: item.quantity || 1,
       })),
       mode: 'payment',
-      success_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/cart`,
+      success_url: `${process.env.FRONTEND_URL || 'https://thegrandgaia.com'}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.FRONTEND_URL || 'https://thegrandgaia.com'}/cart`,
       metadata: {
         ...metadata,
         orderItems: JSON.stringify(orderItems),
