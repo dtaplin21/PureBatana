@@ -148,7 +148,7 @@ router.post('/create-checkout-session', async (req, res) => {
         orderTotal: amount.toString(),
         requestId
       },
-      customer_email: metadata.email,
+      // customer_email: metadata.email,
     });
     
     console.log(`[${requestId}] Checkout session created: ${session.id}`);
