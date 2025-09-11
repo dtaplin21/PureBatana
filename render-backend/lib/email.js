@@ -1,13 +1,19 @@
 import sgMail from '@sendgrid/mail';
 
-if (!process.env.SENDGRID_API_KEY) {
-  throw new Error("SENDGRID_API_KEY environment variable must be set");
+// Initialize SendGrid if API key is available
+if (process.env.SENDGRID_API_KEY) {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+} else {
+  console.warn("SENDGRID_API_KEY not set - email functionality disabled");
 }
-
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 export async function sendEmail(params) {
   try {
+    if (!process.env.SENDGRID_API_KEY) {
+      console.warn('SendGrid API key not set - email not sent');
+      return false;
+    }
+    
     const emailData = {
       to: params.to,
       from: params.from,
