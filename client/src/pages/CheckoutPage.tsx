@@ -166,7 +166,12 @@ export default function CheckoutPage() {
       const createPaymentIntent = async () => {
         try {
           setIsSubmitting(true);
-          console.log("Creating payment intent...", { amount: orderTotal, orderItems: cart });
+          console.log("Creating payment intent...", { 
+            orderTotal, 
+            amountInCents: Math.round(orderTotal * 100), 
+            orderItems: cart,
+            calculation: `${orderTotal} * 100 = ${Math.round(orderTotal * 100)}`
+          });
           
           // Create a payment intent by calling your server
           const orderItems = cart.map(item => ({
@@ -175,8 +180,9 @@ export default function CheckoutPage() {
             price: item.product.price
           }));
           
-          const response = await paymentService.createPaymentIntent({
-            amount: Math.round(orderTotal * 100), // Convert dollars to cents
+          const amountInCents = Math.round(orderTotal * 100);
+          const requestData = {
+            amount: amountInCents, // Convert dollars to cents
             orderItems,
             metadata: {
               email: email,
@@ -184,7 +190,16 @@ export default function CheckoutPage() {
               phone: phone,
               shippingAddress: `${address}, ${city}, ${state} ${zip}, ${country}`
             }
+          };
+          
+          console.log("Amount conversion:", {
+            orderTotal,
+            amountInCents,
+            calculation: `${orderTotal} * 100 = ${amountInCents}`,
+            isCorrect: amountInCents >= 50
           });
+          console.log("Sending payment intent request:", requestData);
+          const response = await paymentService.createPaymentIntent(requestData);
           
           console.log("Payment intent response:", response);
           const data = response;

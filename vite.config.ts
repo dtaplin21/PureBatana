@@ -5,7 +5,9 @@ import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 import dotenv from "dotenv";
 
-// Vite automatically loads .env.local files from the root directory
+// Load environment variables from client directory
+dotenv.config({ path: path.resolve(import.meta.dirname, "client", ".env") });
+dotenv.config({ path: path.resolve(import.meta.dirname, "client", ".env.local") });
 
 export default defineConfig({
   plugins: [
