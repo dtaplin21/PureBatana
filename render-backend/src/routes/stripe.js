@@ -1,6 +1,6 @@
 import express from 'express';
 import stripe from '../config/stripe.js';
-import { sendAdminOrderNotification, sendOrderConfirmationEmail } from '../../lib/email.js';
+import { sendAdminOrderNotification, sendOrderConfirmationEmail } from '../../../lib/email.js';
 
 const router = express.Router();
 
