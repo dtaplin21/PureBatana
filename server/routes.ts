@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { db } from './db';
 import { products, users, orders, reviews, cartItems } from '../shared/schema';
 import { eq, and, count } from 'drizzle-orm';
+import { sendAdminOrderNotification, sendOrderConfirmationEmail } from '../lib/email';
 
 const router = express.Router();
 
@@ -589,6 +590,8 @@ router.post('/create-checkout-session', async (req, res) => {
       return res.status(404).json({ error: 'Product not found' });
     }
 
+    const product = productsData[0];
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: items.map((item: any) => ({
@@ -596,7 +599,9 @@ router.post('/create-checkout-session', async (req, res) => {
           currency: 'usd',
           product_data: {
             name: product.name,
-            images: product.images,
+            images: product.images?.map(img => 
+              img.startsWith('http') ? img : `${req.headers.origin}${img}`
+            ) || [],
           },
           unit_amount: Math.round(product.price * 100), // Convert to cents
         },
@@ -644,6 +649,85 @@ router.get('/order-details', async (req, res) => {
     console.error('Error fetching order details:', error);
     res.status(500).json({ error: 'Failed to fetch order details' });
   }
+});
+
+// Stripe Webhook Endpoint
+router.post('/stripe/webhook', express.raw({type: 'application/json'}), async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  
+  let event;
+  
+  try {
+    if (!webhookSecret) {
+      console.error('STRIPE_WEBHOOK_SECRET is not set');
+      return res.status(400).json({ error: 'Webhook secret not configured' });
+    }
+    
+    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+    console.log(`Received webhook event: ${event.type}`);
+    
+  } catch (err) {
+    console.error(`Webhook signature verification failed: ${err.message}`);
+    return res.status(400).json({ error: 'Invalid signature' });
+  }
+  
+  // Handle the checkout.session.completed event
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    console.log(`Processing completed checkout session: ${session.id}`);
+    
+    try {
+      // Extract order information from session metadata
+      const metadata = session.metadata || {};
+      const orderItems = JSON.parse(metadata.orderItems || '[]');
+      const orderTotal = parseFloat(metadata.orderTotal || '0');
+      
+      // Create order data for email notifications
+      const orderData = {
+        orderNumber: session.id.substring(0, 8).toUpperCase(), // Use first 8 chars of session ID
+        customerName: metadata.customerName || session.customer_details?.name || 'Customer',
+        customerEmail: session.customer_details?.email || metadata.email || 'unknown@example.com',
+        items: orderItems.map(item => ({
+          name: `Product ${item.id}`,
+          quantity: item.quantity || 1,
+          price: (item.price || 0) / 100 // Convert cents to dollars
+        })),
+        subtotal: orderTotal - 5.99, // Subtract shipping
+        shipping: 5.99,
+        total: orderTotal,
+        shippingAddress: [
+          session.customer_details?.address?.line1 || '',
+          session.customer_details?.address?.line2 || '',
+          session.customer_details?.address?.city || '',
+          session.customer_details?.address?.state || '',
+          session.customer_details?.address?.postal_code || '',
+          session.customer_details?.address?.country || ''
+        ].filter(Boolean).join(', '),
+        dateCreated: new Date()
+      };
+      
+      console.log('Order data prepared:', orderData);
+      
+      // Send admin notification email
+      const adminEmailSent = await sendAdminOrderNotification(orderData);
+      console.log(`Admin notification email sent: ${adminEmailSent}`);
+      
+      // Send customer confirmation email
+      const customerEmailSent = await sendOrderConfirmationEmail(orderData);
+      console.log(`Customer confirmation email sent: ${customerEmailSent}`);
+      
+      // Log the successful order processing
+      console.log(`✅ Order processed successfully: ${orderData.orderNumber}`);
+      
+    } catch (error) {
+      console.error('Error processing checkout session:', error);
+      // Don't return error to Stripe - we'll log it but acknowledge receipt
+    }
+  }
+  
+  // Return a response to acknowledge receipt of the event
+  res.json({ received: true });
 });
 
 export default router;
