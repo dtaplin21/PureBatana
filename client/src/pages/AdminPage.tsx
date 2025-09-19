@@ -243,8 +243,11 @@ export default function AdminPage() {
     try {
       setUpdating(true);
       
-      const response = await apiRequest('PATCH', `/api/products/${id}`, {
-        price: editedPrices[id]
+      // Convert price to cents for the API
+      const priceInCents = Math.round(editedPrices[id] * 100);
+      
+      const response = await apiRequest('PUT', `/api/products/${id}/price`, {
+        price: priceInCents
       });
       
       if (response.ok) {
