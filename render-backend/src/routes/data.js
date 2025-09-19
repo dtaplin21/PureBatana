@@ -615,4 +615,38 @@ router.put('/products/:id/price', async (req, res) => {
   }
 });
 
+// Diagnostic endpoint to check database connection and table structure
+router.get('/debug/products', async (req, res) => {
+  try {
+    console.log('🔍 Debugging products table...');
+    
+    // Check if products table exists and get its structure
+    const tableInfo = await sql`
+      SELECT column_name, data_type, is_nullable 
+      FROM information_schema.columns 
+      WHERE table_name = 'products' 
+      AND table_schema = 'public'
+      ORDER BY ordinal_position
+    `;
+    
+    // Get all products
+    const allProducts = await sql`SELECT * FROM products LIMIT 5`;
+    
+    res.json({
+      success: true,
+      tableStructure: tableInfo,
+      sampleProducts: allProducts,
+      count: allProducts.length
+    });
+    
+  } catch (error) {
+    console.error('❌ Debug error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      stack: error.stack
+    });
+  }
+});
+
 export default router;
