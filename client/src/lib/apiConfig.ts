@@ -24,10 +24,17 @@ const config = {
 const RENDER_API_URL = config.renderApiUrl.replace(/\/$/, '');
 const VERCEL_API_URL = config.vercelApiUrl.replace(/\/$/, '');
 
-// Helper function to construct URLs safely
-const buildUrl = (baseUrl: string, path: string): string => {
+// Helper function to construct URLs safely with cache busting
+const buildUrl = (baseUrl: string, path: string, useCacheBust = false): string => {
   try {
-    return new URL(path, baseUrl).toString();
+    const url = new URL(path, baseUrl);
+    
+    // Add cache busting parameter for production to prevent stale cache issues
+    if (useCacheBust && config.isProduction) {
+      url.searchParams.set('_t', Date.now().toString());
+    }
+    
+    return url.toString();
   } catch (error) {
     console.error(`Error building URL for ${baseUrl}${path}:`, error);
     return `${baseUrl}${path}`;
@@ -48,8 +55,8 @@ export const API_ENDPOINTS = {
   RENDER: {
     PRODUCTS: buildUrl(RENDER_API_URL, '/api/products'),
     PRODUCT_BY_SLUG: (slug: string) => buildUrl(RENDER_API_URL, `/api/products/${slug}`),
-    REVIEWS: buildUrl(RENDER_API_URL, '/api/reviews'),
-    REVIEWS_BY_PRODUCT: (productId: number) => buildUrl(RENDER_API_URL, `/api/reviews/product/${productId}`),
+    REVIEWS: buildUrl(RENDER_API_URL, '/api/reviews', true), // Use cache busting
+    REVIEWS_BY_PRODUCT: (productId: number) => buildUrl(RENDER_API_URL, `/api/reviews/product/${productId}`, true), // Use cache busting
     CART_ADD: buildUrl(RENDER_API_URL, '/api/cart/add'),
     CART_REMOVE: buildUrl(RENDER_API_URL, '/api/cart/remove'),
     CART_CLEAR: buildUrl(RENDER_API_URL, '/api/cart/clear'),
@@ -101,11 +108,11 @@ export const getApiUrl = (endpoint: string): string => {
       return buildUrl(RENDER_API_URL, `/api/products/${slug}`);
     }
     if (normalizedEndpoint === '/api/reviews') {
-      return buildUrl(RENDER_API_URL, '/api/reviews');
+      return buildUrl(RENDER_API_URL, '/api/reviews', true); // Use cache busting
     }
     if (normalizedEndpoint.startsWith('/api/reviews/product/')) {
       const productId = normalizedEndpoint.replace('/api/reviews/product/', '');
-      return buildUrl(RENDER_API_URL, `/api/reviews/product/${productId}`);
+      return buildUrl(RENDER_API_URL, `/api/reviews/product/${productId}`, true); // Use cache busting
     }
     if (normalizedEndpoint === '/api/cart/add') {
       return buildUrl(RENDER_API_URL, '/api/cart/add');
