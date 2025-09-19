@@ -277,13 +277,18 @@ export default function AdminPage() {
   const fetchStripeOrders = async () => {
     try {
       setOrdersLoading(true);
-      const response = await apiRequest('GET', '/api/stripe/orders');
+      const response = await apiRequest('GET', '/api/orders');
       
       if (response.ok) {
-        const data = await response.json();
-        setOrders(data.orders);
+        const result = await response.json();
+        
+        // Handle both response formats:
+        // Local backend: direct array [...]
+        // Render backend: {success: true, data: [...]}
+        const orders = Array.isArray(result) ? result : (result.success ? result.data : []);
+        setOrders(orders);
       } else {
-        throw new Error("Failed to fetch Stripe orders");
+        throw new Error("Failed to fetch orders");
       }
     } catch (error) {
       console.error('Error fetching Stripe orders:', error);
@@ -471,7 +476,7 @@ export default function AdminPage() {
               <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
               <p className="mt-4 text-gray-600">Loading orders...</p>
             </div>
-          ) : orders.length === 0 ? (
+          ) : !orders || orders.length === 0 ? (
             <div className="text-center py-8 bg-gray-50 rounded-lg">
               <p className="text-gray-500">No orders found</p>
               <p className="text-sm text-gray-400 mt-2">Orders will appear here when customers make purchases</p>
@@ -490,7 +495,7 @@ export default function AdminPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {orders.map(order => (
+                  {(orders || []).map(order => (
                     <TableRow key={order.id}>
                       <TableCell className="font-medium">{order.id.substring(0, 8)}...</TableCell>
                       <TableCell>
