@@ -205,12 +205,15 @@ export default function AdminPage() {
       setLoading(true);
       // Use the buildApiUrl function to create the full URL
       const response = await fetch(buildApiUrl('/api/products'));
-      const data = await response.json();
-      setProducts(data);
+      const result = await response.json();
+      
+      // Extract the actual products array from the API response
+      const products = result.success ? result.data : [];
+      setProducts(products);
       
       // Initialize edited prices with current prices
       const initialPrices: Record<number, number> = {};
-      data.forEach((product: Product) => {
+      products.forEach((product: Product) => {
         initialPrices[product.id] = product.price;
       });
       setEditedPrices(initialPrices);
