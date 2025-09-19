@@ -528,7 +528,7 @@ router.get('/orders', async (req, res) => {
     console.log('Fetching orders...');
     
     // Use raw SQL to avoid schema conflicts
-    const allOrders = await sql`
+    const allOrders = await sql(`
       SELECT 
         id,
         user_id as "userId",
@@ -543,7 +543,7 @@ router.get('/orders', async (req, res) => {
         updated_at as "updatedAt"
       FROM orders 
       ORDER BY created_at DESC
-    `;
+    `);
     
     // Transform the data to match expected format
     const transformedOrders = allOrders.map(order => ({
