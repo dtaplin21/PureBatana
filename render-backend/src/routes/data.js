@@ -527,32 +527,48 @@ router.get('/orders', async (req, res) => {
   try {
     console.log('Fetching orders...');
     
-    // Try to fetch orders with new schema first
-    try {
-      const allOrders = await db
-        .select()
-        .from(orders)
-        .orderBy(desc(orders.createdAt));
-      
-      res.json({
-        success: true,
-        data: allOrders
-      });
-    } catch (schemaError) {
-      console.log('New schema failed, trying legacy schema...');
-      
-      // Fallback to legacy schema if new schema fails
-      const legacyOrders = await sql`
-        SELECT id, user_id, stripe_session_id, total_amount as total, status, created_at as "createdAt"
-        FROM orders 
-        ORDER BY created_at DESC
-      `;
-      
-      res.json({
-        success: true,
-        data: legacyOrders
-      });
-    }
+    // Use raw SQL to avoid schema conflicts
+    const allOrders = await sql`
+      SELECT 
+        id,
+        user_id as "userId",
+        COALESCE(total, total_amount, 0) as total,
+        status,
+        COALESCE(email, 'unknown@example.com') as email,
+        COALESCE(name, 'Unknown Customer') as name,
+        shipping_address as "shippingAddress",
+        billing_address as "billingAddress",
+        stripe_session_id as "stripeSessionId",
+        created_at as "createdAt",
+        updated_at as "updatedAt"
+      FROM orders 
+      ORDER BY created_at DESC
+    `;
+    
+    // Transform the data to match expected format
+    const transformedOrders = allOrders.map(order => ({
+      id: order.id,
+      userId: order.userId,
+      total: parseFloat(order.total || 0),
+      status: order.status || 'pending',
+      email: order.email,
+      name: order.name,
+      shippingAddress: order.shippingAddress,
+      billingAddress: order.billingAddress,
+      stripeSessionId: order.stripeSessionId,
+      createdAt: order.createdAt,
+      updatedAt: order.updatedAt,
+      // Add customer object for admin panel compatibility
+      customer: {
+        name: order.name,
+        email: order.email
+      }
+    }));
+    
+    res.json({
+      success: true,
+      data: transformedOrders
+    });
     
   } catch (error) {
     console.error('Error fetching orders:', error);
