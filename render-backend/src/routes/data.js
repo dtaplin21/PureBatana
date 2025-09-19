@@ -575,6 +575,8 @@ router.put('/products/:id/price', async (req, res) => {
     const { id } = req.params;
     const { price } = req.body;
     
+    console.log(`Updating product ${id} price to: ${price}`);
+    
     if (!price || isNaN(price)) {
       return res.status(400).json({
         success: false,
@@ -582,29 +584,33 @@ router.put('/products/:id/price', async (req, res) => {
       });
     }
     
-    // The price is already in cents from the frontend
-    const updatedProduct = await db
-      .update(products)
-      .set({ price: Math.round(price) })
-      .where(eq(products.id, parseInt(id)))
-      .returning();
+    // Use raw SQL to update the price (price is already in cents from frontend)
+    const result = await sql`
+      UPDATE products 
+      SET price = ${Math.round(price)}, updated_at = NOW()
+      WHERE id = ${parseInt(id)}
+      RETURNING *
+    `;
     
-    if (updatedProduct.length === 0) {
+    if (result.length === 0) {
       return res.status(404).json({
         success: false,
         error: 'Product not found'
       });
     }
     
+    console.log(`Product ${id} price updated successfully to: ${result[0].price}`);
+    
     res.json({
       success: true,
-      data: updatedProduct[0]
+      data: result[0]
     });
   } catch (error) {
     console.error('Error updating product price:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to update product price'
+      error: 'Failed to update product price',
+      details: error.message
     });
   }
 });
