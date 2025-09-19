@@ -1,4 +1,4 @@
-import { pgTable, serial, text, integer, decimal, timestamp, boolean } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, integer, decimal, timestamp, boolean, doublePrecision } from 'drizzle-orm/pg-core';
 
 export const products = pgTable('products', {
   id: serial('id').primaryKey(),
@@ -24,9 +24,14 @@ export const reviews = pgTable('reviews', {
 
 export const orders = pgTable('orders', {
   id: serial('id').primaryKey(),
-  userId: integer('user_id'),
-  stripeSessionId: text('stripe_session_id'),
-  totalAmount: decimal('total_amount', { precision: 10, scale: 2 }),
-  status: text('status').default('pending'),
-  createdAt: timestamp('created_at').defaultNow()
+  userId: integer('user_id').notNull(),
+  status: text('status').notNull().default('pending'),
+  total: doublePrecision('total').notNull(),
+  shippingAddress: text('shipping_address'),
+  billingAddress: text('billing_address'),
+  email: text('email').notNull(),
+  name: text('name').notNull(),
+  stripeSessionId: text('stripe_session_id'), // Keep for Stripe integration
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow()
 });

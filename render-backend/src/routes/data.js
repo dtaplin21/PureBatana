@@ -526,15 +526,34 @@ router.delete('/reviews/:reviewId', async (req, res) => {
 router.get('/orders', async (req, res) => {
   try {
     console.log('Fetching orders...');
-    const allOrders = await db
-      .select()
-      .from(orders)
-      .orderBy(desc(orders.createdAt));
     
-    res.json({
-      success: true,
-      data: allOrders
-    });
+    // Try to fetch orders with new schema first
+    try {
+      const allOrders = await db
+        .select()
+        .from(orders)
+        .orderBy(desc(orders.createdAt));
+      
+      res.json({
+        success: true,
+        data: allOrders
+      });
+    } catch (schemaError) {
+      console.log('New schema failed, trying legacy schema...');
+      
+      // Fallback to legacy schema if new schema fails
+      const legacyOrders = await sql`
+        SELECT id, user_id, stripe_session_id, total_amount as total, status, created_at as "createdAt"
+        FROM orders 
+        ORDER BY created_at DESC
+      `;
+      
+      res.json({
+        success: true,
+        data: legacyOrders
+      });
+    }
+    
   } catch (error) {
     console.error('Error fetching orders:', error);
     res.status(500).json({
