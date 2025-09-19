@@ -302,4 +302,49 @@ router.post('/webhook', express.raw({type: 'application/json'}), async (req, res
   res.json({ received: true });
 });
 
+// Test email endpoint
+router.post('/test-email', async (req, res) => {
+  try {
+    // Create test order data
+    const testOrderData = {
+      orderNumber: 'TEST123',
+      customerName: 'Test Customer',
+      customerEmail: 'dtaplin21@gmail.com', // Send test to yourself
+      items: [
+        {
+          name: 'Pure Batana Oil (Test)',
+          quantity: 1,
+          price: 29.95
+        }
+      ],
+      subtotal: 29.95,
+      shipping: 5.95,
+      total: 35.90,
+      shippingAddress: '123 Test St, Test City, CA 90210, USA',
+      dateCreated: new Date()
+    };
+    
+    // Test admin notification
+    const adminEmailSent = await sendAdminOrderNotification(testOrderData);
+    
+    // Test customer confirmation
+    const customerEmailSent = await sendOrderConfirmationEmail(testOrderData);
+    
+    res.json({
+      success: true,
+      adminEmailSent,
+      customerEmailSent,
+      message: 'Test emails sent to dtaplin21@gmail.com'
+    });
+    
+  } catch (error) {
+    console.error('Test email error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      message: 'SendGrid API key may not be configured'
+    });
+  }
+});
+
 export default router;
