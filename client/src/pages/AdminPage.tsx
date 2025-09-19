@@ -207,8 +207,10 @@ export default function AdminPage() {
       const response = await fetch(buildApiUrl('/api/products'));
       const result = await response.json();
       
-      // Extract the actual products array from the API response
-      const products = result.success ? result.data : [];
+      // Handle both response formats:
+      // Local backend: direct array [...]
+      // Render backend: {success: true, data: [...]}
+      const products = Array.isArray(result) ? result : (result.success ? result.data : []);
       setProducts(products);
       
       // Initialize edited prices with current prices
