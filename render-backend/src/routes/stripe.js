@@ -69,7 +69,7 @@ router.post('/create-payment-intent', async (req, res) => {
     console.log(`[${requestId}] Amount: ${amount}, Currency: ${currency}`);
     
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // Amount is already in cents
+      amount: Math.round(amount), // Amount is already in cents from frontend
       currency,
       metadata: {
         ...metadata,
