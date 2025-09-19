@@ -582,9 +582,10 @@ router.put('/products/:id/price', async (req, res) => {
       });
     }
     
+    // The price is already in cents from the frontend
     const updatedProduct = await db
       .update(products)
-      .set({ price: parseInt(price) })
+      .set({ price: Math.round(price) })
       .where(eq(products.id, parseInt(id)))
       .returning();
     
