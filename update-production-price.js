@@ -1,13 +1,15 @@
-import { neon } from '@neondatabase/serverless';
-import ws from 'ws';
+import postgres from 'postgres';
+import dotenv from 'dotenv';
 
-// Configure Neon with WebSocket
-const neonConfig = {
-  connectionString: process.env.DATABASE_URL,
-  webSocketConstructor: ws,
-};
+dotenv.config();
 
-const sql = neon(neonConfig);
+// Database connection
+const sql = postgres(process.env.DATABASE_URL, {
+  max: 1,
+  idle_timeout: 0,
+  connect_timeout: 10,
+  ssl: 'require'
+});
 
 async function updateProductPrice() {
   try {

@@ -1,11 +1,19 @@
 #!/usr/bin/env node
 
-import { neon } from '@neondatabase/serverless';
+import postgres from 'postgres';
 import { eq } from 'drizzle-orm';
 import { products } from './lib/schema.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // Database connection
-const sql = neon(process.env.DATABASE_URL);
+const sql = postgres(process.env.DATABASE_URL, {
+  max: 1,
+  idle_timeout: 0,
+  connect_timeout: 10,
+  ssl: 'require'
+});
 
 async function updateProductPrice(productId, newPrice) {
   try {

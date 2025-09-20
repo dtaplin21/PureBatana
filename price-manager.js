@@ -1,10 +1,18 @@
 #!/usr/bin/env node
 
-import { neon } from '@neondatabase/serverless';
+import postgres from 'postgres';
 import readline from 'readline';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // Database connection
-const sql = neon(process.env.DATABASE_URL);
+const sql = postgres(process.env.DATABASE_URL, {
+  max: 1,
+  idle_timeout: 0,
+  connect_timeout: 10,
+  ssl: 'require'
+});
 
 // Create readline interface
 const rl = readline.createInterface({

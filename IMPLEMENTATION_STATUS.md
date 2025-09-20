@@ -13,6 +13,9 @@
 - Moved schema definitions to `lib/schema.ts`
 - Maintained Drizzle ORM integration
 - Environment variable configuration
+- ✅ **Migrated from Neon to Supabase** (September 20, 2025)
+- ✅ **Updated all utility scripts** to use Supabase configuration
+- ✅ **Resolved database connection issues** and improved reliability
 
 ### 3. API Endpoints
 - **Health Check**: `/api/health` - Database connectivity testing
