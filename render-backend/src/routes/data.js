@@ -105,26 +105,29 @@ router.get('/products', async (req, res) => {
       });
     }
     
-    const allProducts = await db.select().from(products);
+    // Use raw SQL to get products (same as price update endpoint)
+    const allProducts = await client`
+      SELECT * FROM products ORDER BY id
+    `;
     
     // Add review count to each product and transform to match frontend Product type
     const productsWithReviewCount = await Promise.all(
       allProducts.map(async (product) => {
-        const reviewCount = await db
-          .select({ count: sql`count(*)` })
-          .from(reviews)
-          .where(eq(reviews.productId, product.id));
+        // Get review count using raw SQL
+        const reviewCountResult = await client`
+          SELECT COUNT(*) as count FROM reviews WHERE product_id = ${product.id}
+        `;
         
         return {
           id: product.id,
           name: product.name,
           slug: product.slug,
           description: product.description,
-          shortDescription: product.shortDescription || product.description.substring(0, 100) + '...',
-          price: parseFloat(product.price), // Convert decimal to number
-          images: product.images || [product.imageUrl || '/images/batana-front.jpg'],
+          shortDescription: product.short_description || product.description.substring(0, 100) + '...',
+          price: parseFloat(product.price), // Convert to number
+          images: product.images || [product.image_url || '/images/batana-front.jpg'],
           category: product.category || 'skincare',
-          stock: product.stock || (product.inStock ? 100 : 0),
+          stock: product.stock || (product.in_stock ? 100 : 0),
           featured: product.featured || false,
           benefits: product.benefits || [
             '100% Pure and Natural',
@@ -133,10 +136,10 @@ router.get('/products', async (req, res) => {
             'Moisturizes and Nourishes'
           ],
           usage: product.usage || 'Apply a few drops to clean skin or hair. Massage gently until absorbed.',
-          isBestseller: product.isBestseller || false,
-          isNew: product.isNew || false,
-          viewCount: product.viewCount || 0,
-          reviewCount: reviewCount[0]?.count || 0
+          isBestseller: product.is_bestseller || false,
+          isNew: product.is_new || false,
+          viewCount: product.view_count || 0,
+          reviewCount: parseInt(reviewCountResult[0]?.count || 0)
         };
       })
     );
