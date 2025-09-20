@@ -569,7 +569,7 @@ router.delete('/cart/clear', async (req, res) => {
   });
 });
 
-// Update product price (admin endpoint)
+// Update product price (admin endpoint) - Quick Fix Version
 router.put('/products/:id/price', async (req, res) => {
   try {
     const { id } = req.params;
@@ -584,18 +584,55 @@ router.put('/products/:id/price', async (req, res) => {
       });
     }
     
-    // For now, return success without actually updating the database
-    // This will allow the admin panel to work while we debug the database issue
-    console.log(`✅ Price update simulated - Product ${id} price set to ${price} cents`);
-    
-    res.json({
-      success: true,
-      data: {
-        id: parseInt(id),
-        price: Math.round(price),
-        message: 'Price update simulated (database update temporarily disabled)'
+    // Quick fix: Use raw SQL with error handling for different schema types
+    try {
+      // Try integer update first (cents)
+      const result = await sql`
+        UPDATE products 
+        SET price = ${Math.round(price)}, updated_at = NOW()
+        WHERE id = ${parseInt(id)}
+        RETURNING *
+      `;
+      
+      if (result.length === 0) {
+        return res.status(404).json({
+          success: false,
+          error: 'Product not found'
+        });
       }
-    });
+      
+      console.log(`✅ Price updated successfully - Product ${id} price set to ${result[0].price}`);
+      
+      res.json({
+        success: true,
+        data: result[0]
+      });
+      
+    } catch (dbError) {
+      console.log('⚠️  Integer update failed, trying decimal update:', dbError.message);
+      
+      // Fallback: Try decimal update (dollars)
+      const result = await sql`
+        UPDATE products 
+        SET price = ${Math.round(price) / 100}, updated_at = NOW()
+        WHERE id = ${parseInt(id)}
+        RETURNING *
+      `;
+      
+      if (result.length === 0) {
+        return res.status(404).json({
+          success: false,
+          error: 'Product not found'
+        });
+      }
+      
+      console.log(`✅ Price updated successfully (decimal) - Product ${id} price set to ${result[0].price}`);
+      
+      res.json({
+        success: true,
+        data: result[0]
+      });
+    }
     
   } catch (error) {
     console.error('Error updating product price:', error);
