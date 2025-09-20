@@ -351,7 +351,7 @@ router.post('/reviews', async (req, res) => {
     res.status(500).json({ 
       success: false,
       error: 'Failed to create review',
-      details: error.message 
+      details: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -567,7 +567,7 @@ router.post('/create-payment-intent', async (req, res) => {
     res.status(500).json({ 
       success: false,
       error: 'Failed to create payment intent',
-      message: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error',
+      message: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.message : String(error)) : 'Internal server error',
       timestamp: new Date().toISOString()
     });
   }
@@ -664,11 +664,11 @@ router.post('/stripe/webhook', express.raw({type: 'application/json'}), async (r
       return res.status(400).json({ error: 'Webhook secret not configured' });
     }
     
-    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+    event = stripe.webhooks.constructEvent(req.body, sig as string, webhookSecret);
     console.log(`Received webhook event: ${event.type}`);
     
   } catch (err) {
-    console.error(`Webhook signature verification failed: ${err.message}`);
+    console.error(`Webhook signature verification failed: ${err instanceof Error ? err.message : String(err)}`);
     return res.status(400).json({ error: 'Invalid signature' });
   }
   
@@ -688,7 +688,7 @@ router.post('/stripe/webhook', express.raw({type: 'application/json'}), async (r
         orderNumber: session.id.substring(0, 8).toUpperCase(), // Use first 8 chars of session ID
         customerName: metadata.customerName || session.customer_details?.name || 'Customer',
         customerEmail: session.customer_details?.email || metadata.email || 'unknown@example.com',
-        items: orderItems.map(item => ({
+        items: orderItems.map((item: any) => ({
           name: `Product ${item.id}`,
           quantity: item.quantity || 1,
           price: (item.price || 0) / 100 // Convert cents to dollars
