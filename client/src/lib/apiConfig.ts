@@ -23,6 +23,7 @@ const config = {
 // Clean URLs (remove trailing slashes)
 const RENDER_API_URL = config.renderApiUrl.replace(/\/$/, '');
 const VERCEL_API_URL = config.vercelApiUrl.replace(/\/$/, '');
+const LOCAL_API_URL = 'http://localhost:5000';
 
 // Helper function to construct URLs safely with cache busting
 const buildUrl = (baseUrl: string, path: string, useCacheBust = false): string => {
@@ -101,6 +102,10 @@ export const getApiUrl = (endpoint: string): string => {
     // ALL OTHER ENDPOINTS NOW GO TO RENDER BACKEND
     // Handle specific Render endpoints using buildUrl for consistency
     if (normalizedEndpoint === '/api/products') {
+      // Use local server for admin panel when running locally
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return buildUrl(LOCAL_API_URL, '/api/products');
+      }
       return buildUrl(RENDER_API_URL, '/api/products');
     }
     if (normalizedEndpoint.startsWith('/api/products/') && normalizedEndpoint !== '/api/products') {
@@ -124,6 +129,10 @@ export const getApiUrl = (endpoint: string): string => {
       return buildUrl(RENDER_API_URL, '/api/cart/clear');
     }
     if (normalizedEndpoint.startsWith('/api/orders')) {
+      // Use local server for admin panel when running locally
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return buildUrl(LOCAL_API_URL, '/api/orders');
+      }
       return buildUrl(RENDER_API_URL, '/api/orders');
     }
     
