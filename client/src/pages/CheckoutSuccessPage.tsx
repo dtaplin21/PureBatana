@@ -4,7 +4,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
 
 // Lazy load Stripe only when needed
-const getStripePromise = async () => {
+const stripePromise = (async () => {
   const { loadStripe } = await import('@stripe/stripe-js');
   const LIVE_STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
   
@@ -14,7 +14,7 @@ const getStripePromise = async () => {
   }
   
   return loadStripe(LIVE_STRIPE_PUBLIC_KEY);
-};
+})();
 
 const CheckoutSuccessPage: React.FC = () => {
   const [location] = useLocation();

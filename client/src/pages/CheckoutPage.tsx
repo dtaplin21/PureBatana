@@ -17,7 +17,7 @@ import {
 } from "@stripe/react-stripe-js";
 
 // Lazy load Stripe only when needed
-const getStripePromise = async () => {
+const stripePromise = (async () => {
   const { loadStripe } = await import('@stripe/stripe-js');
   const LIVE_STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
   
@@ -27,7 +27,7 @@ const getStripePromise = async () => {
   }
   
   return loadStripe(LIVE_STRIPE_PUBLIC_KEY);
-};
+})();
 
 // Payment form component using Stripe Elements
 function CheckoutForm({ 
