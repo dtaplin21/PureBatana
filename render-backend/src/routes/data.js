@@ -644,32 +644,39 @@ router.put('/products/:id/price', async (req, res) => {
   }
 });
 
-// Diagnostic endpoint to check database connection and table structure
-router.get('/debug/products', async (req, res) => {
+// Simple test endpoint for price updates
+router.put('/test-price-update/:id', async (req, res) => {
   try {
-    console.log('🔍 Debugging products table...');
+    const { id } = req.params;
+    const { price } = req.body;
     
-    // Check if products table exists and get its structure
-    const tableInfo = await sql`
-      SELECT column_name, data_type, is_nullable 
-      FROM information_schema.columns 
-      WHERE table_name = 'products' 
-      AND table_schema = 'public'
-      ORDER BY ordinal_position
+    console.log(`🧪 Test price update - Product ID: ${id}, Price: ${price}`);
+    console.log('Client available:', !!client);
+    console.log('Database URL available:', !!connectionString);
+    
+    if (!client) {
+      return res.status(500).json({
+        success: false,
+        error: 'Database client not available'
+      });
+    }
+    
+    // Simple test update
+    const result = await client`
+      UPDATE products 
+      SET price = ${Math.round(price)}
+      WHERE id = ${parseInt(id)}
+      RETURNING id, name, price
     `;
-    
-    // Get all products
-    const allProducts = await sql`SELECT * FROM products LIMIT 5`;
     
     res.json({
       success: true,
-      tableStructure: tableInfo,
-      sampleProducts: allProducts,
-      count: allProducts.length
+      data: result[0],
+      message: 'Test update successful'
     });
     
   } catch (error) {
-    console.error('❌ Debug error:', error);
+    console.error('❌ Test update error:', error);
     res.status(500).json({
       success: false,
       error: error.message,
