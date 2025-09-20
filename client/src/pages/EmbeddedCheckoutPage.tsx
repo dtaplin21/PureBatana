@@ -5,8 +5,18 @@ import { useCart } from '../context/CartContext';
 import { useLocation } from 'wouter';
 import { paymentService } from '../lib/paymentService';
 
-const LIVE_STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
-const stripePromise = loadStripe(LIVE_STRIPE_PUBLIC_KEY);
+// Lazy load Stripe only when needed
+const getStripePromise = async () => {
+  const { loadStripe } = await import('@stripe/stripe-js');
+  const LIVE_STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+  
+  if (!LIVE_STRIPE_PUBLIC_KEY) {
+    console.warn('⚠️ VITE_STRIPE_PUBLIC_KEY not set - Stripe functionality disabled');
+    return null;
+  }
+  
+  return loadStripe(LIVE_STRIPE_PUBLIC_KEY);
+};
 
 // Payment form component using Stripe Elements
 function CheckoutForm({ 
