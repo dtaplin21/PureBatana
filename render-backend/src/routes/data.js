@@ -586,8 +586,8 @@ router.put('/products/:id/price', async (req, res) => {
     
     // Quick fix: Use raw SQL with error handling for different schema types
     try {
-      // Try integer update first (cents)
-      const result = await sql`
+      // Try integer update first (cents) using postgres connection
+      const result = await client`
         UPDATE products 
         SET price = ${Math.round(price)}, updated_at = NOW()
         WHERE id = ${parseInt(id)}
@@ -612,7 +612,7 @@ router.put('/products/:id/price', async (req, res) => {
       console.log('⚠️  Integer update failed, trying decimal update:', dbError.message);
       
       // Fallback: Try decimal update (dollars)
-      const result = await sql`
+      const result = await client`
         UPDATE products 
         SET price = ${Math.round(price) / 100}, updated_at = NOW()
         WHERE id = ${parseInt(id)}
