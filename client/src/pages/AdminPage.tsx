@@ -213,10 +213,12 @@ export default function AdminPage() {
       const products = Array.isArray(result) ? result : (result.success ? result.data : []);
       setProducts(products);
       
-      // Initialize edited prices with current prices
+      // Initialize edited prices with current prices (convert cents to dollars for display)
       const initialPrices: Record<number, number> = {};
       products.forEach((product: Product) => {
-        initialPrices[product.id] = product.price;
+        // Convert price to dollars for admin input (if price >= 100, it's in cents)
+        const priceInDollars = product.price < 100 ? product.price : product.price / 100;
+        initialPrices[product.id] = priceInDollars;
       });
       setEditedPrices(initialPrices);
     } catch (error) {
@@ -441,7 +443,7 @@ export default function AdminPage() {
                 <CardFooter className="flex justify-end">
                   <Button 
                     onClick={() => updateProductPrice(product.id)} 
-                    disabled={updating || editedPrices[product.id] === product.price}
+                    disabled={updating || editedPrices[product.id] === (product.price < 100 ? product.price : product.price / 100)}
                     className="bg-[#3a5a40] hover:bg-[#588157]"
                   >
                     {updating ? 'Updating...' : 'Update Price'}
