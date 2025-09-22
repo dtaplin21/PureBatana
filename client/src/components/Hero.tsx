@@ -40,6 +40,14 @@ export default function Hero() {
     }
   };
 
+  const handleBuyNow = () => {
+    if (product) {
+      // Add to cart then redirect to checkout
+      addToCart(product, 1);
+      window.location.href = '/checkout';
+    }
+  };
+
   // Show loading state
   if (isLoading) {
     return (
@@ -151,15 +159,7 @@ export default function Hero() {
             <div className="flex flex-wrap gap-3">
               <Button 
                 className="bg-[#3a5a40] hover:bg-[#588157] h-12 px-8" 
-                onClick={() => { 
-                  if (product) {
-                    addToCart(product, 1);
-                    toast({
-                      title: "Added to cart",
-                      description: `1 × ${product.name} added to your cart`,
-                    });
-                  }
-                }}
+                onClick={handleBuyNow}
               >
                 <i className="fas fa-credit-card mr-2"></i> Buy Now
               </Button>
