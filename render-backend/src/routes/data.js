@@ -43,7 +43,7 @@ const mockProducts = [
     name: "Pure Batana Oil",
     slug: "pure-batana-oil",
     description: "Premium 100% pure Batana oil for hair and skin care",
-    price: 29.95,
+    price: 1.00,
     imageUrl: "/images/batana-front.jpg",
     inStock: true,
     reviewCount: 15,
