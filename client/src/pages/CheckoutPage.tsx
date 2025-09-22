@@ -148,8 +148,10 @@ export default function CheckoutPage() {
   const [zip, setZip] = useState("");
   const [country, setCountry] = useState("United States");
   
-  // Fixed shipping fee
-  const shippingFee = 5.95;
+  // Shipping configuration
+  const FREE_SHIPPING = import.meta.env.VITE_FREE_SHIPPING === 'true';
+  const SHIPPING_COST = 5.95;
+  const shippingFee = FREE_SHIPPING ? 0 : SHIPPING_COST;
   const orderTotal = cartTotal + shippingFee;
   
   // Contact and shipping info objects

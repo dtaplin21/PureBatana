@@ -41,7 +41,10 @@ export default function CartPage() {
     );
   }
 
-  const shippingFee = cartTotal >= 50 ? 0 : 5.95;
+  // Shipping configuration
+  const FREE_SHIPPING = import.meta.env.VITE_FREE_SHIPPING === 'true';
+  const SHIPPING_COST = 5.95;
+  const shippingFee = FREE_SHIPPING ? 0 : SHIPPING_COST;
   const orderTotal = cartTotal + shippingFee;
 
   return (
@@ -95,7 +98,7 @@ export default function CartPage() {
               <div className="flex justify-between">
                 <span className="text-neutral-600">Shipping</span>
                 <span className="font-medium">
-                  {shippingFee === 0 ? "Free" : `$${shippingFee.toFixed(2)}`}
+                  {FREE_SHIPPING ? "Free" : `$${SHIPPING_COST.toFixed(2)}`}
                 </span>
               </div>
               
@@ -111,7 +114,7 @@ export default function CartPage() {
               <div className="bg-[#f8f7f4] p-3 rounded-md text-sm">
                 <p className="flex items-center mb-2">
                   <i className="fas fa-truck text-[#588157] mr-2"></i>
-                  <span>{cartTotal >= 50 ? "You qualify for free shipping!" : `Add $${(50 - cartTotal).toFixed(2)} more to qualify for free shipping`}</span>
+                  <span>Free shipping on all orders!</span>
                 </p>
                 <p className="flex items-center">
                   <i className="fas fa-shield-alt text-[#588157] mr-2"></i>
