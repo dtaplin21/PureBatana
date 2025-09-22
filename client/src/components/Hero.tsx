@@ -24,7 +24,7 @@ export default function Hero() {
       return result.data || result; // Handle different response formats
     },
     retry: 2, // Retry twice if it fails
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: 0, // No cache - always fetch fresh data
   });
   
   const { addToCart } = useCart();
