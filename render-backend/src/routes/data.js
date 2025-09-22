@@ -233,47 +233,51 @@ router.get('/products/:slug', async (req, res) => {
       });
     }
     
-    const product = await db
-      .select()
-      .from(products)
-      .where(eq(products.slug, slug))
-      .limit(1);
+    // Use raw SQL to get product with review count (same approach as price update)
+    const productResult = await client`
+      SELECT 
+        p.*,
+        COALESCE(r.review_count, 0) as review_count
+      FROM products p
+      LEFT JOIN (
+        SELECT product_id, COUNT(*) as review_count
+        FROM reviews
+        GROUP BY product_id
+      ) r ON p.id = r.product_id
+      WHERE p.slug = ${slug}
+      LIMIT 1
+    `;
     
-    if (product.length === 0) {
+    if (productResult.length === 0) {
       return res.status(404).json({
         success: false,
         error: 'Product not found'
       });
     }
     
-    // Add review count
-    const reviewCount = await db
-      .select({ count: sql`count(*)` })
-      .from(reviews)
-      .where(eq(reviews.productId, product[0].id));
-    
+    const product = productResult[0];
     const productWithReviewCount = {
-      id: product[0].id,
-      name: product[0].name,
-      slug: product[0].slug,
-      description: product[0].description,
-      shortDescription: product[0].shortDescription || product[0].description.substring(0, 100) + '...',
-      price: parseFloat(product[0].price), // Convert decimal to number
-      images: product[0].images || [product[0].imageUrl || '/images/batana-front.jpg'],
-      category: product[0].category || 'skincare',
-      stock: product[0].stock || (product[0].inStock ? 100 : 0),
-      featured: product[0].featured || false,
-      benefits: product[0].benefits || [
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      description: product.description,
+      shortDescription: product.short_description || product.description.substring(0, 100) + '...',
+      price: parseFloat(product.price), // Convert to number
+      images: product.images || [product.image_url || '/images/batana-front.jpg'],
+      category: product.category || 'skincare',
+      stock: product.stock || (product.in_stock ? 100 : 0),
+      featured: product.featured || false,
+      benefits: product.benefits || [
         '100% Pure and Natural',
         'Cold-Pressed Extraction',
         'Rich in Essential Fatty Acids',
         'Moisturizes and Nourishes'
       ],
-      usage: product[0].usage || 'Apply a few drops to clean skin or hair. Massage gently until absorbed.',
-      isBestseller: product[0].isBestseller || false,
-      isNew: product[0].isNew || false,
-      viewCount: product[0].viewCount || 0,
-      reviewCount: reviewCount[0]?.count || 0
+      usage: product.usage || 'Apply a few drops to clean skin or hair. Massage gently until absorbed.',
+      isBestseller: product.is_bestseller || false,
+      isNew: product.is_new || false,
+      viewCount: product.view_count || 0,
+      reviewCount: parseInt(product.review_count || 0)
     };
     
     res.json({
