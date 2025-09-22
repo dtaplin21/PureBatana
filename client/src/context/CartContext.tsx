@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { Product } from "@shared/schema";
+import { API_ENDPOINTS } from "@/lib/apiConfig";
 
 export interface CartItemType {
   product: Product;
@@ -12,6 +13,7 @@ interface CartContextType {
   removeItem: (productId: number) => void;
   updateQuantity: (productId: number, quantity: number) => void;
   clearCart: () => void;
+  refreshCartPrices: () => Promise<void>;
   cartTotal: number;
   cartCount: number;
   isLoading: boolean;
@@ -23,6 +25,7 @@ const CartContext = createContext<CartContextType>({
   removeItem: () => {},
   updateQuantity: () => {},
   clearCart: () => {},
+  refreshCartPrices: async () => {},
   cartTotal: 0,
   cartCount: 0,
   isLoading: true,
@@ -92,6 +95,37 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     setCart([]);
   };
 
+  // Refresh cart prices by fetching fresh product data
+  const refreshCartPrices = async () => {
+    if (cart.length === 0) return;
+    
+    try {
+      const updatedCart = await Promise.all(
+        cart.map(async (item) => {
+          try {
+            // Fetch fresh product data from API
+            const response = await fetch(`${API_ENDPOINTS.RENDER.PRODUCT_BY_SLUG(item.product.slug)}?t=${Date.now()}`);
+            const result = await response.json();
+            const freshProduct = result.data || result;
+            
+            return {
+              ...item,
+              product: freshProduct
+            };
+          } catch (error) {
+            console.error(`Failed to refresh price for product ${item.product.id}:`, error);
+            // Return original item if refresh fails
+            return item;
+          }
+        })
+      );
+      
+      setCart(updatedCart);
+    } catch (error) {
+      console.error('Failed to refresh cart prices:', error);
+    }
+  };
+
   // Calculate cart total (convert cents to dollars, handle both formats)
   const cartTotal = cart.reduce((total, item) => {
     // If price is less than 100, assume it's already in dollars
@@ -110,6 +144,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       removeItem,
       updateQuantity,
       clearCart,
+      refreshCartPrices,
       cartTotal,
       cartCount,
       isLoading

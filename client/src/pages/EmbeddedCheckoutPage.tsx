@@ -85,7 +85,7 @@ function CheckoutForm({
 }
 
 const EmbeddedCheckoutPage: React.FC = () => {
-  const { cart, clearCart } = useCart();
+  const { cart, clearCart, refreshCartPrices } = useCart();
   const [, setLocation] = useLocation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -120,6 +120,13 @@ const EmbeddedCheckoutPage: React.FC = () => {
       setLocation('/cart');
     }
   }, [cart, setLocation]);
+
+  // Refresh cart prices when embedded checkout page loads
+  useEffect(() => {
+    if (cart.length > 0) {
+      refreshCartPrices();
+    }
+  }, [cart.length, refreshCartPrices]);
 
   // Load the payment intent when necessary
   useEffect(() => {

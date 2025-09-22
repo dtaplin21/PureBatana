@@ -129,7 +129,7 @@ function CheckoutForm({
 
 export default function CheckoutPage() {
   const [location, setLocation] = useLocation();
-  const { cart, cartTotal, clearCart } = useCart();
+  const { cart, cartTotal, clearCart, refreshCartPrices } = useCart();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -170,6 +170,13 @@ export default function CheckoutPage() {
     country
   };
   
+  // Refresh cart prices when checkout page loads
+  useEffect(() => {
+    if (cart.length > 0) {
+      refreshCartPrices();
+    }
+  }, [cart.length, refreshCartPrices]);
+
   // Load the payment intent when necessary
   useEffect(() => {
     // Only create a payment intent once we have contact and shipping info

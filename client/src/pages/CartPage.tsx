@@ -3,12 +3,30 @@ import CartItem from "@/components/CartItem";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Separator } from "@/components/ui/separator";
+import { useState, useEffect } from "react";
 
 export default function CartPage() {
-  const { cart, removeItem, updateQuantity, clearCart, cartTotal, isLoading } = useCart();
+  const { cart, removeItem, updateQuantity, clearCart, cartTotal, isLoading, refreshCartPrices } = useCart();
+  const [isRefreshingPrices, setIsRefreshingPrices] = useState(false);
   
   // Calculate total quantity across all cart items
   const totalQuantity = cart.reduce((total, item) => total + item.quantity, 0);
+
+  // Refresh prices when cart page loads
+  useEffect(() => {
+    if (cart.length > 0 && !isLoading) {
+      refreshCartPrices();
+    }
+  }, [cart.length, isLoading, refreshCartPrices]);
+
+  const handleRefreshPrices = async () => {
+    setIsRefreshingPrices(true);
+    try {
+      await refreshCartPrices();
+    } finally {
+      setIsRefreshingPrices(false);
+    }
+  };
 
   // Loading state
   if (isLoading) {
@@ -49,7 +67,28 @@ export default function CartPage() {
 
   return (
     <div className="container mx-auto px-4 py-16">
-      <h1 className="font-display font-bold text-3xl text-[#3a5a40] mb-8">Your Cart</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="font-display font-bold text-3xl text-[#3a5a40]">Your Cart</h1>
+        <Button 
+          onClick={handleRefreshPrices}
+          disabled={isRefreshingPrices}
+          variant="outline"
+          size="sm"
+          className="border-[#3a5a40] text-[#3a5a40] hover:bg-[#3a5a40] hover:text-white"
+        >
+          {isRefreshingPrices ? (
+            <>
+              <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-[#3a5a40] border-t-transparent"></div>
+              Refreshing...
+            </>
+          ) : (
+            <>
+              <i className="fas fa-sync-alt mr-2"></i>
+              Refresh Prices
+            </>
+          )}
+        </Button>
+      </div>
       
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="lg:w-2/3">
