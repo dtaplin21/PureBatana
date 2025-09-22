@@ -43,7 +43,7 @@ const mockProducts = [
     name: "Pure Batana Oil",
     slug: "pure-batana-oil",
     description: "Premium 100% pure Batana oil for hair and skin care",
-    price: 1.00,
+    price: 2.50, // Updated to match current price
     imageUrl: "/images/batana-front.jpg",
     inStock: true,
     reviewCount: 15,
@@ -192,46 +192,49 @@ router.get('/products/:slug', async (req, res) => {
     const { slug } = req.params;
     console.log(`📦 Fetching product with slug: ${slug}`);
     
-    if (!db) {
-      console.log('📦 Using mock data (no database connection)');
-      const product = mockProducts.find(p => p.slug === slug);
-      if (!product) {
-        return res.status(404).json({
-          success: false,
-          error: 'Product not found'
-        });
-      }
-      
-      // Transform mock data to match frontend Product type
-      const transformedProduct = {
-        id: product.id,
-        name: product.name,
-        slug: product.slug,
-        description: product.description,
-        shortDescription: product.description.substring(0, 100) + '...',
-        price: parseFloat(product.price), // Convert string to number
-        images: [product.imageUrl || '/images/batana-front.jpg'],
-        category: 'skincare',
-        stock: product.inStock ? 100 : 0,
-        featured: false,
-        benefits: [
-          '100% Pure and Natural',
-          'Cold-Pressed Extraction',
-          'Rich in Essential Fatty Acids',
-          'Moisturizes and Nourishes'
-        ],
-        usage: 'Apply a few drops to clean skin or hair. Massage gently until absorbed.',
-        isBestseller: false,
-        isNew: true,
-        viewCount: 0,
-        reviewCount: product.reviewCount || 0
-      };
-      
-      return res.json({
-        success: true,
-        data: transformedProduct
+    // Temporarily use mock data to fix API hanging issues
+    console.log('📦 Using mock data (temporary fix for API issues)');
+    const product = mockProducts.find(p => p.slug === slug);
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        error: 'Product not found'
       });
     }
+    
+    // Transform mock data to match frontend Product type
+    const transformedProduct = {
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      description: product.description,
+      shortDescription: product.description.substring(0, 100) + '...',
+      price: parseFloat(product.price), // Convert string to number
+      images: [product.imageUrl || '/images/batana-front.jpg'],
+      category: 'skincare',
+      stock: product.inStock ? 100 : 0,
+      featured: false,
+      benefits: [
+        '100% Pure and Natural',
+        'Cold-Pressed Extraction',
+        'Rich in Essential Fatty Acids',
+        'Moisturizes and Nourishes'
+      ],
+      usage: 'Apply a few drops to clean skin or hair. Massage gently until absorbed.',
+      isBestseller: false,
+      isNew: true,
+      viewCount: 0,
+      reviewCount: product.reviewCount || 0
+    };
+    
+    return res.json({
+      success: true,
+      data: transformedProduct
+    });
+    
+    // Database logic commented out temporarily
+    /*
+    if (!db) {
     
     // Try to get product from database first
     try {
