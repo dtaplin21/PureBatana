@@ -12,12 +12,12 @@ export default function CartPage() {
   // Calculate total quantity across all cart items
   const totalQuantity = cart.reduce((total, item) => total + item.quantity, 0);
 
-  // Refresh prices when cart page loads
-  useEffect(() => {
-    if (cart.length > 0 && !isLoading) {
-      refreshCartPrices();
-    }
-  }, [cart.length, isLoading, refreshCartPrices]);
+  // Disable automatic refresh to prevent hanging - user can manually refresh
+  // useEffect(() => {
+  //   if (cart.length > 0 && !isLoading) {
+  //     refreshCartPrices();
+  //   }
+  // }, [cart.length, isLoading, refreshCartPrices]);
 
   const handleRefreshPrices = async () => {
     setIsRefreshingPrices(true);

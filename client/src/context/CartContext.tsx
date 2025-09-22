@@ -103,8 +103,20 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       const updatedCart = await Promise.all(
         cart.map(async (item) => {
           try {
-            // Fetch fresh product data from API
-            const response = await fetch(`${API_ENDPOINTS.RENDER.PRODUCT_BY_SLUG(item.product.slug)}?t=${Date.now()}`);
+            // Fetch fresh product data from API with timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+            
+            const response = await fetch(`${API_ENDPOINTS.RENDER.PRODUCT_BY_SLUG(item.product.slug)}?t=${Date.now()}`, {
+              signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
+            
             const result = await response.json();
             const freshProduct = result.data || result;
             

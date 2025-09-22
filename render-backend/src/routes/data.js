@@ -233,51 +233,88 @@ router.get('/products/:slug', async (req, res) => {
       });
     }
     
-    // Use raw SQL to get product with review count (same approach as price update)
-    const productResult = await client`
-      SELECT 
-        p.*,
-        COALESCE(r.review_count, 0) as review_count
-      FROM products p
-      LEFT JOIN (
-        SELECT product_id, COUNT(*) as review_count
-        FROM reviews
-        GROUP BY product_id
-      ) r ON p.id = r.product_id
-      WHERE p.slug = ${slug}
-      LIMIT 1
-    `;
+    // Try to get product from database first
+    try {
+      const productResult = await client`
+        SELECT 
+          p.*,
+          COALESCE(r.review_count, 0) as review_count
+        FROM products p
+        LEFT JOIN (
+          SELECT product_id, COUNT(*) as review_count
+          FROM reviews
+          GROUP BY product_id
+        ) r ON p.id = r.product_id
+        WHERE p.slug = ${slug}
+        LIMIT 1
+      `;
+      
+      if (productResult.length > 0) {
+        const product = productResult[0];
+        const productWithReviewCount = {
+          id: product.id,
+          name: product.name,
+          slug: product.slug,
+          description: product.description,
+          shortDescription: product.short_description || product.description.substring(0, 100) + '...',
+          price: parseFloat(product.price), // Convert to number
+          images: product.images || [product.image_url || '/images/batana-front.jpg'],
+          category: product.category || 'skincare',
+          stock: product.stock || (product.in_stock ? 100 : 0),
+          featured: product.featured || false,
+          benefits: product.benefits || [
+            '100% Pure and Natural',
+            'Cold-Pressed Extraction',
+            'Rich in Essential Fatty Acids',
+            'Moisturizes and Nourishes'
+          ],
+          usage: product.usage || 'Apply a few drops to clean skin or hair. Massage gently until absorbed.',
+          isBestseller: product.is_bestseller || false,
+          isNew: product.is_new || false,
+          viewCount: product.view_count || 0,
+          reviewCount: parseInt(product.review_count || 0)
+        };
+        
+        return res.json({
+          success: true,
+          data: productWithReviewCount
+        });
+      }
+    } catch (dbError) {
+      console.error('Database query failed, falling back to mock data:', dbError.message);
+    }
     
-    if (productResult.length === 0) {
+    // Fall back to mock data if database query fails
+    const mockProduct = mockProducts.find(p => p.slug === slug);
+    if (!mockProduct) {
       return res.status(404).json({
         success: false,
         error: 'Product not found'
       });
     }
     
-    const product = productResult[0];
     const productWithReviewCount = {
-      id: product.id,
-      name: product.name,
-      slug: product.slug,
-      description: product.description,
-      shortDescription: product.short_description || product.description.substring(0, 100) + '...',
-      price: parseFloat(product.price), // Convert to number
-      images: product.images || [product.image_url || '/images/batana-front.jpg'],
-      category: product.category || 'skincare',
-      stock: product.stock || (product.in_stock ? 100 : 0),
-      featured: product.featured || false,
-      benefits: product.benefits || [
+      id: mockProduct.id,
+      name: mockProduct.name,
+      slug: mockProduct.slug,
+      description: mockProduct.description,
+      shortDescription: mockProduct.description.substring(0, 100) + '...',
+      price: parseFloat(mockProduct.price), // Convert to number
+      images: [mockProduct.imageUrl || '/images/batana-front.jpg'],
+      category: 'skincare',
+      stock: mockProduct.inStock ? 100 : 0,
+      featured: false,
+      benefits: [
         '100% Pure and Natural',
         'Cold-Pressed Extraction',
         'Rich in Essential Fatty Acids',
         'Moisturizes and Nourishes'
       ],
-      usage: product.usage || 'Apply a few drops to clean skin or hair. Massage gently until absorbed.',
-      isBestseller: product.is_bestseller || false,
-      isNew: product.is_new || false,
-      viewCount: product.view_count || 0,
-      reviewCount: parseInt(product.review_count || 0)
+      usage: 'Apply a few drops to clean skin or hair. Massage gently until absorbed.',
+      isBestseller: false,
+      isNew: true,
+      viewCount: 0,
+      reviewCount: mockProduct.reviewCount || 0
     };
     
     res.json({

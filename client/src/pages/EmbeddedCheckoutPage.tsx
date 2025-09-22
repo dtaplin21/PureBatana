@@ -121,12 +121,12 @@ const EmbeddedCheckoutPage: React.FC = () => {
     }
   }, [cart, setLocation]);
 
-  // Refresh cart prices when embedded checkout page loads
-  useEffect(() => {
-    if (cart.length > 0) {
-      refreshCartPrices();
-    }
-  }, [cart.length, refreshCartPrices]);
+  // Disable automatic refresh to prevent hanging
+  // useEffect(() => {
+  //   if (cart.length > 0) {
+  //     refreshCartPrices();
+  //   }
+  // }, [cart.length, refreshCartPrices]);
 
   // Load the payment intent when necessary
   useEffect(() => {

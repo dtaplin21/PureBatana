@@ -170,12 +170,12 @@ export default function CheckoutPage() {
     country
   };
   
-  // Refresh cart prices when checkout page loads
-  useEffect(() => {
-    if (cart.length > 0) {
-      refreshCartPrices();
-    }
-  }, [cart.length, refreshCartPrices]);
+  // Disable automatic refresh to prevent hanging
+  // useEffect(() => {
+  //   if (cart.length > 0) {
+  //     refreshCartPrices();
+  //   }
+  // }, [cart.length, refreshCartPrices]);
 
   // Load the payment intent when necessary
   useEffect(() => {
