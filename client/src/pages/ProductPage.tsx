@@ -34,7 +34,7 @@ export default function ProductPage() {
   const { data: product, isLoading: productLoading, isError: productError } = useQuery<ProductWithMeta>({
     queryKey: [`/api/products/${slug}`],
     queryFn: async () => {
-      const response = await fetch(API_ENDPOINTS.VERCEL.PRODUCT_BY_SLUG(slug));
+      const response = await fetch(API_ENDPOINTS.RENDER.PRODUCT_BY_SLUG(slug));
       const result = await response.json();
       return result.data; // Extract the data from the API response
     }
@@ -45,7 +45,7 @@ export default function ProductPage() {
     queryKey: [`/api/reviews/product/${product?.id}`],
     enabled: !!product?.id, // Only run the query if we have a product ID
     queryFn: async () => {
-      const response = await fetch(API_ENDPOINTS.VERCEL.REVIEWS_BY_PRODUCT(product?.id || 0));
+      const response = await fetch(API_ENDPOINTS.RENDER.REVIEWS_BY_PRODUCT(product?.id || 0));
       const result = await response.json();
       return result.data; // Extract the data from the API response
     }
