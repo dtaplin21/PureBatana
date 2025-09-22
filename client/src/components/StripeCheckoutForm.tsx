@@ -75,7 +75,7 @@ export default function StripeCheckoutForm({ amount, orderItems, quantity, onSuc
     setIsProcessing(true);
 
     // Get the return URL for successful payments or cancellations
-    const returnUrl = `${window.location.origin}/checkout-success`;
+    const returnUrl = `${window.location.origin}/checkout/success`;
 
     try {
       console.log("Initiating payment confirmation");

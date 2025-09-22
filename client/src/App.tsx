@@ -33,7 +33,7 @@ function Router() {
           <Route path="/product/:slug" component={ProductPage} />
           <Route path="/cart" component={CartPage} />
           <Route path="/checkout" component={EmbeddedCheckoutPage} />
-          <Route path="/checkout-success" component={CheckoutSuccessPage} />
+          <Route path="/checkout/success" component={CheckoutSuccessPage} />
           <Route path="/orders" component={OrdersPage} />
           <Route path="/contact" component={ContactPage} />
           <Route path="/contact-simple" component={SimpleContactPage} />
