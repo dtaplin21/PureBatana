@@ -53,7 +53,7 @@ const mockProducts = [
     name: "Pure Batana Oil",
     slug: "pure-batana-oil",
     description: "Premium 100% pure Batana oil for hair and skin care",
-    price: 2.50, // Updated to match current price
+    price: 29.95, // Fallback price if database is unavailable
     imageUrl: "/images/batana-front.jpg",
     inStock: true,
     reviewCount: 15,
@@ -92,7 +92,7 @@ router.get('/products', async (req, res) => {
       });
     }
     
-    if (!db) {
+    if (!client) {
       console.log('📦 Using mock data (no database connection)');
       // Transform mock data to match frontend Product type
       const transformedMockProducts = mockProducts.map(product => ({
@@ -217,8 +217,64 @@ router.get('/products/:slug', async (req, res) => {
     const { slug } = req.params;
     console.log(`📦 Fetching product with slug: ${slug}`);
     
-    // Temporarily use mock data to fix API hanging issues
-    console.log('📦 Using mock data (temporary fix for API issues)');
+    // Try database first, fall back to mock data if needed
+    if (client) {
+      try {
+        console.log('📦 Fetching from database...');
+        const productResult = await client`
+          SELECT 
+            p.*,
+            COALESCE(r.review_count, 0) as review_count
+          FROM products p
+          LEFT JOIN (
+            SELECT product_id, COUNT(*) as review_count
+            FROM reviews
+            GROUP BY product_id
+          ) r ON p.id = r.product_id
+          WHERE p.slug = ${slug}
+          LIMIT 1
+        `.timeout(5000); // 5 second timeout
+        
+        if (productResult.length > 0) {
+          const product = productResult[0];
+          const productWithReviewCount = {
+            id: product.id,
+            name: product.name,
+            slug: product.slug,
+            description: product.description,
+            shortDescription: product.short_description || product.description.substring(0, 100) + '...',
+            price: parseFloat(product.price), // Convert to number
+            images: product.images || [product.image_url || '/images/batana-front.jpg'],
+            category: product.category || 'skincare',
+            stock: product.stock || (product.in_stock ? 100 : 0),
+            featured: product.featured || false,
+            benefits: product.benefits || [
+              '100% Pure and Natural',
+              'Cold-Pressed Extraction',
+              'Rich in Essential Fatty Acids',
+              'Moisturizes and Nourishes'
+            ],
+            usage: product.usage || 'Apply a few drops to clean skin or hair. Massage gently until absorbed.',
+            isBestseller: product.is_bestseller || false,
+            isNew: product.is_new || false,
+            viewCount: product.view_count || 0,
+            reviewCount: parseInt(product.review_count || 0)
+          };
+          
+          console.log(`✅ Found product in database: ${product.name} - $${product.price/100}`);
+          return res.json({
+            success: true,
+            data: productWithReviewCount
+          });
+        }
+      } catch (dbError) {
+        console.error('❌ Database query failed:', dbError.message);
+        console.log('📦 Falling back to mock data');
+      }
+    }
+    
+    // Fall back to mock data
+    console.log('📦 Using mock data (database unavailable)');
     const product = mockProducts.find(p => p.slug === slug);
     if (!product) {
       return res.status(404).json({
