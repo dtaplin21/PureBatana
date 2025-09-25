@@ -6,6 +6,11 @@ import { products, reviews, orders } from '../schema.js';
 
 const router = express.Router();
 
+// Simple in-memory cache (resets on server restart)
+let productsCache = null;
+let productsCacheTime = 0;
+const CACHE_DURATION = 30000; // 30 seconds cache
+
 // Database connection
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -18,9 +23,14 @@ if (connectionString) {
   try {
     client = postgres(connectionString, {
       ssl: 'require',
-      max: 1,
+      max: 10, // Increased from 1 to 10 for better concurrency
       idle_timeout: 20,
-      connect_timeout: 10,
+      connect_timeout: 10, // Increased back to 10 seconds for stability
+      prepare: true, // Enable prepared statements for better performance
+      debug: false, // Disable debug logging for production
+      transform: {
+        undefined: null, // Transform undefined to null for better DB compatibility
+      },
     });
     db = drizzle(client);
     console.log('✅ Database connected successfully');
@@ -72,6 +82,16 @@ router.get('/products', async (req, res) => {
   try {
     console.log('📦 Fetching all products...');
     
+    // Check cache first
+    const now = Date.now();
+    if (productsCache && (now - productsCacheTime) < CACHE_DURATION) {
+      console.log('📦 Using cached products data');
+      return res.json({
+        success: true,
+        data: productsCache
+      });
+    }
+    
     if (!db) {
       console.log('📦 Using mock data (no database connection)');
       // Transform mock data to match frontend Product type
@@ -106,6 +126,7 @@ router.get('/products', async (req, res) => {
     }
     
     // Use a single JOIN query to get products with review counts (fixes N+1 query problem)
+    // Add timeout and optimize query
     const allProducts = await client`
       SELECT 
         p.*,
@@ -117,7 +138,7 @@ router.get('/products', async (req, res) => {
         GROUP BY product_id
       ) r ON p.id = r.product_id
       ORDER BY p.id
-    `;
+    `.timeout(5000); // 5 second timeout
     
     // Transform products to match frontend Product type
     const productsWithReviewCount = allProducts.map((product) => {
@@ -145,6 +166,10 @@ router.get('/products', async (req, res) => {
         reviewCount: parseInt(product.review_count || 0)
       };
     });
+    
+    // Cache the result
+    productsCache = productsWithReviewCount;
+    productsCacheTime = Date.now();
     
     res.json({
       success: true,
@@ -651,6 +676,11 @@ router.put('/products/:id/price', async (req, res) => {
       }
       
       console.log(`✅ Price updated successfully - Product ${id} price set to ${result[0].price}`);
+      
+      // Invalidate cache when price is updated
+      productsCache = null;
+      productsCacheTime = 0;
+      console.log('🗑️ Products cache invalidated');
       
       res.json({
         success: true,
