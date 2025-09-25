@@ -257,9 +257,11 @@ router.get('/products/:slug', async (req, res) => {
       data: transformedProduct
     });
     
-    // Database logic commented out temporarily
+    // Database logic commented out temporarily - using mock data for now
     /*
     if (!db) {
+      // Database connection logic here
+    }
     
     // Try to get product from database first
     try {
@@ -311,8 +313,9 @@ router.get('/products/:slug', async (req, res) => {
     } catch (dbError) {
       console.error('Database query failed, falling back to mock data:', dbError.message);
     }
+    */
     
-    // Fall back to mock data if database query fails
+    // Fall back to mock data (current implementation)
     const mockProduct = mockProducts.find(p => p.slug === slug);
     if (!mockProduct) {
       return res.status(404).json({
