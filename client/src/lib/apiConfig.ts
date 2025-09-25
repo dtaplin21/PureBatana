@@ -25,6 +25,15 @@ const RENDER_API_URL = config.renderApiUrl.replace(/\/$/, '');
 const VERCEL_API_URL = config.vercelApiUrl.replace(/\/$/, '');
 const LOCAL_API_URL = 'http://localhost:5000';
 
+// Debug logging
+console.log('🔧 API Configuration:', {
+  hostname: window.location.hostname,
+  renderApiUrl: RENDER_API_URL,
+  vercelApiUrl: VERCEL_API_URL,
+  isProduction: config.isProduction,
+  envVar: import.meta.env.VITE_RENDER_API_URL
+});
+
 // Helper function to construct URLs safely with cache busting
 const buildUrl = (baseUrl: string, path: string, useCacheBust = false): string => {
   try {
@@ -133,7 +142,9 @@ export const getApiUrl = (endpoint: string): string => {
       if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         return buildUrl(LOCAL_API_URL, '/api/orders');
       }
-      return buildUrl(RENDER_API_URL, '/api/orders');
+      const ordersUrl = buildUrl(RENDER_API_URL, '/api/orders');
+      console.log('🔍 Orders URL constructed:', ordersUrl);
+      return ordersUrl;
     }
     
     // Default to Render for any other endpoints
