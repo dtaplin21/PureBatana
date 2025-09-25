@@ -1,0 +1,30 @@
+name: Keep Render Service Alive
+
+on:
+  schedule:
+    # Run every 10 minutes
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Ping Render Service
+      run: |
+        echo "🔄 Pinging Render service to prevent cold start..."
+        
+        # Ping health endpoint
+        curl -s -w "Health: %{http_code} (%{time_total}s)\n" \
+          https://purebatana.onrender.com/health
+        
+        # Ping products endpoint
+        curl -s -w "Products: %{http_code} (%{time_total}s)\n" \
+          https://purebatana.onrender.com/api/products
+        
+        # Ping specific product endpoint
+        curl -s -w "Product: %{http_code} (%{time_total}s)\n" \
+          https://purebatana.onrender.com/api/products/pure-batana-oil
+        
+        echo "✅ Keep-alive ping completed"
